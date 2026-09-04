@@ -19,7 +19,7 @@ services:
       - key: SECRETO_SESION
         generateValue: true
       - key: ORIGEN_PUBLICO
-        sync: false
+        value: https://oraculo1.onrender.com
       - key: DATA_DIR
         value: /data
       - key: UPLOAD_DIR

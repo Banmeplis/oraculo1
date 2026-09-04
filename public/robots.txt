@@ -1,6 +1,6 @@
-User-agent: *
+﻿User-agent: *
 Allow: /
 Disallow: /panel.html
 Disallow: /perfil.html
 
-Sitemap: https://tu-dominio.example/sitemap.xml
+Sitemap: https://oraculo1.onrender.com/sitemap.xml
