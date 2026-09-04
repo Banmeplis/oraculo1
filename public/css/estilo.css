@@ -576,6 +576,15 @@ h3 { font-size: 1.25rem; }
 .arcangel-regente .ar-info small { color: var(--lavanda-suave); letter-spacing: 2px; text-transform: uppercase; font-size: 0.72rem; }
 .arcangel-regente .ar-info h3 { font-family: var(--fuente-deco); color: rgba(var(--color-arc), 1); font-size: 1.5rem; margin: 2px 0 4px; text-shadow: 0 0 22px rgba(var(--color-arc), 0.55); }
 .arcangel-regente .ar-regencia { font-size: 0.85rem; color: var(--lavanda); letter-spacing: 0.5px; }
+.arcangel-regente .ar-fila { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.arcangel-regente .ar-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border-radius: 999px;
+  font-size: 0.82rem; font-weight: 600;
+  color: var(--nocturno);
+  background: linear-gradient(135deg, rgba(var(--chip), 0.95), rgba(var(--chip), 0.75));
+  box-shadow: 0 4px 14px rgba(var(--chip), 0.5);
+}
 .arcangel-regente .ar-mensaje { font-family: var(--fuente-serif); font-size: 1.15rem; color: var(--blanco-humo); margin-top: 10px; }
 @media (max-width: 760px) {
   .arcangel-regente { flex-direction: column; text-align: center; padding: 20px 18px; }
@@ -608,6 +617,14 @@ h3 { font-size: 1.25rem; }
   gap: 10px;
 }
 .bloque-categoria .cat-icono { font-size: 1.3rem; }
+.bloque-categoria h4 .cat-arc {
+  display: inline-flex; align-items: center; gap: 5px;
+  margin-left: 8px; padding: 3px 11px; border-radius: 999px;
+  font-size: 0.74rem; font-weight: 700; color: var(--nocturno);
+  background: linear-gradient(135deg, rgba(var(--chip), 0.95), rgba(var(--chip), 0.7));
+  box-shadow: 0 3px 10px rgba(var(--chip), 0.45);
+  vertical-align: middle;
+}
 .bloque-categoria p {
   font-family: var(--fuente-serif);
   font-size: 1.22rem;

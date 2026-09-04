@@ -87,38 +87,52 @@ const TIRADAS = {
 
   /* ------------------------- 7 arcángeles regentes ----------------------- */
   arcangeles: {
-    miguel:  { nombre: "Arcángel Miguel",  emoji: "⚔️", regencia: "Protección y fuerza",      color: "104, 140, 220",     mensaje: "El guerrero de la luz vigila tu camino y disuelve toda oscuridad que se interponga. Bajo su espada, tu protección está garantizada mientras avanzas con valor." },
-    gabriel: { nombre: "Arcángel Gabriel", emoji: "📯", regencia: "Mensajes y propósito",      color: "212, 175, 55",      mensaje: "El mensajero divino despeja tu mente y te trae claridad sobre el propósito de tu alma. Presta atención a las señales: a través de él el universo te habla." },
-    rafael:  { nombre: "Arcángel Rafael",  emoji: "🕯️", regencia: "Curación y guía",          color: "90, 200, 160",      mensaje: "El sanador ilumina las heridas que piden ser cuidadas, tanto del cuerpo como del alma. Su energía restauradora fluye hacia ti y te devuelve el equilibrio." },
-    uriel:   { nombre: "Arcángel Uriel",   emoji: "🔥", regencia: "Sabiduría y discernimiento", color: "230, 150, 60",      mensaje: "El portador de la luz te otorga la sabiduría para ver con claridad lo que está oculto. Confía en la certeza interior que enciende en tu corazón." },
-    zadkiel: { nombre: "Arcángel Zadkiel", emoji: "💜", regencia: "Misericordia y liberación", color: "160, 110, 240",     mensaje: "El ángel de la misericordia te ayuda a soltar culpas, viejos resentimientos y ataduras del pasado. Su presencia abre paso a un perdón que te libera." },
-    jofiel:  { nombre: "Arcángel Jofiel",  emoji: "🌞", regencia: "Belleza e inspiración",     color: "255, 170, 120",     mensaje: "El ángel de la belleza inunda tu vida de inspiración y te muestra la luz que hay incluso en los días grises. Rodeate de lo que te eleva y verás florecer tu mundo." },
-    chamuel: { nombre: "Arcángel Chamuel", emoji: "💗", regencia: "Paz y amor",               color: "240, 120, 150",     mensaje: "El ángel del amor puro trae paz a tus relaciones y reaviva los lazos más sinceros. A su calor, las puertas del corazón se abren a un afecto verdadero." }
+    miguel:  { nombre: "Arcángel Miguel",  emoji: "⚔️", regencia: "Protección y fuerza",      color: "104, 140, 220",     mensaje: "El guerrero de la luz vigila tu camino y disuelve toda oscuridad que se interponga. Bajo su espada, tu protección está garantizada mientras avanzas con valor.", consejo: "Te doy valor: no camines con miedo, camina con firmeza y nos defenderé la retaguardia." },
+    gabriel: { nombre: "Arcángel Gabriel", emoji: "📯", regencia: "Mensajes y propósito",      color: "212, 175, 55",      mensaje: "El mensajero divino despeja tu mente y te trae claridad sobre el propósito de tu alma. Presta atención a las señales: a través de él el universo te habla.", consejo: "Te traigo el mensaje que esperabas: escucha con el corazón abierto y la respuesta llegará." },
+    rafael:  { nombre: "Arcángel Rafael",  emoji: "🕯️", regencia: "Curación y guía",          color: "90, 200, 160",      mensaje: "El sanador ilumina las heridas que piden ser cuidadas, tanto del cuerpo como del alma. Su energía restauradora fluye hacia ti y te devuelve el equilibrio.", consejo: "Te curo y te sostengo: respira, suelta el dolor y deja que la sanación invada tu ser." },
+    uriel:   { nombre: "Arcángel Uriel",   emoji: "🔥", regencia: "Sabiduría y discernimiento", color: "230, 150, 60",      mensaje: "El portador de la luz te otorga la sabiduría para ver con claridad lo que está oculto. Confía en la certeza interior que enciende en tu corazón.", consejo: "Te doy discernimiento: no actúes por impulso, mira con luz interior y decide en paz." },
+    zadkiel: { nombre: "Arcángel Zadkiel", emoji: "💜", regencia: "Misericordia y liberación", color: "160, 110, 240",     mensaje: "El ángel de la misericordia te ayuda a soltar culpas, viejos resentimientos y ataduras del pasado. Su presencia abre paso a un perdón que te libera.", consejo: "Te libero de culpas: perdónate y perdona, y sentirás cuán ligera es tu alma." },
+    jofiel:  { nombre: "Arcángel Jofiel",  emoji: "🌞", regencia: "Belleza e inspiración",     color: "255, 170, 120",     mensaje: "El ángel de la belleza inunda tu vida de inspiración y te muestra la luz que hay incluso en los días grises. Rodeate de lo que te eleva y verás florecer tu mundo.", consejo: "Te inspiro y te ilumino: busca la belleza que te rodea y ella te guiará." },
+    chamuel: { nombre: "Arcángel Chamuel", emoji: "💗", regencia: "Paz y amor",               color: "240, 120, 150",     mensaje: "El ángel del amor puro trae paz a tus relaciones y reaviva los lazos más sinceros. A su calor, las puertas del corazón se abren a un afecto verdadero.", consejo: "Te doy amor y paz: abre el corazón y deja que el amor fluya sin miedo." }
   },
 
+  /* selecciona de 2 a 7 arcángeles, en proporción a la cantidad de cartas */
+  arcangelesDeLectura(resultado) {
+    const n = (resultado.cartas || []).length;
+    let min, max;
+    if (n <= 1)      { min = 2; max = 3; }
+    else if (n <= 3) { min = 3; max = 4; }
+    else if (n <= 5) { min = 4; max = 5; }
+    else             { min = 5; max = 7; }
+    const cantidad = min + Math.floor(Math.random() * (max - min + 1));
+    const barajado = this.barajar(Object.keys(this.arcangeles));
+    return barajado.slice(0, Math.min(cantidad, 7)).map(clave => ({ clave, ...this.arcangeles[clave] }));
+  },
+
+  /* arcángel que se encarga de cada área (rota entre los elegidos) */
+  arcangelDeArea(arcangeles, indice) {
+    return arcangeles[indice % arcangeles.length];
+  },
+
+  /* arcángel regente principal de la lectura (el primero de los elegidos) */
   arcangelRegente(resultado) {
-    const claves = Object.keys(this.arcangeles);
-    const s = (resultado.cartas || [])
-      .map(c => c.nombre + c.arcana + (c.invertido ? "i" : "d"))
-      .join("|") + "||" + resultado.tirada.id;
-    let h = 2166136261;
-    for (let i = 0; i < s.length; i++) {
-      h ^= s.charCodeAt(i);
-      h = Math.imul(h, 16777619);
-    }
-    h = h >>> 0;
-    const clave = claves[h % claves.length];
-    return { clave, ...this.arcangeles[clave] };
+    const elegidos = resultado.__arcangeles || this.arcangelesDeLectura(resultado);
+    return elegidos[0];
   },
 
-  /* tiñe el fondo de la página con la energía del arcángel regente */
-  aplicarFondo(arcangel) {
-    const rgb = arcangel.color;
-    document.documentElement.style.setProperty("--color-arc", rgb);
+  /* tiñe el fondo con la energía de los arcángeles que guían la lectura */
+  aplicarFondo(arcangeles) {
+    const lista = Array.isArray(arcangeles) ? arcangeles : [arcangeles];
+    const primario = lista[0].color;
+    let grads = "";
+    lista.forEach((a, i) => {
+      const rgb = a.color;
+      const pos = (i % 2 === 0) ? "12% 10%" : "90% 95%";
+      grads += `radial-gradient(1000px 700px at ${pos}, rgba(${rgb},0.32), transparent 60%),`;
+    });
+    document.documentElement.style.setProperty("--color-arc", primario);
     document.body.style.background =
-      "radial-gradient(1100px 700px at 12% 10%, rgba(" + rgb + ",0.42), transparent 58%)," +
-      "radial-gradient(1000px 800px at 90% 95%, rgba(" + rgb + ",0.35), transparent 60%)," +
-      "radial-gradient(600px 500px at 50% 50%, rgba(" + rgb + ",0.18), transparent 65%)," +
+      grads +
       "linear-gradient(160deg, var(--nocturno) 0%, var(--nocturno2) 55%, #241650 100%)";
   },
 
@@ -169,7 +183,7 @@ const TIRADAS = {
     ].concat([{ cierre: true, texto: cierrePoderoso, cita }]);
   },
 
-  /* una línea por área, con la personalidad del arcángel regente al frente */
+  /* una línea por área, con la personalidad del arcángel al frente */
   fraseArea(arcangel, area) {
     const f = this.fraseArcangel(arcangel);
     return f[area];
@@ -177,15 +191,51 @@ const TIRADAS = {
 
   fraseArcangel(a) {
     const A = a.nombre;
+    const C = a.consejo || "";
     return {
-      economia: `${A}, señor de la ${a.regencia.toLowerCase()}, vela por esta área y te dice: la abundancia no es cuestión de suerte, sino de orden y de decisión. Confía en su guía para ordenar tus recursos y abrir el caudal que mereces.`,
-      amor: `${A} sostiene tu corazón en esta lectura: su energía de ${a.regencia.toLowerCase()} se derrama sobre tus vínculos para que el amor llegue, se sane o se libere tal como lo necesitas.`,
-      situacion: `Desde su reino de ${a.regencia.toLowerCase()}, ${A} despeja la niebla de tus circunstancias y te muestra lo que de verdad importa, para que decidas con claridad y sin miedo.`,
-      bloqueo: `${A} ilumina con su ${a.regencia.toLowerCase()} las cadenas invisibles que te retienen, y te da la fuerza para soltarlas una a una. Nada puede mantenerte atado cuando su luz te acompaña.`,
-      trabajo: `Con la sabiduría de su ${a.regencia.toLowerCase()}, ${A} orienta tu camino profesional y despeja el sendero hacia el reconocimiento y la meta que persigues.`,
-      futuro: `${A} despliega ante ti el mapa del porvenir: desde su ${a.regencia.toLowerCase()}, te asegura que lo que viene está alineado con tu propósito, si caminas con fe y decisión.`,
-      cierre: `${A} sella esta lectura con su presencia. No estás sola: un arcángel ha tomado tu mano para guiarte. Confía, actúa y deja que su luz te lleve.`
+      economia: `${A}, señor de la ${a.regencia.toLowerCase()}, vela por esta área y te dice: la abundancia no es cuestión de suerte, sino de orden y de decisión. Confía en su guía para ordenar tus recursos y abrir el caudal que mereces. ${C}`,
+      amor: `${A} sostiene tu corazón en esta lectura: su energía de ${a.regencia.toLowerCase()} se derrama sobre tus vínculos para que el amor llegue, se sane o se libere tal como lo necesitas. ${C}`,
+      situacion: `Desde su reino de ${a.regencia.toLowerCase()}, ${A} despeja la niebla de tus circunstancias y te muestra lo que de verdad importa, para que decidas con claridad y sin miedo. ${C}`,
+      bloqueo: `${A} ilumina con su ${a.regencia.toLowerCase()} las cadenas invisibles que te retienen, y te da la fuerza para soltarlas una a una. Nada puede mantenerte atado cuando su luz te acompaña. ${C}`,
+      trabajo: `Con la sabiduría de su ${a.regencia.toLowerCase()}, ${A} orienta tu camino profesional y despeja el sendero hacia el reconocimiento y la meta que persigues. ${C}`,
+      futuro: `${A} despliega ante ti el mapa del porvenir: desde su ${a.regencia.toLowerCase()}, te asegura que lo que viene está alineado con tu propósito, si caminas con fe y decisión. ${C}`,
+      cierre: `${A} sella esta lectura con su presencia. No estás sola: un arcángel ha tomado tu mano para guiarte. Confía, actúa y deja que su luz te lleve. ${C}`
     };
+  },
+
+  /* -------------------------- métodos de ayuda arcángel ------------------- */
+  nombreCorto(nombre) { return nombre.replace("Arcángel ", ""); },
+
+  nombresArcangeles(lista) {
+    if (lista.length <= 1) return lista[0].nombre;
+    const cortos = lista.map(a => this.nombreCorto(a.nombre));
+    return cortos.slice(0, -1).join(", ") + " y " + cortos.slice(-1);
+  },
+
+  listaRegencias(lista) {
+    if (lista.length <= 1) return lista[0].regencia + " · rey de esta lectura";
+    return lista.map(a => this.nombreCorto(a.nombre) + ": " + a.regencia.toLowerCase()).join("  ·  ");
+  },
+
+  /* un solo arcángel simbólico que representa la unión del coro (para el cierre) */
+  arcangelUnido(lista) {
+    return {
+      nombre: this.nombresArcangeles(lista),
+      regencia: "reunidos en una sola luz para ti",
+      color: this.coraz(lista),
+      consejo: "Hoy no caminas sola: somos varios los que sostenemos tu luz desde el cielo, y todos te acompañamos en este camino."
+    };
+  },
+
+  coraz(lista) {
+    return lista[Math.floor(lista.length / 2)].color;
+  },
+
+  mensajeUnido(lista) {
+    if (lista.length <= 1) return lista[0].mensaje;
+    const nombres = this.nombresArcangeles(lista);
+    const principal = lista[0];
+    return `Hoy, ${nombres} se reúnen ante ti como un consejo celestial. ${principal.nombre} toma la palabra en tu nombre, y juntos despejan tu camino con sus dones unidos: el amor, la fuerza, la claridad y la paz que tu alma necesita ahora.`;
   },
 
   /* -------------------------- motor de la lectura -------------------------- */
@@ -203,15 +253,18 @@ const TIRADAS = {
       <p class="comparte"><small>✨ Comparte tu resultado con quien quieras ✨</small></p>
     </div>`;
 
-    const arcangel = this.arcangelRegente(resultadoHTML);
-    this.aplicarFondo(arcangel);
+    const arcangeles = this.arcangelesDeLectura(resultadoHTML);
+    resultadoHTML.__arcangeles = arcangeles;
+    const arcangel = arcangeles[0];
+    this.aplicarFondo(arcangeles);
     html += `<div class="arcangel-regente vidrio">
       <div class="ar-seal">${arcangel.emoji}</div>
       <div class="ar-info">
-        <small>Tu lectura está regida por</small>
-        <h3>${arcangel.nombre}</h3>
-        <span class="ar-regencia">${arcangel.regencia} · rey de esta lectura</span>
-        <p class="ar-mensaje">${arcangel.mensaje}</p>
+        <small>${arcangeles.length > 1 ? "Tus arcángeles regentes se unen en esta lectura" : "Tu lectura está regida por"}</small>
+        <h3>${this.nombresArcangeles(arcangeles)}</h3>
+        <span class="ar-regencia">${this.listaRegencias(arcangeles)}</span>
+        <div class="ar-fila">${arcangeles.map(a => `<span class="ar-chip" style="--chip:${a.color}">${a.emoji} ${this.nombreCorto(a.nombre)}</span>`).join("")}</div>
+        <p class="ar-mensaje">${this.mensajeUnido(arcangeles)}</p>
       </div>
     </div>`;
 
@@ -233,18 +286,21 @@ const TIRADAS = {
 
     const finales = this.interpretacionFinal(resultadoHTML);
     let htmlFinal = `<div class="interpretacion-final"><h3 class="titulo-interp-final">✨ Interpretación final de tu tirada ✨</h3>`;
-    finales.forEach(b => {
+    finales.forEach((b, i) => {
+      const arcDeArea = this.arcangelDeArea(arcangeles, i);
       if (b.cierre) {
         htmlFinal += `<div class="mensaje-poderoso vidrio">
           <h3 style="color:var(--dorado)">El mensaje final</h3>
-          <p class="presencia-arc">${this.fraseArea(arcangel, "cierre")}</p>
+          <p class="presencia-arc">${this.fraseArea(this.arcangelUnido(arcangeles), "cierre")}</p>
           <p>${b.texto}</p>
           <p class="cita">"${b.cita}"</p>
         </div>`;
       } else {
         htmlFinal += `<div class="bloque-categoria vidrio">
-          <h4><span class="cat-icono">${b.icono}</span> ${b.titulo}</h4>
-          <p class="presencia-arc">${this.fraseArea(arcangel, b.area)}</p>
+          <h4><span class="cat-icono">${b.icono}</span> ${b.titulo}
+            <span class="cat-arc" style="--chip:${arcDeArea.color}">${arcDeArea.emoji} ${this.nombreCorto(arcDeArea.nombre)}</span>
+          </h4>
+          <p class="presencia-arc">${this.fraseArea(arcDeArea, b.area)}</p>
           <p>${b.texto}</p>
         </div>`;
       }
