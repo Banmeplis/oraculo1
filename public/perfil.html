@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi perfil · Oráculo</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔮</text></svg>">
+  <link rel="stylesheet" href="/css/estilo.css">
+</head>
+<body>
+
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="logo" href="/"><span>☾</span> Oráculo</a>
+      <nav class="menu">
+        <a href="/tarot.html">Tarot</a>
+        <a href="/blog.html">Blog</a>
+        <div id="zona-usuario"></div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="contenedor" style="max-width:640px">
+    <section class="titulo-seccion" style="margin-top:50px">
+      <div class="deco">☾ ✦ ☾</div>
+      <h2>Mi perfil</h2>
+      <p>Cuida tu presencia en el Oráculo</p>
+    </section>
+
+    <div class="tarjeta perfil-cabecera">
+      <div class="avatar" id="avatar-mostrar">O</div>
+      <div>
+        <h3 id="perfil-nombre"></h3>
+        <p id="perfil-email" style="color:var(--lavanda-suave)"></p>
+        <p id="perfil-rol" style="font-size:.85rem;color:var(--dorado)"></p>
+      </div>
+    </div>
+
+    <div id="aviso" class="oculto"></div>
+
+    <div class="tarjeta" style="margin-top:20px">
+      <h3>Editar información</h3>
+      <div class="campo" style="margin-top:16px">
+        <label for="pf-avatar">Foto de perfil (URL)</label>
+        <input type="text" id="pf-avatar" placeholder="https://... o /uploads/...">
+      </div>
+      <div class="campo">
+        <label for="pf-nombre">Nombre</label>
+        <input type="text" id="pf-nombre">
+      </div>
+      <div class="campo">
+        <label for="pf-bio">Sobre mí</label>
+        <textarea id="pf-bio" placeholder="Cuéntale al universo quién eres..."></textarea>
+      </div>
+      <div class="centrado">
+        <button class="btn btn-dorado" id="btn-guardar-perfil">Guardar cambios</button>
+      </div>
+    </div>
+
+    <div class="tarjeta" style="margin-top:20px">
+      <h3>Cambiar contraseña</h3>
+      <div id="aviso-pass" class="oculto"></div>
+      <div class="campo" style="margin-top:16px">
+        <label for="pf-actual">Contraseña actual</label>
+        <input type="password" id="pf-actual">
+      </div>
+      <div class="campo">
+        <label for="pf-nueva">Nueva contraseña</label>
+        <input type="password" id="pf-nueva">
+      </div>
+      <div class="centrado">
+        <button class="btn btn-lavanda" id="btn-cambiar-pass">Actualizar contraseña</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="pie">
+    <div class="logo"><span>☾</span> Oráculo</div>
+  </footer>
+
+  <script src="/js/app.js"></script>
+  <script>
+    function aviso(el, texto, tipo) {
+      el.classList.remove("oculto");
+      el.innerHTML = '<div class="aviso ' + tipo + '">' + texto + '</div>';
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      let perfil = null;
+      try {
+        const d = await fetchJSON("/api/sesion");
+        if (!d.user) { location.href = "/login.html?redir=perfil"; return; }
+        SESION._usuario = d.user;
+        SESION.renderizar();
+        perfil = await fetchJSON("/api/perfil");
+      } catch { location.href = "/login.html?redir=perfil"; return; }
+
+      document.getElementById("perfil-nombre").textContent = perfil.nombre;
+      document.getElementById("perfil-email").textContent = perfil.email;
+      document.getElementById("perfil-rol").textContent = perfil.rol === "admin" ? "Administradora" : "Autora";
+      document.getElementById("pf-nombre").value = perfil.nombre;
+      document.getElementById("pf-bio").value = perfil.bio || "";
+      document.getElementById("pf-avatar").value = perfil.avatar || "";
+      actualizarAvatar(perfil.avatar, perfil.nombre);
+
+      document.getElementById("pf-avatar").addEventListener("input", (e) => actualizarAvatar(e.target.value, perfil.nombre));
+      document.getElementById("pf-nombre").addEventListener("input", (e) => actualizarAvatar(document.getElementById("pf-avatar").value, e.target.value));
+
+      document.getElementById("btn-guardar-perfil").addEventListener("click", async () => {
+        const body = {
+          nombre: document.getElementById("pf-nombre").value.trim(),
+          bio: document.getElementById("pf-bio").value,
+          avatar: document.getElementById("pf-avatar").value.trim() || null
+        };
+        if (!body.nombre) { aviso(document.getElementById("aviso"), "El nombre no puede estar vacío", "error"); return; }
+        try {
+          await fetchJSON("/api/perfil", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+          aviso(document.getElementById("aviso"), "Perfil actualizado ✓", "ok");
+          SESION.cargar();
+        } catch (e) { aviso(document.getElementById("aviso"), e.message, "error"); }
+      });
+
+      document.getElementById("btn-cambiar-pass").addEventListener("click", async () => {
+        const actual = document.getElementById("pf-actual").value;
+        const nueva = document.getElementById("pf-nueva").value;
+        if (!actual || !nueva) { aviso(document.getElementById("aviso-pass"), "Completa ambos campos", "error"); return; }
+        try {
+          await fetchJSON("/api/perfil/password", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ actual, nueva }) });
+          aviso(document.getElementById("aviso-pass"), "Contraseña actualizada ✓", "ok");
+          document.getElementById("pf-actual").value = "";
+          document.getElementById("pf-nueva").value = "";
+        } catch (e) { aviso(document.getElementById("aviso-pass"), e.message, "error"); }
+      });
+    });
+
+    function actualizarAvatar(url, nombre) {
+      const av = document.getElementById("avatar-mostrar");
+      if (url) { av.style.backgroundImage = "url('" + url + "')"; av.textContent = ""; }
+      else { av.style.backgroundImage = ""; av.textContent = (nombre || "O").trim()[0].toUpperCase(); }
+    }
+  </script>
+</body>
+</html>

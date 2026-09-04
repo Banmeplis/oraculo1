@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi panel · Oráculo</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔮</text></svg>">
+  <link rel="stylesheet" href="/css/estilo.css">
+</head>
+<body>
+
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="logo" href="/"><span>☾</span> Oráculo</a>
+      <nav class="menu">
+        <a href="/tarot.html">Tarot</a>
+        <a href="/blog.html">Blog</a>
+        <div id="zona-usuario"></div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="contenedor">
+    <section class="titulo-seccion" style="margin-top:50px">
+      <div class="deco">✧ ✦ ✧</div>
+      <h2>Mi panel mágico</h2>
+      <p id="bienvenida"></p>
+    </section>
+
+    <div class="panel-layout">
+      <aside class="tarjeta panel-nav" style="padding:12px">
+        <a href="#" data-vista="nueva" class="activo">✍️ Nueva publicación</a>
+        <a href="#" data-vista="posts">📚 Mis publicaciones</a>
+        <a href="#" data-vista="lecturas">🔮 Mis lecturas</a>
+      </aside>
+
+      <div>
+        <!-- NUEVA PUBLICACIÓN -->
+        <section id="vista-nueva" class="tarjeta">
+          <h3>Escribe un nuevo artículo</h3>
+          <p style="color:var(--lavanda-suave);font-size:.92rem;margin-bottom:18px">
+            Usa formato ligero: <b># Título</b> para encabezados, <b>**negrita**</b>, listas con <b>-</b>, citas con <b>&gt;</b> e imágenes con <b>![texto](url)</b>.
+          </p>
+          <div id="aviso-nueva"></div>
+          <div class="campo">
+            <label for="p-titulo">Título *</label>
+            <input type="text" id="p-titulo" placeholder="El título de tu bendición">
+          </div>
+          <div class="campo">
+            <label for="p-resumen">Resumen</label>
+            <input type="text" id="p-resumen" placeholder="Una frase que invite a leer">
+          </div>
+          <div class="rejilla rejilla-2">
+            <div class="campo">
+              <label for="p-portada">Imagen de portada</label>
+              <input type="file" id="p-portada" accept="image/*">
+              <small style="color:var(--lavanda-suave)">Sube una imagen ilustrativa</small>
+            </div>
+            <div class="campo">
+              <label for="p-video">Video (opcional)</label>
+              <input type="file" id="p-video" accept="video/*">
+              <small style="color:var(--lavanda-suave)">MP4 · WebM (máx. 80 MB)</small>
+            </div>
+          </div>
+          <div class="campo">
+            <label for="p-cuerpo">Contenido</label>
+            <textarea id="p-cuerpo" style="min-height:260px" placeholder="Comparte tu sabiduría..."></textarea>
+          </div>
+          <div class="campo">
+            <label><input type="checkbox" id="p-publicado" checked> &nbsp;Publicar de inmediato</label>
+          </div>
+          <button class="btn btn-dorado" id="btn-publicar">Publicar en el blog</button>
+        </section>
+
+        <!-- MIS PUBLICACIONES -->
+        <section id="vista-posts" class="oculto">
+          <div id="lista-posts-panel"></div>
+        </section>
+
+        <!-- MIS LECTURAS -->
+        <section id="vista-lecturas" class="oculto">
+          <h3>Mis lecturas guardadas</h3>
+          <div id="lista-lecturas"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="pie">
+    <div class="logo"><span>☾</span> Oráculo</div>
+  </footer>
+
+  <script src="/js/app.js"></script>
+  <script>
+    let archivoPortada = null, archivoVideo = null;
+    const aviso = document.getElementById("aviso-nueva");
+
+    function mostrar(texto, tipo) { aviso.innerHTML = '<div class="aviso ' + tipo + '">' + texto + '</div>'; }
+    function recargarNav() { SESION.cargar(); }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      if (new URLSearchParams(location.search).get("bienvenida")) {
+        document.getElementById("bienvenida").innerHTML =
+          '<div class="aviso ok">✦ Cuenta creada e inicio de sesión correctos. Que tu camino se ilumine.</div>';
+      }
+      try {
+        const d = await fetchJSON("/api/sesion");
+        if (!d.user) { location.href = "/login.html?redir=panel"; return; }
+        SESION._usuario = d.user;
+        SESION.renderizar();
+      } catch { location.href = "/login.html?redir=panel"; }
+      cargarPostsPanel();
+      cargarLecturas();
+    });
+
+    /* pestañas */
+    document.querySelectorAll(".panel-nav a").forEach(a => {
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        document.querySelectorAll(".panel-nav a").forEach(x => x.classList.remove("activo"));
+        a.classList.add("activo");
+        ["nueva", "posts", "lecturas"].forEach(v =>
+          document.getElementById("vista-" + v).classList.toggle("oculto", v !== a.dataset.vista));
+        if (a.dataset.vista === "posts") cargarPostsPanel();
+        if (a.dataset.vista === "lecturas") cargarLecturas();
+      });
+    });
+
+    /* archivos */
+    document.getElementById("p-portada").addEventListener("change", async (e) => {
+      const f = e.target.files[0]; if (!f) return;
+      try { archivoPortada = await subirArchivo(f); mostrar("Imagen subida ✓", "ok"); }
+      catch (err) { mostrar(err.message, "error"); }
+    });
+    document.getElementById("p-video").addEventListener("change", async (e) => {
+      const f = e.target.files[0]; if (!f) return;
+      try { archivoVideo = await subirArchivo(f); mostrar("Video subido ✓", "ok"); }
+      catch (err) { mostrar(err.message, "error"); }
+    });
+
+    async function subirArchivo(file) {
+      const fd = new FormData();
+      fd.append("archivo", file);
+      const r = await fetch("/api/subir", { method: "POST", body: fd });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || "Error al subir");
+      return d;
+    }
+
+    /* publicar */
+    async function crearOrActualizar() {
+      const editarId = btnPublicar.dataset.editar;
+      const body = {
+        titulo: document.getElementById("p-titulo").value.trim(),
+        resumen: document.getElementById("p-resumen").value.trim(),
+        cuerpo: document.getElementById("p-cuerpo").value,
+        portada: archivoPortada ? archivoPortada.url : null,
+        video: archivoVideo ? archivoVideo.url : null,
+        publicado: document.getElementById("p-publicado").checked
+      };
+      try {
+        if (!body.titulo) { mostrar("Escribe un título", "error"); return; }
+        if (editarId) {
+          await fetchJSON("/api/posts/" + editarId, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+          mostrar("Cambios guardados ✓", "ok");
+          btnPublicar.textContent = "Publicar en el blog";
+          delete btnPublicar.dataset.editar;
+        } else {
+          const d = await fetchJSON("/api/posts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+          mostrar('¡Publicado! <a href="/articulo.html?id=' + d.id + '">Ver artículo</a>', "ok");
+          ["p-titulo", "p-resumen", "p-cuerpo"].forEach(id => document.getElementById(id).value = "");
+          document.getElementById("p-portada").value = "";
+          document.getElementById("p-video").value = "";
+          archivoPortada = archivoVideo = null;
+        }
+        cargarPostsPanel();
+      } catch (e) { mostrar(e.message, "error"); }
+    }
+
+    /* mis publicaciones */
+    async function cargarPostsPanel() {
+      const c = document.getElementById("lista-posts-panel");
+      try {
+        const posts = await fetchJSON("/api/mis-posts");
+        c.innerHTML = posts.map(p => `
+          <div class="tarjeta miniatura-post">
+            <div class="datos">
+              <strong>${p.titulo}</strong>
+              <span style="font-size:.85rem;color:var(--lavanda-suave)">${fechaLegible(p.creado_en)} · ${p.publicado ? "publicado ✓" : "borrador"}</span>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <a class="btn btn-suave" style="padding:8px 16px" href="/articulo.html?id=${p.id}">Ver</a>
+              <a class="btn btn-suave" style="padding:8px 16px" href="#" data-edit="${p.id}">Editar</a>
+              <button class="btn btn-suave" style="padding:8px 16px" data-del="${p.id}">Borrar</button>
+            </div>
+          </div>`).join("") || '<p class="centrado" style="color:var(--lavanda-suave)">Aún no has publicado nada.</p>';
+
+        c.querySelectorAll("[data-edit]").forEach(a => a.addEventListener("click", async (e) => {
+          e.preventDefault();
+          const id = a.dataset.edit;
+          try {
+            const p = await fetchJSON("/api/posts/" + id);
+            document.getElementById("p-titulo").value = p.titulo;
+            document.getElementById("p-resumen").value = p.resumen || "";
+            document.getElementById("p-cuerpo").value = p.cuerpo || "";
+            archivoPortada = p.portada ? { url: p.portada } : null;
+            archivoVideo = p.video ? { url: p.video } : null;
+            document.getElementById("btn-publicar").textContent = "Guardar cambios";
+            document.getElementById("btn-publicar").dataset.editar = id;
+            document.querySelector('.panel-nav a[data-vista="nueva"]').click();
+          } catch (e2) { mostrar(e2.message, "error"); }
+        }));
+
+        c.querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", async () => {
+          if (!confirm("¿Segura que deseas borrar esta publicación?")) return;
+          try {
+            await fetchJSON("/api/posts/" + b.dataset.del, { method: "DELETE" });
+            cargarPostsPanel();
+          } catch (e) { mostrar(e.message, "error"); }
+        }));
+      } catch (e) { c.innerHTML = '<div class="aviso error">' + e.message + '</div>'; }
+    }
+
+    const btnPublicar = document.getElementById("btn-publicar");
+    btnPublicar.addEventListener("click", crearOrActualizar);
+
+    /* lecturas */
+    async function cargarLecturas() {
+      const c = document.getElementById("lista-lecturas");
+      const locales = JSON.parse(localStorage.getItem("oraculoLecturas") || "[]");
+      let html = "";
+      if (SESION.usuario) {
+        try {
+          const leidas = await fetchJSON("/api/lecturas");
+          leidas.forEach(l => {
+            const cartas = JSON.parse(l.cartas || "[]");
+            const fav = l.favorita ? "★ Favorita" : "☆ Marcar";
+            html += `<div class="tarjeta miniatura-post">
+              <div class="datos">
+                <strong>${l.tirada}</strong>
+                <span style="font-size:.85rem;color:var(--lavanda-suave)">${cartas.map(c=>c.emoji+" "+c.nombre).join(" · ")}</span>
+                <span style="font-size:.85rem;color:var(--lavanda-suave)">${fechaLegible(l.creado_en)}</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+                <button class="btn ${l.favorita ? "btn-dorado" : "btn-suave"}" style="padding:8px 14px" data-fav="${l.id}" data-est="${l.favorita ? 1 : 0}">${fav}</button>
+                <button class="btn btn-suave" style="padding:8px 14px" data-borrar="${l.id}">Borrar</button>
+              </div>
+            </div>`;
+          });
+        } catch {}
+      }
+      locales.forEach(l => {
+        html += `<div class="tarjeta miniatura-post">
+          <div class="datos">
+            <strong>${l.tirada}</strong>
+            <span style="font-size:.85rem;color:var(--lavanda-suave)">${l.cartas.map(c=>c.emoji+" "+c.nombre).join(" · ")}</span>
+            <span style="font-size:.85rem;color:var(--lavanda-suave)">${fechaLegible(l.fecha)} · local</span>
+          </div>
+        </div>`;
+      });
+      c.innerHTML = html || '<p class="centrado" style="color:var(--lavanda-suave)">Aún no has guardado lecturas. Haz una en <a href="/tarot.html" style="color:var(--dorado)">el Tarot</a>.</p>';
+
+      c.querySelectorAll("[data-borrar]").forEach(b => b.addEventListener("click", async () => {
+        try {
+          await fetchJSON("/api/lecturas/" + b.dataset.borrar, { method: "DELETE" });
+          cargarLecturas();
+        } catch {}
+      }));
+      c.querySelectorAll("[data-fav]").forEach(b => b.addEventListener("click", async () => {
+        try {
+          await fetchJSON("/api/lecturas/" + b.dataset.fav + "/favorita", { method: "PUT" });
+          cargarLecturas();
+        } catch {}
+      }));
+    }
+  </script>
+</body>
+</html>

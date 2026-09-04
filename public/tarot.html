@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tarot Oráculo · Tiradas interactivas</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔮</text></svg>">
+  <link rel="stylesheet" href="/css/estilo.css">
+</head>
+<body>
+
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="logo" href="/"><span>☾</span> Oráculo</a>
+      <nav class="menu">
+        <a href="/tarot.html">Tarot</a>
+        <a href="/blog.html">Blog</a>
+        <div id="zona-usuario"></div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="contenedor">
+    <section class="titulo-seccion" style="margin-top:50px">
+      <div class="deco">✦ ☾ ✦</div>
+      <h2>Elige tu lectura</h2>
+      <p>Toca el mazo, piensa en tu pregunta con el corazón en calma y deja que las cartas revelen su mensaje.</p>
+    </section>
+
+    <div id="opciones-tiradas" class="palos-opciones"></div>
+
+    <section class="titulo-seccion">
+      <div class="deco">✧</div>
+      <h2>Cómo se lee en el Oráculo</h2>
+    </section>
+    <div class="rejilla rejilla-3">
+      <div class="tarjeta"><h3>1 · Conecta</h3><p style="color:var(--lavanda-suave)">Respira profundo y formula tu pregunta o intención en silencio.</p></div>
+      <div class="tarjeta"><h3>2 · Baraja</h3><p style="color:var(--lavanda-suave)">Baraja el mazo digital con tu energía hasta sentir el momento.</p></div>
+      <div class="tarjeta"><h3>3 · Recibe</h3><p style="color:var(--lavanda-suave)">Elige tus cartas y lee el mensaje que el oráculo guarda para ti.</p></div>
+    </div>
+  </main>
+
+  <footer class="pie">
+    <div class="logo"><span>☾</span> Oráculo</div>
+    <p>Guía espiritual · <a class="enlace" href="/blog.html">Blog</a> · <a class="enlace" href="/registro.html">Únete</a></p>
+  </footer>
+
+  <script src="/js/app.js"></script>
+  <script src="/js/tarot.js"></script>
+  <script src="/js/tiradas.js"></script>
+</body>
+</html>

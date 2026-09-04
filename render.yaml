@@ -1,0 +1,30 @@
+# Render.com blueprint. Crea el servicio y persiste la base SQLite.
+# Cómo usarlo:
+#   1. Sube este proyecto a un repositorio (GitHub/GitLab).
+#   2. En Render: "New > Blueprint" y pega la URL del repo, o
+#      usa "New > Web Service" apuntando al repo (build = npm install, start = npm start).
+#   3. Añade el volumen persistente montado en /data (usa el plugin "Disk").
+
+services:
+  - type: web
+    name: oraculo
+    runtime: node
+    plan: free
+    buildCommand: "npm install"
+    startCommand: "node server.js"
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: 24.20.0
+      - key: SECRETO_SESION
+        generateValue: true
+      - key: ORIGEN_PUBLICO
+        sync: false
+      - key: DATA_DIR
+        value: /data
+      - key: UPLOAD_DIR
+        value: /data/uploads
+    disk:
+      name: data
+      mountPath: /data
+      sizeGB: 1

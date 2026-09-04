@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog · Oráculo</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔮</text></svg>">
+  <link rel="stylesheet" href="/css/estilo.css">
+</head>
+<body>
+
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="logo" href="/"><span>☾</span> Oráculo</a>
+      <nav class="menu">
+        <a href="/tarot.html">Tarot</a>
+        <a href="/blog.html">Blog</a>
+        <div id="zona-usuario"></div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="contenedor">
+    <section class="titulo-seccion" style="margin-top:50px">
+      <div class="deco">✧ ✦ ✧</div>
+      <h2>El Rincón del Blog</h2>
+      <p>Reflexiones, bendiciones y sabiduría compartida por la comunidad del Oráculo.</p>
+    </section>
+
+    <div class="rejilla rejilla-3" id="lista-posts"></div>
+  </main>
+
+  <footer class="pie">
+    <div class="logo"><span>☾</span> Oráculo</div>
+    <p>¿Quieres escribir? <a class="enlace" href="/panel.html">Entra a tu panel</a></p>
+  </footer>
+
+  <script src="/js/app.js"></script>
+  <script>
+    fetch("/api/posts")
+      .then(r => r.json())
+      .then(posts => {
+        const c = document.getElementById("lista-posts");
+        if (!posts.length) { c.innerHTML = '<p class="centrado" style="grid-column:1/-1;color:var(--lavanda-suave)">Aún no hay publicaciones. Sé la primera en iluminar el rincón. ✨</p>'; return; }
+        c.innerHTML = posts.map(p => `
+          <article class="tarjeta post">
+            ${p.portada ? `<img class="portada" src="${p.portada}" alt="${p.titulo}">` : `<div class="portada" style="display:grid;place-items:center;font-size:2.4rem">✧</div>`}
+            <div class="cuerpo-post">
+              <h3><a href="/articulo.html?id=${p.id}">${p.titulo}</a></h3>
+              <div class="meta">✧ ${p.autor} · ${fechaLegible(p.creado_en)}</div>
+              <p class="resumen">${p.resumen || ""}</p>
+              <a class="leer-mas" href="/articulo.html?id=${p.id}">Leer más →</a>
+            </div>
+          </article>`).join("");
+      })
+      .catch(() => {});
+  </script>
+</body>
+</html>

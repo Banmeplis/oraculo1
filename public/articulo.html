@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Artículo · Oráculo</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔮</text></svg>">
+  <link rel="stylesheet" href="/css/estilo.css">
+</head>
+<body>
+
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="logo" href="/"><span>☾</span> Oráculo</a>
+      <nav class="menu">
+        <a href="/tarot.html">Tarot</a>
+        <a href="/blog.html">Blog</a>
+        <div id="zona-usuario"></div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="contenedor" style="max-width:820px">
+    <div id="articulo" class="oculto">
+      <div class="articulo-cabecera">
+        <h1 id="a-titulo"></h1>
+        <div class="meta" id="a-meta"></div>
+      </div>
+      <nav style="display:flex;gap:12px;justify-content:center">
+        <a class="btn btn-suave" href="/blog.html">← Volver al blog</a>
+      </nav>
+        <div id="a-contenido"></div>
+    </div>
+    <div class="centrado oculto" id="a-vacio" style="padding:70px 0">
+      <p style="color:var(--lavanda-suave)">El artículo no fue encontrado.</p>
+      <a class="btn btn-dorado" href="/blog.html">Ir al blog</a>
+    </div>
+
+    <section id="comentarios-seccion" class="oculto" style="margin-top:40px">
+      <div class="titulo-seccion" style="margin-top:0;margin-bottom:20px">
+        <div class="deco">💬</div>
+        <h2>Comentarios</h2>
+        <p id="cuenta-comentarios"></p>
+      </div>
+      <div id="lista-comentarios"></div>
+      <div class="tarjeta" style="margin-top:20px" id="form-comentario-box">
+        <h3 style="margin-bottom:14px;font-size:1.1rem">Deja tu comentario</h3>
+        <div id="aviso-comentario"></div>
+        <div class="campo">
+          <textarea id="c-cuerpo" placeholder="Comparte tu opinión..." style="min-height:100px"></textarea>
+        </div>
+        <div class="centrado">
+          <button class="btn btn-dorado" id="btn-comentar">Enviar comentario</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <div class="logo"><span>☾</span> Oráculo</div>
+    <p>Que la luz te acompañe</p>
+  </footer>
+
+  <script src="/js/app.js"></script>
+  <script>
+    const id = new URLSearchParams(location.search).get("id");
+    fetch("/api/posts/" + id)
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(p => {
+        document.getElementById("articulo").classList.remove("oculto");
+        document.getElementById("a-titulo").textContent = p.titulo;
+        document.getElementById("a-meta").innerHTML =
+          `✧ ${p.autor} · ${fechaLegible(p.creado_en)}` +
+          (p.video ? " · incluye video" : "");
+        let c = "";
+        if (p.portada) c += `<img class="articulo-portada" src="${p.portada}" alt="${p.titulo}">`;
+        if (p.video) c += `<div class="centrado"><video controls style="max-width:100%;border-radius:16px;margin:20px 0">
+          <source src="${p.video}"></video></div>`;
+        c += `<div class="articulo-cuerpo">${marcarComoHTML(p.cuerpo || "")}</div>`;
+        document.getElementById("a-contenido").innerHTML = c;
+      })
+      .catch(() => document.getElementById("a-vacio").classList.remove("oculto"));
+
+    /* ------------------------- comentarios ------------------------- */
+    let postId = id;
+    const seccion = document.getElementById("comentarios-seccion");
+    const lista = document.getElementById("lista-comentarios");
+    const avisoC = document.getElementById("aviso-comentario");
+
+    async function cargarComentarios() {
+      try {
+        const coms = await fetchJSON("/api/posts/" + postId + "/comentarios");
+        document.getElementById("cuenta-comentarios").textContent =
+          (coms.length === 1 ? "1 comentario" : coms.length + " comentarios");
+        if (!coms.length) {
+          lista.innerHTML = '<p class="centrado" style="color:var(--lavanda-suave)">Aún no hay comentarios. Sé la primera en compartir.</p>';
+        } else {
+          lista.innerHTML = coms.map(c => `
+            <div class="comentario vidrio">
+              <div class="comentario-cab">
+                <span class="comentario-autor">${escapHtml(c.autor)}</span>
+                <span class="comentario-fecha">${fechaLegible(c.creado_en)}</span>
+                ${(SESION.usuario && (c.user_id === SESION.usuario.id || SESION.usuario.rol === "admin")) ?
+                  `<button class="btn btn-suave" style="padding:4px 12px;font-size:.8rem" data-borrar-com="${c.id}">Eliminar</button>` : ""}
+              </div>
+              <p>${escapHtml(c.cuerpo)}</p>
+            </div>`).join("");
+          lista.querySelectorAll("[data-borrar-com]").forEach(b => b.addEventListener("click", async () => {
+            if (!confirm("¿Eliminar este comentario?")) return;
+            try { await fetchJSON("/api/comentarios/" + b.dataset.borrarCom, { method: "DELETE" }); cargarComentarios(); }
+            catch (e) { avisoC.innerHTML = '<div class="aviso error">' + e.message + '</div>'; }
+          }));
+        }
+      } catch (e) { lista.innerHTML = '<div class="aviso error">' + e.message + '</div>'; }
+    }
+
+    document.getElementById("btn-comentar").addEventListener("click", async () => {
+      const cuerpo = document.getElementById("c-cuerpo").value.trim();
+      if (!cuerpo) { avisoC.innerHTML = '<div class="aviso error">Escribe un comentario</div>'; return; }
+      try {
+        await fetchJSON("/api/posts/" + postId + "/comentarios", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ cuerpo })
+        });
+        avisoC.innerHTML = '<div class="aviso ok">Comentario publicado ✓</div>';
+        document.getElementById("c-cuerpo").value = "";
+        cargarComentarios();
+      } catch (e) { avisoC.innerHTML = '<div class="aviso error">' + e.message + '</div>'; }
+    });
+
+    /* mostramos comentarios al cargar el artículo */
+    window.addEventListener("load", () => {
+      seccion.classList.remove("oculto");
+      cargarComentarios();
+    });
+  </script>
+</body>
+</html>

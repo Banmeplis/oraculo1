@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar sesión · Oráculo</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔮</text></svg>">
+  <link rel="stylesheet" href="/css/estilo.css">
+</head>
+<body>
+
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="logo" href="/"><span>☾</span> Oráculo</a>
+      <nav class="menu">
+        <a href="/tarot.html">Tarot</a>
+        <a href="/blog.html">Blog</a>
+        <div id="zona-usuario"></div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="contenedor">
+    <div class="form-tarjeta tarjeta">
+      <div class="centrado" style="margin-bottom:8px">
+        <div style="font-size:2.2rem">🔮</div>
+        <h2 style="font-family:var(--fuente-deco);margin-top:8px">Bienvenida de vuelta</h2>
+        <p style="color:var(--lavanda-suave)">Entra para escribir en el blog y guardar tus lecturas.</p>
+      </div>
+
+      <div id="aviso-login"></div>
+
+      <div class="campo">
+        <label for="email">Correo</label>
+        <input type="email" id="email" autocomplete="email" placeholder="tucorreo@ejemplo.com">
+      </div>
+      <div class="campo">
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" autocomplete="current-password" placeholder="••••••••">
+      </div>
+      <button class="btn btn-dorado" id="btn-entrar" style="width:100%">Entrar al Oráculo</button>
+
+      <div class="separador"><span>o continúa con</span></div>
+      <a class="btn btn-google" href="/auth/google">
+        <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15A11 11 0 0 0 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+        Iniciar sesión con Google
+      </a>
+
+      <p class="centrado" style="margin-top:20px;color:var(--lavanda-suave);font-size:.92rem">
+        ¿Aún no tienes cuenta? <a href="/registro.html" class="enlace" style="color:var(--dorado)">Crear cuenta</a>
+      </p>
+    </div>
+  </main>
+
+  <footer class="pie">
+    <div class="logo"><span>☾</span> Oráculo</div>
+  </footer>
+
+  <script src="/js/app.js"></script>
+  <script>
+    const err = new URLSearchParams(location.search).get("err");
+    const aviso = document.getElementById("aviso-login");
+    if (err === "google-no-config")
+      aviso.innerHTML = '<div class="aviso info">El inicio con Google aún no está configurado (falta el client_id en config.json). Puedes usar tu correo y contraseña.</div>';
+    if (err === "google-error")
+      aviso.innerHTML = '<div class="aviso error">No se pudo conectar con Google. Intenta de nuevo o usa tu correo.</div>';
+
+    document.getElementById("btn-entrar").addEventListener("click", async () => {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      aviso.innerHTML = "";
+      try {
+        const d = await fetchJSON("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+        });
+        location.href = "/panel.html?bienvenida=1";
+      } catch (e) {
+        aviso.innerHTML = '<div class="aviso error">' + e.message + '</div>';
+      }
+    });
+  </script>
+</body>
+</html>
