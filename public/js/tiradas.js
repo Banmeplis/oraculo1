@@ -192,8 +192,8 @@ const TIRADAS = {
   armarResultado(resultadoHTML) {
     const t = resultadoHTML.tirada;
     let html = '<div class="resultado">';
-    html += '<div class="titulo-seccion" style="margin-top:0"><div class="deco">' + this.elegantIcono[t.id] + "</div>";
-    html += "<h2>" + t.nombre + "</h2><p>Resultado de la tirada de tarot completa gratis</p></div>";
+    html += '<div class="resultado-cabecera"><div class="deco">' + this.elegantIcono[t.id] + "</div>";
+    html += "<p>Resultado de la tirada de tarot completa gratis</p></div>";
 
     html += `<div class="contexto-tirada vidrio">
       <h3 style="color:var(--dorado);margin-bottom:10px">Interpretación general de la Tirada de Tarot</h3>

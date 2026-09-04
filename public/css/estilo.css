@@ -493,6 +493,25 @@ h3 { font-size: 1.25rem; }
   color: var(--lavanda);
 }
 .resultado .interp { font-family: var(--fuente-serif); font-size: 1.22rem; color: var(--blanco-humo); }
+
+/* cabecera ligera del resultado (sin repetir el título de la tirada) */
+.resultado-cabecera {
+  text-align: center;
+  margin: 0 auto 6px;
+  padding-top: 8px;
+}
+.resultado-cabecera .deco {
+  display: inline-block;
+  color: var(--dorado);
+  font-size: 1.9rem;
+  line-height: 1;
+  letter-spacing: 8px;
+}
+.resultado-cabecera p {
+  max-width: 640px;
+  margin: 10px auto 0;
+  color: var(--lavanda-suave);
+}
 .resultado .mensaje-final {
   margin-top: 30px; padding: 26px;
   border: 1px solid rgba(212, 175, 55, 0.4);
