@@ -6,16 +6,18 @@
 window.INICIO = (function () {
   "use strict";
 
-  /* Los 7 arcángeles regentes (misma energía que las tiradas) */
+  /* Los 7 arcángeles regentes según el día de la semana (tradición) */
   var ARCANGELES = {
-    miguel:  { nombre: "Arcángel Miguel", regencia: "Protección y fuerza",   emoji: "⚔️", color: [104, 140, 220] },
-    gabriel: { nombre: "Arcángel Gabriel", regencia: "Mensajes y revelación", emoji: "🕊️", color: [212, 175, 55] },
-    rafael:  { nombre: "Arcángel Rafael", regencia: "Curación y sanación",    emoji: "💚", color: [90, 200, 160] },
-    uriel:   { nombre: "Arcángel Uriel", regencia: "Sabiduría y discernimiento", emoji: "🔥", color: [230, 150, 60] },
-    zadkiel: { nombre: "Arcángel Zadkiel", regencia: "Misericordia y perdón", emoji: "💜", color: [160, 110, 240] },
-    jofiel:  { nombre: "Arcángel Jofiel", regencia: "Belleza y claridad",     emoji: "🌸", color: [255, 170, 120] },
-    chamuel:{ nombre: "Arcángel Chamuel", regencia: "Paz y amor",            emoji: "💖", color: [240, 120, 150] }
+    miguel:  { nombre: "Arcángel Miguel", dia: 0, regencia: "Protección, fuerza y valor",  emoji: "⚔️", color: [59, 130, 246] },
+    jofiel:  { nombre: "Arcángel Jofiel", dia: 1, regencia: "Sabiduría, iluminación y lucidez", emoji: "🌸", color: [250, 204, 21] },
+    chamuel: { nombre: "Arcángel Chamuel", dia: 2, regencia: "Amor, unión familiar y perdón", emoji: "💖", color: [244, 114, 182] },
+    gabriel: { nombre: "Arcángel Gabriel", dia: 3, regencia: "Pureza, comunicación y guía", emoji: "🕊️", color: [226, 232, 240] },
+    rafael:  { nombre: "Arcángel Rafael", dia: 4, regencia: "Salud, sanación y bienestar",  emoji: "💚", color: [74, 222, 128] },
+    uriel:   { nombre: "Arcángel Uriel", dia: 5, regencia: "Abundancia, paz y prosperidad", emoji: "🔥", color: [249, 115, 22] },
+    zadkiel: { nombre: "Arcángel Zadkiel", dia: 6, regencia: "Perdón, libertad y transformación", emoji: "💜", color: [147, 51, 234] }
   };
+
+  var SEMANA = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
   /* Mensajes poderosos del día, en primera persona, como si nos hablara
      (cada uno también varía según el día) */
@@ -36,24 +38,28 @@ window.INICIO = (function () {
       "Todo aquello que te dolía sana hoy. Confía en este proceso: yo cuido de ti y de los tuyos en cada paso."
     ],
     uriel: [
-      "Yo ilumino la noche de tu duda. Lo que hoy no entiendes, muy pronto tendrá sentido. Pide claridad y te la daré sin reservas.",
-      "Déjame encender la antorcha de la sabiduría en tu sendero. No tomes decisiones en la oscuridad: detente, respira y verás la respuesta.",
-      "La respuesta que buscas ya está dentro de ti. Hoy te ayudo a escucharla con honestidad y valentía."
+      "Te traigo la abundancia que mereces: hoy abro las puertas de la prosperidad en tu economía y en tu hogar. Confía y actúa con fe.",
+      "Hoy tu trabajo y tus decisiones rinden frutos. He encendido la luz de la prosperidad en tu camino; acércate y recógela.",
+      "Yo soy el arcángel de la provisión. Deja de temer por el mañana: hoy los recursos llegan, la paz se instala y la abundancia fluye hacia ti.",
+      "Trabaja con alegría y gratitud: hoy recojo lo sembrado y te devuelvo prosperidad, paz y estabilidad económica."
     ],
     zadkiel: [
       "Te ofrezco la misericordia: perdónate por lo que aún te reprochas. Hoy libero tu corazón de todo lo que no mereces cargar.",
-      "Suéltalo y deja que el azul violeta del perdón lo disuelva. Suelta el resentimiento y sentirás nacer algo nuevo y luminoso.",
-      "Hoy el cielo pone en ti compasión y dulzura. Perdona y serás perdonada; suelta y serás libre."
+      "Suéltalo y deja que el violeta del perdón lo disuelva. Suelta el resentimiento y sentirás nacer algo nuevo y luminoso.",
+      "Hoy el cielo pone en ti compasión y dulzura. Perdona y serás perdonada; suelta y serás libre.",
+      "Con la llama violeta de la transmutación transformo tu pasado en luz y te devuelvo la libertad de empezar de nuevo."
     ],
     jofiel: [
-      "Yo embellezco tu vida y tu mente. Busca la belleza que te rodea hoy y déjala entrar: en la luz, en las personas, en ti.",
-      "Limpio la niebla de tu mente para que veas con claridad divina. Lo que hoy se te presenta borroso, pronto será cristalino.",
-      "Te abro las puertas del estudio y la inspiración. Deja que la belleza del conocimiento florezca en tu día."
+      "Enciendo en ti la antorcha de la sabiduría y la lucidez mental. Hoy verás con claridad lo que antes te confundía.",
+      "Yo ilumino tu mente: las respuestas, los estudios y las decisiones se aclaran hoy bajo mi luz amarilla. Confía en tu intuición.",
+      "Te abro los ojos del entendimiento. Este día es para aprender, discernir y brillar con la luz del conocimiento.",
+      "Limpio la niebla de tu pensamiento para que la sabiduría y la iluminación lleguen a cada pregunta de tu corazón."
     ],
     chamuel: [
-      "Yo soy el arcángel del amor. Hoy lleno tu corazón y tu hogar de paz. Ábrete a recibir amor y verás cómo se multiplica.",
-      "Donde hay tensión, hoy pongo paz; donde hay distancia, hoy pongo encuentro. Busca el amor en cada rincón de tu día.",
-      "Te guardo en mi rosa de luz. Siente el amor incondicional del cielo sobre ti y deja que fluya hacia quienes amas."
+      "Yo soy el arcángel del amor. Hoy lleno tu corazón y tu hogar de paz, unión y perdón. Ábrete a recibir amor y verás cómo se multiplica.",
+      "Donde hay tensión, hoy pongo paz; donde hay distancia, hoy pongo encuentro; donde hay rencor, hoy pongo perdón. El amor fluye a tu alrededor.",
+      "Te guardo en mi rosa de luz: hoy restauro la armonía entre quienes amas. Busca el amor en cada rincón de tu día.",
+      "Suelta el peso y abre tu corazón: el amor incondicional llega hoy para sanar tu familia, tus vínculos y tu ser."
     ]
   };
 
@@ -63,16 +69,16 @@ window.INICIO = (function () {
     return f.getFullYear() + "-" + pad(f.getMonth() + 1) + "-" + pad(f.getDate());
   }
 
-  /* selección determinista diaria del arcángel */
+  /* arcángel del día según el día de la semana (0=Domingo ... 6=Sábado) */
   function arcangelDelDia(fecha) {
-    var s = claveHoy(fecha);
-    var h = 0, i;
-    for (i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) % 700000; }
+    var f = fecha || new Date();
+    var dia = f.getDay();
     var claves = Object.keys(ARCANGELES);
-    var idx = h % claves.length;
-    var c = ARCANGELES[claves[idx]];
-    c.clave = claves[idx];
-    return c;
+    var c = null;
+    for (var i = 0; i < claves.length; i++) {
+      if (ARCANGELES[claves[i]].dia === dia) { c = ARCANGELES[claves[i]]; c.clave = claves[i]; break; }
+    }
+    return c || (ARCANGELES.miguel.clave = "miguel") && ARCANGELES.miguel;
   }
 
   /* mensaje del día según arcángel + día (rota entre sus frases) */
