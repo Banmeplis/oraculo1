@@ -1,9 +1,9 @@
-﻿# Render.com blueprint. Crea el servicio y persiste la base SQLite.
-# CÃ³mo usarlo:
+# Render.com blueprint. Crea el servicio y persiste la base SQLite.
+# Cómo usarlo:
 #   1. Sube este proyecto a un repositorio (GitHub/GitLab).
 #   2. En Render: "New > Blueprint" y pega la URL del repo, o
 #      usa "New > Web Service" apuntando al repo (build = npm install, start = npm start).
-#   3. AÃ±ade el volumen persistente montado en /data (usa el plugin "Disk").
+#   3. Añade el volumen persistente montado en /data (usa el plugin "Disk").
 
 services:
   - type: web
