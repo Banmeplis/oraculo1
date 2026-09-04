@@ -3,4 +3,4 @@ Allow: /
 Disallow: /panel.html
 Disallow: /perfil.html
 
-Sitemap: https://oraculo1.onrender.com/sitemap.xml
+Sitemap: https://oraculo1-hhwc.onrender.com/sitemap.xml
