@@ -503,12 +503,8 @@ const TIRADAS = {
     const esGranTirada = t.id === "gran-tirada";
     const finales = esGranTirada ? this.interpretacionGranTirada(resultadoHTML) : this.interpretacionFinal(resultadoHTML);
     if (resultadoHTML.fuerte) {
-      finales.push({
-        cierre: true,
-        regano: true,
-        texto: "He dicho todo con fuerza y no me arrepiento: esta lectura fue fuerte porque tú eres fuerte. No vengo a asustarte, vengo a despertarte. Las cartas no se equivocaron, y tú tampoco vas a fallar si las escuchas: deja de posponer lo que sabes, suelta lo que te pesa y camina. El cielo no te suelta la mano, pero tampoco va a caminar por ti.",
-        cita: "Esta fue una Lectura Fuerte: guárdala en tu memoria y vuelve a ella cuando dudes."
-      });
+      // el cierre único ya viene dentro de interpretacionGranTirada/
+      // interpretacionFinal; aquí solo se marca el tono del encabezado
     }
     const tituloFinal = resultadoHTML.fuerte
       ? "🔥 ¡¡ LECTURA FUERTE !! 🔥"
