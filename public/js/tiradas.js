@@ -549,35 +549,8 @@ function iniciarTirada(tipo) {
 
   escena.innerHTML = "";
 
-  /* Paso 1 · barajado */
-  escena.innerHTML = `
-    <div class="centrado">
-      <p style="margin-bottom:18px">Cierra los ojos, respira profundo y piensa en tu pregunta. Cuando estés lista, baraja tu mazo.</p>
-      <div class="mazo" id="fan-barajado"></div>
-      <div class="spinner oculto" id="spinner-barajo"></div>
-      <div style="margin-top:26px">
-        <button class="btn btn-dorado" id="btn-barajar">✦ Barajar mis cartas</button>
-      </div>
-    </div>`;
-
-  const fan = document.getElementById("fan-barajado");
-  const mazoFan = TIRADAS.barajar(TIRADAS.mazo.slice());
-  for (let i = 0; i < 12; i++) {
-    const c = mazoFan[i % mazoFan.length];
-    const m = document.createElement("div");
-    m.className = "minicarta";
-    m.style.width = "84px";
-    m.style.padding = "8px 6px";
-    m.innerHTML = `${TIRADAS.figuraDe(c)}<span class="nom">${c.nombre}</span>`;
-    fan.appendChild(m);
-  }
-
-  document.getElementById("btn-barajar").addEventListener("click", () => {
-    const sp = document.getElementById("spinner-barajo");
-    sp.classList.remove("oculto");
-    fan.classList.add("oculto");
-    setTimeout(() => mostrarEleccion(d), 1400);
-  });
+  /* Paso 1 · elegir las cartas (el mazo ya viene barajado) */
+  mostrarEleccion(d);
 }
 
 /* Paso 2 · elegir las cartas tocando el mazo */
@@ -589,7 +562,7 @@ function mostrarEleccion(r) {
   let elegidas = 0;
   escena.innerHTML = `
     <div class="centrado">
-      <p style="margin-bottom:8px">${r.tirada.n === 1 ? "Elige tu carta del mazo:" : `Elige tus ${r.tirada.n} cartas del mazo.`}</p>
+      <p style="margin-bottom:8px">Cierra los ojos, piensa en tu pregunta y selecciona tu${r.tirada.n === 1 ? " carta:" : "s " + r.tirada.n + " cartas:"}</p>
       <p style="font-size:.9rem;color:var(--lavanda-suave)">Seleccionadas: <span id="contador">0</span> de ${r.tirada.n}</p>
       <div class="escenario" id="escenario-eleccion"></div>
       <div class="oculto" id="aviso-cartas">
