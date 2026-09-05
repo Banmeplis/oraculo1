@@ -374,12 +374,14 @@ function iniciarTirada(tipo) {
     </div>`;
 
   const fan = document.getElementById("fan-barajado");
+  const mazoFan = TIRADAS.barajar(TIRADAS.mazo.slice());
   for (let i = 0; i < 12; i++) {
+    const c = mazoFan[i % mazoFan.length];
     const m = document.createElement("div");
     m.className = "minicarta";
-    m.style.width = "72px";
-    m.style.padding = "12px 6px";
-    m.innerHTML = "<span class='nm' style='font-size:1.2rem'>✦</span><span class='nom'>Oráculo</span>";
+    m.style.width = "84px";
+    m.style.padding = "8px 6px";
+    m.innerHTML = `${TIRADAS.figuraDe(c)}<span class="nom">${c.nombre}</span>`;
     fan.appendChild(m);
   }
 
