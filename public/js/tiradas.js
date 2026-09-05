@@ -46,6 +46,7 @@ const TIRADAS = {
         arcana: c.arcana,
         palo: c.palo,
         emoji: c.emoji,
+        img: c.img,
         palabras: c.palabras,
         texto: invertido ? c.invertida : c.derecho,
         sentido: invertido ? "invertida" : "derecha",
@@ -56,6 +57,14 @@ const TIRADAS = {
   },
 
   idDe(c) { return c.arcana === "mayor" ? "M" + c.n : c.paloClave + "-" + c.n; },
+
+  /* figura de la carta: usa la imagen del arcano cuando existe, si no el emoji */
+  figuraDe(c, cls) {
+    const cnm = cls ? "c-nm " + cls : "c-nm";
+    return c.img
+      ? `<img class="c-art" src="${c.img}" alt="${c.nombre}" loading="lazy">`
+      : `<div class="${cnm}">${c.emoji}</div>`;
+  },
 
   /* ------------------------------ cita final ------------------------------ */
   citas: [
@@ -272,7 +281,7 @@ const TIRADAS = {
       const pos = t.posiciones[i];
       html += `<div class="carta-grande vidrio">
         <div class="sello ${c.invertido ? "invertida" : ""}"><div>
-          <div class="c-nm">${c.emoji}</div>
+          ${this.figuraDe(c)}
           <small>${c.arcana === "mayor" ? "Arcano Mayor" : c.palo}</small>
         </div></div>
         <div style="flex:1;min-width:240px">
@@ -430,13 +439,13 @@ function mostrarEleccion(r) {
     if (elegidas >= r.tirada.n) return;
     const carta = r.cartas[elegidas];
     elm.style.animation = "flotar 1s ease-in-out infinite";
-    elm.innerHTML = `<span class="nm">${carta.emoji}</span><span class="nom">${carta.nombre}</span>`;
+    elm.innerHTML = `${TIRADAS.figuraDe(carta)}<span class="nom">${carta.nombre}</span>`;
     setTimeout(() => {
       const plaza = document.getElementById("plaza-" + elegidas);
       plaza.classList.add("girada");
       const cara = plaza.querySelector(".cara");
       cara.innerHTML = `<div>
-        <div class="c-nm">${carta.emoji}</div>
+        ${TIRADAS.figuraDe(carta)}
         <div class="c-nombre">${carta.nombre}</div>
         <div class="c-pos">${carta.invertido ? "invertida" : "derecha"}</div>
       </div>`;

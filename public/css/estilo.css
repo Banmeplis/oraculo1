@@ -329,6 +329,7 @@ h3 { font-size: 1.25rem; }
 }
 .minicarta:hover { transform: translateY(-6px) scale(1.04); box-shadow: 0 14px 30px rgba(0,0,0,0.55); border-color: var(--dorado); }
 .minicarta .nm { font-family: var(--fuente-deco); font-size: 1.5rem; }
+.minicarta .c-art { width: 54px; height: 54px; object-fit: cover; display: block; margin: 0 auto 4px; border-radius: 8px; }
 .minicarta .nom { font-size: 0.68rem; color: var(--lavanda); line-height: 1.3; font-family: var(--fuente-serif); }
 
 /* Escenario de tirada: cartas boca abajo */
@@ -368,6 +369,7 @@ h3 { font-size: 1.25rem; }
   padding: 8px;
 }
 .carta-plaza .cara .c-nm { font-size: 1.3rem; font-family: var(--fuente-deco); }
+.carta-plaza .cara .c-art { width: 96px; height: 128px; object-fit: cover; display: block; border-radius: 8px; }
 .carta-plaza .cara .c-nombre { font-size: 0.62rem; line-height: 1.25; text-align: center; font-family: var(--fuente-serif); font-weight: 600; }
 .carta-plaza .cara .c-pos { font-size: 0.55rem; letter-spacing: 1px; color: #7a5c1e; margin-top: 4px; }
 .carta-plaza.girada .cara { transform: rotateY(0); }
@@ -481,6 +483,8 @@ h3 { font-size: 1.25rem; }
 }
 .resultado .sello .c-nm { font-family: var(--fuente-deco); font-size: 1.7rem; }
 .resultado .sello.invertida { background: linear-gradient(160deg, #2b1c66, #170f3c); color: var(--lavanda); }
+.resultado .sello .c-art { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+.resultado .sello.invertida .c-art { transform: rotate(180deg); filter: brightness(0.72) saturate(0.85); }
 .resultado h4 { color: var(--dorado); margin-bottom: 6px; letter-spacing: 1px; font-size: 0.9rem; }
 .resultado h3 { color: var(--blanco); margin: 4px 0 8px; }
 .resultado .palabras { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
