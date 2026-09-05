@@ -38,23 +38,25 @@ const TIRADAS = {
     const t = this.catalogo.find(x => x.id === tipo);
     if (!t) return null;
     this.definirMazo();
-    const barajado = this.barajar(this.mazo);
-    const cartas = barajado.slice(0, t.n).map(c => {
-      const invertido = Math.random() < 0.35;
-      return {
-        id: this.idDe(c),
-        nombre: c.nombre,
-        arcana: c.arcana,
-        palo: c.palo,
-        emoji: c.emoji,
-        img: c.img,
-        palabras: c.palabras,
-        texto: invertido ? c.invertida : c.derecho,
-        sentido: invertido ? "invertida" : "derecha",
-        invertido
-      };
-    });
-    return { tirada: t, cartas };
+    const mazo = this.barajar(this.mazo);
+    return { tirada: t, cartas: [], mazo };
+  },
+
+  /* construye la carta a partir del arcano, decidiendo sentido al azar */
+  construirCarta(arc) {
+    const invertido = Math.random() < 0.35;
+    return {
+      id: this.idDe(arc),
+      nombre: arc.nombre,
+      arcana: arc.arcana,
+      palo: arc.palo,
+      emoji: arc.emoji,
+      img: arc.img,
+      palabras: arc.palabras,
+      texto: invertido ? arc.invertida : arc.derecho,
+      sentido: invertido ? "invertida" : "derecha",
+      invertido
+    };
   },
 
   idDe(c) { return "M" + c.n; },
@@ -150,66 +152,58 @@ const TIRADAS = {
       "linear-gradient(160deg, var(--nocturno) 0%, var(--nocturno2) 55%, #241650 100%)";
   },
 
-/* interpretación final por áreas: cada arcángel habla de su área,
-     con contexto según las cartas que hayan salido en la lectura */
-  listaCartasTexto(resultado) {
-    return resultado.cartas
-      .map(c => "<strong>" + c.nombre + "</strong>" + (c.invertido ? " <span class='c-pos'>en sombra</span>" : ""))
-      .join(" y ");
-  },
-
+/* interpretación final por áreas: cada arcángel habla de su área en primera
+     persona; el tono (luz o sombra) se decide según las cartas de la lectura,
+     pero el arcángel no nombra las cartas: solo entrega el mensaje */
   interpretacionFinal(resultado) {
     const cartas = resultado.cartas;
     const total = cartas.length;
     const bien = cartas.filter(c => !c.invertido).length;
     const propor = bien / total;
     const cita = this.citas[Math.floor(Math.random() * this.citas.length)];
-    const lista = this.listaCartasTexto(resultado);
-    const palabras = cartas.map(c => c.palabras.slice(0, 2).join(", ") + (c.invertido ? " en sombra" : "")).join(" · ");
-    const firma = ' <em class="cita">»' + palabras + '«</em>';
 
     const areas = [
       {
         icono: "🛡️", area: "situacion", clave: "miguel", titulo: "Situación y protección",
         texto: propor >= 0.5
-          ? `En tu lectura, ${lista} iluminan el escenario de tu presente y tu camino laboral. Arcángel Miguel desenvaina su espada de luz y te asegura que estás protegida y sostenida: lo que hoy construyes, cuidas o decides avanza bajo su escudo. Avanza con paso firme y sin miedo, porque tu fuerza se consolida y tu posición se fortalece.${firma}`
-          : `En tu lectura, ${lista} marcan las tensiones que hoy envuelven tu presente y tu trabajo. Arcángel Miguel alza su espada y te habla con voz de guerrero: hay una batalla donde estás gastando tu energía sin ser valorada, una grieta que pides no ignorar. Repliega fuerzas, traza tus límites y no des explicaciones por defender tu lugar.${firma}`
+          ? "Yo soy Miguel, el guerrero de la luz, y vengo a decirte que estás protegida y sostenida: lo que hoy construyes, cuidas o decides avanza bajo mi escudo. Avanza con paso firme y sin miedo, porque tu fuerza se consolida y tu posición se fortalece ante cualquier adversidad."
+          : "Yo soy Miguel, y te hablo con la voz de quien conoce la batalla: hay una lucha donde estás gastando tu energía sin ser valorada, una grieta que ya no puedes ignorar. Repliega fuerzas, traza tus límites y no des explicaciones por defender tu lugar: esta es tu hora de protegerte."
       },
       {
         icono: "💞", area: "amor", clave: "chamuel", titulo: "Amor y relaciones",
         texto: propor >= 0.5
-          ? `Arcángel Chamuel, el ángel del amor puro, mira ${lista} y su luz rosa envuelve tus vínculos. Estas cartas confirman que el afecto sincero fluye hacia ti: hoy la puerta de tu corazón se abre a un encuentro, una reconciliación o una entrega que ya se sentía esperada. Abre la mano y recibe: mereces ser amada sin condiciones.${firma}`
-          : `Arcángel Chamuel contempla ${lista} y sostiene tu corazón con dulzura y verdad. Hay un aviso que no debes callar: repites patrones que te dejan con menos amor del que mereces, o entregas tu luz donde no es cuidada. No mendigues afecto ni confundas silencio con paz: nombra lo que sientes, ama desde tu dignidad y deja que el amor justo vuelva a ti.${firma}`
+          ? "Yo soy Chamuel, el ángel del amor puro, y envuelvo tus vínculos con mi luz rosa: el afecto sincero fluye hacia ti y hoy la puerta de tu corazón se abre a un encuentro, una reconciliación o una entrega que ya se sentía esperada. Abre la mano y recibe: mereces ser amada sin condiciones."
+          : "Yo soy Chamuel, y sostengo tu corazón con dulzura y verdad: hay un aviso que no debes callar. Repites patrones que te dejan con menos amor del que mereces, o entregas tu luz donde no es cuidada. No mendigues afecto ni confundas silencio con paz: nombra lo que sientes, ama desde tu dignidad y deja que el amor justo vuelva a ti."
       },
       {
         icono: "💚", area: "salud", clave: "rafael", titulo: "Salud y energía",
         texto: propor >= 0.5
-          ? `Con ${lista} ante sí, Arcángel Rafael deja caer su luz esmeralda sobre tu cuerpo y tu alma. Estas cartas hablan de restauración: la sanación que pediste está en marcha y tu equilibrio vuelve a asentarse. Respira, descansa y confía en la medicina divina que ya trabaja en ti.${firma}`
-          : `Arcángel Rafael posa su mano sobre ${lista} y te advierte con serena severidad: hay una parte de ti que estás descuidando, un cansancio que callas o un dolor que pospones. No te demores: priorizarte no es egoísmo, es el único camino para volver a brillar. Tu sanación empieza hoy por detenerte.${firma}`
+          ? "Yo soy Rafael, el sanador, y dejo caer mi luz esmeralda sobre tu cuerpo y tu alma: la sanación que pediste está en marcha y tu equilibrio vuelve a asentarse. Respira, descansa y confía en la medicina divina que ya trabaja en ti."
+          : "Yo soy Rafael, y te advierto con serena severidad: hay una parte de ti que estás descuidando, un cansancio que callas o un dolor que pospones. No te demores: priorizarte no es egoísmo, es el único camino para volver a brillar. Tu sanación empieza hoy por detenerte."
       },
       {
         icono: "📯", area: "mensajes", clave: "gabriel", titulo: "Mensajes y propósito",
         texto: propor >= 0.5
-          ? `Ante ${lista}, Arcángel Gabriel hace sonar su cuerno de plata: el mensaje que esperabas está en camino y tu propósito se aclara. Presta atención a las señales que hallarás en las palabras, los nombres y las coincidencias del día: el cielo te está hablando con total claridad.${firma}`
-          : `Arcángel Gabriel contempla ${lista} y aparta el ruido con su trompeta: llevas tiempo escuchando lo que quieres oír, no lo que necesitas. Dentro de tu lectura hay un mensaje que aún no te has atrevido a aceptar. Silencia la ansiedad, vuelve a preguntar con honestidad y la respuesta llegará cuando te calles.${firma}`
+          ? "Yo soy Gabriel, el mensajero del cielo, y hago sonar mi cuerno de plata: el mensaje que esperabas está en camino y tu propósito se aclara. Presta atención a las señales que hallarás en las palabras, los nombres y las coincidencias del día: te estoy hablando con total claridad."
+          : "Yo soy Gabriel, y aparto el ruido con mi trompeta: llevas tiempo escuchando lo que quieres oír, no lo que necesitas. Hay un mensaje que aún no te has atrevido a aceptar. Silencia la ansiedad, vuelve a preguntar con honestidad y la respuesta llegará cuando te calles."
       },
       {
         icono: "💰", area: "economia", clave: "uriel", titulo: "Economía y abundancia",
         texto: propor >= 0.5
-          ? `Arcángel Uriel enciende su antorcha dorada sobre ${lista}: el plano de tus recursos se abre a un flujo que ya está en marcha. La abundancia que pediste está ordenándose para llegar a ti; administra con calma, actúa con decisión y mira los detalles que otros pasan por alto: ahí está tu puerta.${firma}`
-          : `Arcángel Uriel examina ${lista} con su mirada de fuego tranquilo y no te engaña: la energía de tu dinero pide revisión y orden. Hay fugas, gastos que se repiten y promesas que llegan con más ruido que sustancia. No es una condena, sino un aviso a tiempo: cierra las rendijas, pon límites a tu generosidad y deja espacio para que la abundancia real entre.${firma}`
+          ? "Yo soy Uriel, y enciendo mi antorcha dorada sobre tus recursos: el plano de tu economía se abre a un flujo que ya está en marcha. La abundancia que pediste está ordenándose para llegar a ti; administra con calma, actúa con decisión y mira los detalles que otros pasan por alto: ahí está tu puerta."
+          : "Yo soy Uriel, y no te engaño: la energía de tu dinero pide revisión y orden. Hay fugas, gastos que se repiten y promesas que llegan con más ruido que sustancia. No es una condena, sino un aviso a tiempo: cierra las rendijas, pon límites a tu generosidad y deja espacio para que la abundancia real entre."
       },
       {
         icono: "🔓", area: "bloqueo", clave: "zadkiel", titulo: "Bloqueos a liberar",
         texto: propor >= 0.5
-          ? `Con ${lista} en la mano, Arcángel Zadkiel abre sus alas violetas sobre ti: la misericordia está desatando lo que te tenía aprisionada. Suelta la culpa, perdona lo que sea necesario y siente cuánta libertad entra cuando dejas de cargar el pasado. Hay cadenas que solo tú mantienes puestas: esta es tu hora de soltarlas.${firma}`
-          : `Arcángel Zadkiel, señor de la liberación, mira ${lista} y te señala la cadena que llevas demasiado tiempo arrastrando: un rencor, un miedo ya vencido o una culpa que no te corresponde. Cada día sin perdonar pesa más. Suelta la piedra, perdónate y perdona: tu corazón no fue hecho para cargar tanto peso, y esta lectura te da la llave.${firma}`
+          ? "Yo soy Zadkiel, el ángel de la misericordia, y abro mis alas violetas sobre ti: la liberación ya está desatando lo que te tenía aprisionada. Suelta la culpa, perdona lo que sea necesario y siente cuánta libertad entra cuando dejas de cargar el pasado. Hay cadenas que solo tú mantienes puestas: esta es tu hora de soltarlas."
+          : "Yo soy Zadkiel, señor de la liberación, y te señalo la cadena que llevas demasiado tiempo arrastrando: un rencor, un miedo ya vencido o una culpa que no te corresponde. Cada día sin perdonar pesa más. Suelta la piedra, perdónate y perdona: tu corazón no fue hecho para cargar tanto peso, y este mensaje te da la llave."
       },
       {
         icono: "🌟", area: "futuro", clave: "jofiel", titulo: "Futuro e inspiración",
         texto: propor >= 0.5
-          ? `Arcángel Jofiel ilumina con su lámpara dorada el horizonte trazado por ${lista}: lo que viene está alineado con tu propósito y tu luz ya florece. Confía en el proceso, suelta lo que cumplió su ciclo y camina hacia lo nuevo con la certeza de que el universo está cuadrando las piezas a tu favor.${firma}`
-          : `Arcángel Jofiel apaga su lámpara un instante ante ${lista} y te regaña con dulzura exigente: lo que anhelas no llegará mientras sigas mirando atrás o comparándote con el camino de otros. Tu futuro no se recibe, se construye, y empieza en la decisión de hoy. Enciende tu propia luz y camina: el porvenir te está esperando.${firma}`
+          ? "Yo soy Jofiel, y ilumino tu horizonte con mi lámpara dorada: lo que viene está alineado con tu propósito y tu luz ya florece. Confía en el proceso, suelta lo que cumplió su ciclo y camina hacia lo nuevo con la certeza de que el universo está cuadrando las piezas a tu favor."
+          : "Yo soy Jofiel, y apago mi lámpara un instante para que me mires por completo: lo que anhelas no llegará mientras sigas mirando atrás o comparándote con el camino de otros. Tu futuro no se recibe, se construye, y empieza en la decisión de hoy. Enciende tu propia luz y camina: el porvenir te está esperando."
       }
     ];
 
@@ -246,42 +240,44 @@ const TIRADAS = {
     "Resultado final": "jofiel"
   },
 
-  /* voces de cada arcángel: opinión luminosa, aviso matizado o regaño firme */
+  /* voces de cada arcángel en primera persona: opinión luminosa, aviso
+     matizado o regaño firme; el arcángel nunca nombra las cartas, solo
+     entrega el mensaje que su lectura le inspira */
   voces: {
     miguel: {
-      luz: "Arcángel Miguel desenvaina su espada de luz y sonríe ante {cartas}: estas cartas en tu camino confirman que estás siendo sostenido y protegido. Avanza con paso firme, porque tu fuerza se está consolidando y nada podrá derribarte mientras camines con fe y con límites bien puestos.",
-      mixto: "Arcángel Miguel observa {cartas} y te habla con la voz del soldado que conoce la batalla: hay protección, sí, pero también hay una grieta que no puedes ignorar. No te duermas: refuerza tus defensas, elige tus batallas y no dejes tu guardia a merced de quien no te cuida.",
-      sombra: "Arcángel Miguel alza la espada y te regaña con firmeza: {cartas} te muestran que has bajado el escudo demasiado pronto. Estás exponiéndote donde no hay protección, gastando tu fuerza donde no se te valora. Repliega tu energía, pon tus límites y no vuelvas a avanzar sin tu fuego encendido."
+      luz: "Yo soy Miguel, el guerrero de la luz: he venido a decirte que estás siendo sostenido y protegido. Avanza con paso firme, porque tu fuerza se está consolidando y nada podrá derribarte mientras camines con fe y con límites bien puestos.",
+      mixto: "Yo soy Miguel, y te hablo con la voz del soldado que conoce la batalla: hay protección, sí, pero también hay una grieta que no puedes ignorar. No te duermas: refuerza tus defensas, elige tus batallas y no dejes tu guardia a merced de quien no te cuida.",
+      sombra: "Yo soy Miguel, y te regaño con firmeza: has bajado el escudo demasiado pronto. Estás exponiéndote donde no hay protección, gastando tu fuerza donde no se te valora. Repliega tu energía, pon tus límites y no vuelvas a avanzar sin tu fuego encendido."
     },
     chamuel: {
-      luz: "Arcángel Chamuel envuelve {cartas} con la luz rosa del amor verdadero: tus vínculos son bendecidos y el afecto sincero fluye hacia ti y desde ti. Abre el corazón y deja que el amor se asiente donde ya está siendo recibido, porque hoy el cielo confirma la unión.",
-      mixto: "Arcángel Chamuel contempla {cartas} y sostiene tu corazón con dulzura y verdad: hay amor, pero también hay un nudo que pide ser hablado. No confundas silencio con paz ni distancia con indiferencia: nombra lo que sientes con honestidad y el vínculo encontrará su equilibrio.",
-      sombra: "Arcángel Chamuel cruza los brazos y te regaña con amor severo: {cartas} te muestran que estás entregando tu corazón donde no es cuidado, o cerrando la puerta a quien sí lo merecería. No mendigues afecto donde solo hay ego: ama desde la dignidad y el amor te devolverá la paz."
+      luz: "Yo soy Chamuel, el ángel del amor verdadero: envuelvo tus vínculos con mi luz rosa, y te aseguro que el afecto sincero fluye hacia ti y desde ti. Abre el corazón y deja que el amor se asiente donde ya está siendo recibido, porque el cielo confirma la unión.",
+      mixto: "Yo soy Chamuel, y sostengo tu corazón con dulzura y verdad: hay amor, pero también hay un nudo que pide ser hablado. No confundas silencio con paz ni distancia con indiferencia: nombra lo que sientes con honestidad y el vínculo encontrará su equilibrio.",
+      sombra: "Yo soy Chamuel, y te regaño con amor severo: estás entregando tu corazón donde no es cuidado, o cerrando la puerta a quien sí lo merecería. No mendigues afecto donde solo hay ego: ama desde la dignidad y el amor te devolverá la paz."
     },
     rafael: {
-      luz: "Arcángel Rafael deja su luz esmeralda sobre {cartas}: tu cuerpo, tu mente y tu alma están siendo sanados. Esta energía restauradora es real y está trabajando en ti: respira, descansa y confía en que la medicina divina ya está haciendo su obra.",
-      mixto: "Arcángel Rafael posa su mano sobre {cartas} y te habla como el médico que ve la herida y también la cura: hay sanación en camino, pero hay una atención que te estás negando. Atiende lo que tu cuerpo o tu alma te piden calladamente, y la guía te llevará a la plenitud.",
-      sombra: "Arcángel Rafael aparta la mano y te regaña con serena severidad: {cartas} te advierten que estás descuidando lo que más necesitas cuidar. No postergues más tu salud y tu paz, no sigas dándote a todos mientras no te queda nada para ti: la sanación empieza por detenerte y priorizarte."
+      luz: "Yo soy Rafael, el sanador: dejo mi luz esmeralda sobre tu cuerpo, tu mente y tu alma, porque estás siendo sanado. Esta energía restauradora es real y está trabajando en ti: respira, descansa y confía en que la medicina divina ya está haciendo su obra.",
+      mixto: "Yo soy Rafael, y te hablo como el médico que ve la herida y también la cura: hay sanación en camino, pero hay una atención que te estás negando. Atiende lo que tu cuerpo o tu alma te piden calladamente, y la guía te llevará a la plenitud.",
+      sombra: "Yo soy Rafael, y te regaño con serena severidad: estás descuidando lo que más necesitas cuidar. No postergues más tu salud y tu paz, no sigas dándote a todos mientras no te queda nada para ti: la sanación empieza por detenerte y priorizarte."
     },
     gabriel: {
-      luz: "Arcángel Gabriel hace sonar su cuerno de plata ante {cartas}: el mensaje que esperabas está en camino y tu propósito se aclara. Escucha las señales, porque a través de ellas el cielo te habla con total claridad y tu llamado interior se hace más nítido.",
-      mixto: "Arcángel Gabriel te susurra con {cartas} delante: la verdad está cerca, pero llega mezclada con ruido. No te apresures a concluir: contrasta lo que oyes, revisa lo que crees y el mensaje puro terminará llegando a tu corazón sin necesidad de forzar nada.",
-      sombra: "Arcángel Gabriel te interrumpe con su trompeta y te regaña: {cartas} muestran que has dejado de escuchar, que repites palabras viejas y das por sentado lo que aún no ha sido dicho. Silencia el ruido, vuelve a preguntar y abre los oídos: tu respuesta no llegará hasta que te calles."
+      luz: "Yo soy Gabriel, el mensajero del cielo: hago sonar mi cuerno de plata porque el mensaje que esperabas está en camino y tu propósito se aclara. Escucha las señales, porque a través de ellas el cielo te habla con total claridad y tu llamado interior se hace más nítido.",
+      mixto: "Yo soy Gabriel, y te susurro que la verdad está cerca, pero llega mezclada con ruido. No te apresures a concluir: contrasta lo que oyes, revisa lo que crees y el mensaje puro terminará llegando a tu corazón sin necesidad de forzar nada.",
+      sombra: "Yo soy Gabriel, y te interrumpo con mi trompeta para regañarte: has dejado de escuchar, repites palabras viejas y das por sentado lo que aún no ha sido dicho. Silencia el ruido, vuelve a preguntar y abre los oídos: tu respuesta no llegará hasta que te calles."
     },
     uriel: {
-      luz: "Arcángel Uriel enciende su antorcha sobre {cartas}: la sabiduría te ilumina y el discernimiento te acompaña. Confía en la certeza interior que ahora se enciende en ti, porque ves con claridad lo que otros no comprenden y tus decisiones hoy tienen luz propia.",
-      mixto: "Arcángel Uriel observa {cartas} con su mirada de fuego tranquilo: tienes la verdad cerca, pero el impulso te empuja a decidir antes de tiempo. Detente, examina y compara: la sabiduría que buscas no está en actuar más rápido, sino en mirar más profundo.",
-      sombra: "Arcángel Uriel posa su antorcha frente a ti y te regaña sin rodeos: {cartas} te muestran que estás actuando por impulso, sin mirar el conjunto. Has dejado que la emoción nuble el juicio y eso te está costando caro. Vuelve a la claridad, pide tiempo al mundo y decide desde la luz, no desde el miedo."
+      luz: "Yo soy Uriel, el portador de la antorcha: enciendo mi luz sobre ti porque la sabiduría te ilumina y el discernimiento te acompaña. Confía en la certeza interior que ahora se enciende en ti, porque ves con claridad lo que otros no comprenden y tus decisiones tienen luz propia.",
+      mixto: "Yo soy Uriel, y te observo con mirada de fuego tranquilo: tienes la verdad cerca, pero el impulso te empuja a decidir antes de tiempo. Detente, examina y compara: la sabiduría que buscas no está en actuar más rápido, sino en mirar más profundo.",
+      sombra: "Yo soy Uriel, y te regaño sin rodeos: estás actuando por impulso, sin mirar el conjunto. Has dejado que la emoción nuble el juicio y eso te está costando caro. Vuelve a la claridad, pide tiempo al mundo y decide desde la luz, no desde el miedo."
     },
     zadkiel: {
-      luz: "Arcángel Zadkiel abre sus alas violetas sobre {cartas}: la misericordia y el perdón están desatando lo que te tenía aprisionado. Suéltalo todo, perdona lo que sea necesario y siente cuánta libertad entra en tu alma cuando dejas de cargar el pasado.",
-      mixto: "Arcángel Zadkiel contempla {cartas} y te tiende la llave: la liberación es posible, pero hay una cadena que tú mismo mantienes puesta. No se trata solo de que otros te suelten: hay algo que debes soltar tú. Date permiso para dejar ir y el cielo te sostendrá.",
-      sombra: "Arcángel Zadkiel lanza una mirada compasiva y firme y te regaña: {cartas} revelan que llevas demasiado tiempo atado a la culpa, al rencor o a un pasado que ya no existe. Cada día que no perdonas, te encadenas más. Suelta la piedra, perdónate y perdona: tu corazón no fue hecho para cargar tanto peso."
+      luz: "Yo soy Zadkiel, el ángel de la misericordia: abro mis alas violetas sobre ti porque la misericordia y el perdón están desatando lo que te tenía aprisionado. Suéltalo todo, perdona lo que sea necesario y siente cuánta libertad entra en tu alma cuando dejas de cargar el pasado.",
+      mixto: "Yo soy Zadkiel, y te tiendo la llave: la liberación es posible, pero hay una cadena que tú mismo mantienes puesta. No se trata solo de que otros te suelten: hay algo que debes soltar tú. Date permiso para dejar ir y el cielo te sostendrá.",
+      sombra: "Yo soy Zadkiel, y te miro con compasión y firmeza para regañarte: llevas demasiado tiempo atado a la culpa, al rencor o a un pasado que ya no existe. Cada día que no perdonas, te encadenas más. Suelta la piedra, perdónate y perdona: tu corazón no fue hecho para cargar tanto peso."
     },
     jofiel: {
-      luz: "Arcángel Jofiel acaricia {cartas} con un rayo dorado de inspiración: la belleza y la luz que tanto buscas ya están floreciendo a tu alrededor. Rodeate de lo que te eleva, confía en tu creatividad y verás cómo tu mundo empieza a brillar con tus propios colores.",
-      mixto: "Arcángel Jofiel sostiene {cartas} y te habla como quien conoce el arte de los comienzos: hay luz, pero todavía tienes los ojos puestos en lo que no fue. Deja de mirar atrás y permite que la inspiración nueva entre: la belleza no llega donde la mirada anda nublada.",
-      sombra: "Arcángel Jofiel apaga su lámpara un instante y te regaña con dulzura exigente: {cartas} te muestran que has dejado de ver la luz que sí tienes, comparándote y ensombreciendo tu propio camino. Cuida lo que miras: la inspiración huye de quien no cree en su propia belleza. Enciende tu luz otra vez."
+      luz: "Yo soy Jofiel, el ángel de la inspiración: acaricio tu camino con un rayo dorado porque la belleza y la luz que tanto buscas ya están floreciendo a tu alrededor. Rodéate de lo que te eleva, confía en tu creatividad y verás cómo tu mundo empieza a brillar con tus propios colores.",
+      mixto: "Yo soy Jofiel, y te hablo como quien conoce el arte de los comienzos: hay luz, pero todavía tienes los ojos puestos en lo que no fue. Deja de mirar atrás y permite que la inspiración nueva entre: la belleza no llega donde la mirada anda nublada.",
+      sombra: "Yo soy Jofiel, y te regaño con dulzura exigente: has dejado de ver la luz que sí tienes, comparándote y ensombreciendo tu propio camino. Cuida lo que miras: la inspiración huye de quien no cree en su propia belleza. Enciende tu luz otra vez."
     }
   },
 
@@ -308,11 +304,7 @@ const TIRADAS = {
     return bloques.map(b => {
       const inv = b.temas.filter(t => t.carta.invertido).length;
       const tenor = inv === 0 ? "luz" : (inv === b.temas.length ? "sombra" : "mixto");
-      const listaCartas = b.temas.map(t => t.carta.nombre + (t.carta.invertido ? " (revertida)" : "")).join(" y ");
-      const palabras = b.temas.map(t => t.carta.palabras.slice(0, 2).join(", ") + (t.carta.invertido ? " en sombra" : "")).join(" · ");
-      const texto = this.voces[b.clave][tenor]
-        .replace("{cartas}", `<strong>${listaCartas}</strong>`)
-        + ` <em class="cita">»${palabras}«</em>`;
+      const texto = this.voces[b.clave][tenor];
       const arc = b.arcangel;
       return {
         icono: arc.emoji,
@@ -571,18 +563,19 @@ function mostrarEleccion(r) {
     escenario.appendChild(slot);
   });
 
-  // mazo para tocar: cartas boca abajo (dorso real) que el usuario toca
+  // mazo: las 22 cartas boca arriba para que elijas las de tu lectura
   const zonaMazo = document.createElement("div");
-  zonaMazo.className = "mazo";
+  zonaMazo.className = "mazo mazo-eleccion";
   zonaMazo.style.marginTop = "34px";
-  for (let i = 0; i < 15; i++) {
-    const c = document.createElement("div");
-    c.className = "minicarta";
-    c.style.width = "84px";
-    c.innerHTML = "<div class='dorso-mini'></div><span class='nom'>Toca para elegir</span>";
-    c.addEventListener("click", () => elegirUna(c, r));
-    zonaMazo.appendChild(c);
-  }
+  r.mazo.forEach((c, i) => {
+    const m = document.createElement("div");
+    m.className = "minicarta";
+    m.style.width = "84px";
+    m.dataset.idx = String(i);
+    m.innerHTML = `${TIRADAS.figuraDe(c)}<span class="nom">${c.nombre}</span>`;
+    m.addEventListener("click", () => elegirUna(m, r));
+    zonaMazo.appendChild(m);
+  });
   escenario.appendChild(zonaMazo);
 
   const contador = document.getElementById("contador");
@@ -590,9 +583,12 @@ function mostrarEleccion(r) {
 
   function elegirUna(elm, r) {
     if (elegidas >= r.tirada.n) return;
-    const carta = r.cartas[elegidas];
+    const c = r.mazo[Number(elm.dataset.idx)];
+    const carta = TIRADAS.construirCarta(c);
+    r.cartas.push(carta);
+    elm.style.pointerEvents = "none";
+    elm.style.opacity = "0.35";
     elm.style.animation = "flotar 1s ease-in-out infinite";
-    elm.innerHTML = `${TIRADAS.figuraDe(carta)}<span class="nom">${carta.nombre}</span>`;
     setTimeout(() => {
       const plaza = document.getElementById("plaza-" + elegidas);
       plaza.classList.add("girada");
