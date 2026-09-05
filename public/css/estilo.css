@@ -708,6 +708,44 @@ h3 { font-size: 1.25rem; }
 }
 .bloque-categoria.regano .combinacion-texto { border-left-color: #c0507a; background: rgba(192, 80, 122, 0.08); }
 
+/* ----------------------- LECTURA FUERTE -------------------------------- */
+.titulo-interp-final.titulo-fuerte {
+  color: #ffb37a;
+  text-shadow: 0 0 18px rgba(255, 120, 60, 0.65), 0 0 40px rgba(255, 90, 40, 0.4);
+  animation: fuerte-pulso 1.4s ease-in-out infinite;
+}
+@keyframes fuerte-pulso {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+.raya-fuerte {
+  border: none;
+  height: 2px;
+  margin: 14px auto 22px;
+  width: 220px;
+  background: linear-gradient(90deg, transparent, rgba(255, 120, 60, 0.85), transparent);
+  box-shadow: 0 0 16px rgba(255, 100, 50, 0.7);
+}
+.bloque-categoria.regano {
+  border-color: rgba(192, 80, 122, 0.5);
+  background: linear-gradient(165deg, rgba(70, 20, 40, 0.75), rgba(40, 10, 30, 0.85));
+  box-shadow: 0 0 24px rgba(192, 80, 122, 0.22);
+}
+.regano-tag {
+  display: inline-block;
+  margin: 0 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #f2a900, #d98835);
+  color: #2b0f26;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  vertical-align: middle;
+  box-shadow: 0 0 12px rgba(242, 169, 0, 0.55);
+}
+
 /* ----------------------- interpretación final -------------------------- */
 .interpretacion-final { margin-top: 44px; }
 .titulo-interp-final {
