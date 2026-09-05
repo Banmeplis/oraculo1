@@ -545,7 +545,7 @@ function mostrarEleccion(r) {
   let elegidas = 0;
   escena.innerHTML = `
     <div class="centrado">
-      <p style="margin-bottom:8px">Ahora elige tus cartas.</p>
+      <p style="margin-bottom:8px">${r.tirada.n === 1 ? "Elige tu carta del mazo:" : `Elige tus ${r.tirada.n} cartas del mazo.`}</p>
       <p style="font-size:.9rem;color:var(--lavanda-suave)">Seleccionadas: <span id="contador">0</span> de ${r.tirada.n}</p>
       <div class="escenario" id="escenario-eleccion"></div>
       <div class="oculto" id="aviso-cartas">
@@ -586,25 +586,27 @@ function mostrarEleccion(r) {
     const c = r.mazo[Number(elm.dataset.idx)];
     const carta = TIRADAS.construirCarta(c);
     r.cartas.push(carta);
+    elegidas++;
     elm.style.pointerEvents = "none";
     elm.style.opacity = "0.35";
     elm.style.animation = "flotar 1s ease-in-out infinite";
-    setTimeout(() => {
-      const plaza = document.getElementById("plaza-" + elegidas);
-      plaza.classList.add("girada");
-      const cara = plaza.querySelector(".cara");
-      cara.innerHTML = `<div>
-        ${TIRADAS.figuraDe(carta)}
-        <div class="c-nombre">${carta.nombre}</div>
-        <div class="c-pos">${carta.invertido ? "invertida" : "derecha"}</div>
-      </div>`;
-      elegidas++;
-      contador.textContent = elegidas;
-      if (elegidas === r.tirada.n) {
-        aviso.classList.remove("oculto");
-        setTimeout(() => mostrarResultado(r), 1100);
-      }
-    }, 550);
+    const plaza = document.getElementById("plaza-" + (elegidas - 1));
+    plaza.classList.add("girada");
+    const cara = plaza.querySelector(".cara");
+    cara.innerHTML = `<div>
+      ${TIRADAS.figuraDe(carta)}
+      <div class="c-nombre">${carta.nombre}</div>
+      <div class="c-pos">${carta.invertido ? "invertida" : "derecha"}</div>
+    </div>`;
+    contador.textContent = elegidas;
+    if (elegidas === r.tirada.n) {
+      zonaMazo.querySelectorAll(".minicarta").forEach(x => {
+        x.style.pointerEvents = "none";
+        x.style.opacity = x.style.opacity || "0.2";
+      });
+      aviso.classList.remove("oculto");
+      setTimeout(() => mostrarResultado(r), 1100);
+    }
   }
 }
 
