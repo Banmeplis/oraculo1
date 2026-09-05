@@ -646,9 +646,57 @@ h3 { font-size: 1.25rem; }
   box-shadow: 0 4px 14px rgba(var(--chip), 0.5);
 }
 .arcangel-regente .ar-mensaje { font-family: var(--fuente-serif); font-size: 1.15rem; color: var(--blanco-humo); margin-top: 10px; }
+.arcangel-regente .ar-presentes {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  justify-content: center;
+}
+.arcangel-regente .ar-titulo {
+  font-family: var(--fuente-titulo);
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--dorado);
+  margin-right: 4px;
+}
 @media (max-width: 760px) {
   .arcangel-regente { flex-direction: column; text-align: center; padding: 20px 18px; }
 }
+
+/* ----------------------- combinación de cartas --------------------------- */
+.combo-tag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--nocturno);
+}
+.combo-tag.combo-normal {
+  background: linear-gradient(135deg, rgba(90, 200, 160, 0.95), rgba(90, 200, 160, 0.7));
+  box-shadow: 0 4px 12px rgba(90, 200, 160, 0.45);
+}
+.combo-tag.combo-espejada {
+  background: linear-gradient(135deg, rgba(230, 150, 60, 0.95), rgba(230, 150, 60, 0.7));
+  box-shadow: 0 4px 12px rgba(230, 150, 60, 0.45);
+}
+.combo-tag.combo-sombra {
+  background: linear-gradient(135deg, rgba(160, 110, 240, 0.95), rgba(160, 110, 240, 0.7));
+  box-shadow: 0 4px 12px rgba(160, 110, 240, 0.45);
+}
+.combinacion-texto {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--dorado);
+  background: rgba(212, 175, 55, 0.07);
+  border-radius: 0 10px 10px 0;
+  font-family: var(--fuente-serif);
+  font-size: 1.1rem;
+  color: var(--blanco-humo);
+}
+.bloque-categoria.regano .combinacion-texto { border-left-color: #c0507a; background: rgba(192, 80, 122, 0.08); }
 
 /* ----------------------- interpretación final -------------------------- */
 .interpretacion-final { margin-top: 44px; }

@@ -219,7 +219,7 @@ const TIRADAS = {
       regano: false,
       presencia: this.fraseArea(this.arcangeles[a.clave], a.clave === "chamuel" ? "amor" : a.clave),
       texto: a.texto
-    })).concat([{ cierre: true, texto: cierrePoderoso, cita }]);
+    })).concat([this.bloqueCombinacionGlobal(resultado), { cierre: true, texto: cierrePoderoso, cita }]);
   },
   /* ----------------------- GRAN TIRADA · 14 cartas ------------------------ */
   /* asigna cada tema de la gran tirada al arcángel que lo custodia */
@@ -314,13 +314,62 @@ const TIRADAS = {
         arcangel: arc,
         regano: tenor === "sombra",
         presencia: this.fraseArea(arc, b.clave),
-        texto
+        texto,
+        combinacion: this.combinacionDe(b)
       };
     }).concat([{
       cierre: true,
       texto: "Los siete arcángeles han hablado, cada uno desde su don, y han sellado juntos esta lectura con una sola certeza: no estás sola ni desamparada. Todas las voces señalan el mismo camino, y todas te sostienen para que lo recorras con fe. Suelta el miedo, abraza el consejo que más te dolió escuchar y deja que la luz de este consejo celestial te guíe hacia la vida que mereces.",
       cita
     }]);
+  },
+
+  /* la combinación de las cartas de cada arcángel: normal (luz), espejada
+     (mezcla de derecha e invertida) o en sombra; el arcángel la nombra con
+     sus propias palabras y según su contexto */
+  combinacionDe(bloque) {
+    const inv = bloque.temas.filter(t => t.carta.invertido).length;
+    const temas = bloque.temas.map(t => t.tema.toLowerCase()).join(" y ");
+    const tipo = inv === 0 ? "luz" : (bloque.temas.length === inv ? "sombra" : "mixto");
+    const arc = bloque.arcangel;
+    const A = this.nombreCorto(arc.nombre);
+    const R = arc.regencia.toLowerCase();
+    const textos = {
+      luz: `La combinación de mis cartas en ${temas} es normal y luminosa: todas apuntan en la misma dirección y su energía se multiplica a tu favor. Yo, ${A}, te aseguro que esta unión te respalda con mi ${R}: actúa con calma y confianza, porque lo que se alinea contigo no se deshace fácilmente.`,
+      mixto: `La combinación de mis cartas en ${temas} es espejada: unas te muestran su luz y otras te devuelven tu propia sombra, hablándote con honestidad. Yo, ${A}, te digo que este espejo no es un castigo: es un aviso a tiempo para que equilibres lo que hoy está a medias. Atiende ambas caras y la balanza volverá a tu favor desde mi ${R}.`,
+      sombra: `La combinación de mis cartas en ${temas} es en sombra: todas se presentan invertidas, y eso raramente significa no; significa que debes voltear el enfoque. Yo, ${A}, te hablo con serenidad y firmeza: la oscuridad solo te muestra lo que no has querido mirar. Devuelve la luz a estos asuntos desde mi ${R} y lo que parecía bloqueado empezará a moverse.`
+    };
+    return { tipo: tipo === "mixto" ? "espejada" : tipo, texto: textos[tipo] };
+  },
+
+  /* bloque de combinación global de las lecturas cortas (1, 3, 5, 10 cartas):
+     el arcángel regente resume cómo se combina toda la lectura */
+  bloqueCombinacionGlobal(resultado) {
+    const total = resultado.cartas.length;
+    const inv = resultado.cartas.filter(c => c.invertido).length;
+    const arc = this.arcangelesDeLectura(resultado)[0];
+    const A = this.nombreCorto(arc.nombre);
+    const R = arc.regencia.toLowerCase();
+    let tipo, texto;
+    if (inv === 0) {
+      tipo = "normal";
+      texto = `La combinación de tus cartas es normal y luminosa: todas brillan del derecho y su energía se une para impulsarte. Yo, ${A}, te confirmo desde mi ${R} que este respaldo es real: avanza con el corazón abierto, porque lo que se combina a tu favor ya está en movimiento.`;
+    } else if (inv === total) {
+      tipo = "sombra";
+      texto = `La combinación de tus cartas es en sombra: todas se presentan invertidas, y eso raramente es un no: es una llamada a voltear el enfoque. Yo, ${A}, te hablo con serenidad y firmeza: cada carta en sombra te enseña lo que no querías ver; devuelve la luz a estas áreas desde mi ${R} y el camino se despejará.`;
+    } else {
+      tipo = "espejada";
+      texto = `La combinación de tus cartas es espejada: unas te muestran su luz y otras te devuelven tu propia sombra. Yo, ${A}, te digo desde mi ${R} que este espejo es un regalo: te muestra lo que ya avanza y lo que aún pide atención. No ignores tu reflejo: escucha las dos caras y la balanza se inclinará a tu favor.`;
+    }
+    return {
+      icono: "🔗",
+      area: "combinacion",
+      titulo: "La combinación de tus cartas",
+      arcangel: arc,
+      regano: tipo === "sombra",
+      combinacion: { tipo, texto },
+      texto: ""
+    };
   },
 
   /* una línea por área, con la personalidad del arcángel al frente */
@@ -393,10 +442,7 @@ const TIRADAS = {
     html += "<p>Resultado de la tirada de tarot completa gratis</p></div>";
 
     html += `<div class="contexto-tirada vidrio">
-      <h3 style="color:var(--dorado);margin-bottom:10px">Interpretación general de la Tirada de Tarot</h3>
-      <p>Aquí tienes la interpretación de tu tirada de tarot completa gratis.</p>
-      <p>Nuestras videntes y tarotistas te pueden dar un servicio totalmente personalizado, confidencial, realizando una tirada de cartas personal de gran calidad. Junto a su don de videncia, podrán ayudarte con tu futuro.</p>
-      <div class="fila-tarot">${Array(7).fill("tarot").map(x => "<span>" + x + "</span>").join("")}</div>
+      <h3 style="color:var(--dorado);margin-bottom:10px">Interpretación Angelical</h3>
       <p class="comparte"><small>✨ Comparte tu resultado con quien quieras ✨</small></p>
     </div>`;
 
@@ -405,14 +451,10 @@ const TIRADAS = {
     const arcangel = arcangeles[0];
     this.aplicarFondo(arcangeles);
     html += `<div class="arcangel-regente vidrio">
-      <div class="ar-seal">${arcangel.emoji}</div>
-      <div class="ar-info">
-        <small>${arcangeles.length > 1 ? "Tus arcángeles regentes se unen en esta lectura" : "Tu lectura está regida por"}</small>
-        <h3>${this.nombresArcangeles(arcangeles)}</h3>
-        <span class="ar-regencia">${this.listaRegencias(arcangeles)}</span>
-        <div class="ar-fila">${arcangeles.map(a => `<span class="ar-chip" style="--chip:${a.color}">${a.emoji} ${this.nombreCorto(a.nombre)}</span>`).join("")}</div>
-        <p class="ar-mensaje">${this.mensajeUnido(arcangeles)}</p>
-      </div>
+      <p class="ar-presentes">
+        <span class="ar-titulo">Arcángeles presentes:</span>
+        ${arcangeles.map(a => `<span class="ar-chip" style="--chip:${a.color}">${a.emoji} ${this.nombreCorto(a.nombre)}</span>`).join("")}
+      </p>
     </div>`;
 
     resultadoHTML.cartas.forEach((c, i) => {
@@ -451,9 +493,11 @@ const TIRADAS = {
           <h4><span class="cat-icono">${b.icono}</span> ${b.titulo}
             <span class="cat-arc" style="--chip:${arcDeArea.color}">${arcDeArea.emoji} ${this.nombreCorto(arcDeArea.nombre)}</span>
             ${b.regano ? '<span class="regano-tag">régano</span>' : ""}
+            ${b.combinacion ? `<span class="combo-tag combo-${b.combinacion.tipo}">combinación ${b.combinacion.tipo}</span>` : ""}
           </h4>
           <p class="presencia-arc">${b.presencia || this.fraseArea(arcDeArea, b.area)}</p>
-          <p>${b.texto}</p>
+          ${b.texto ? `<p>${b.texto}</p>` : ""}
+          ${b.combinacion ? `<p class="combinacion-texto">${b.combinacion.texto}</p>` : ""}
         </div>`;
       }
     });
