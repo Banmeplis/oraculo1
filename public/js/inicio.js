@@ -112,14 +112,63 @@ window.INICIO = (function () {
     return fraccion;
   }
 
+  /* ------------------------ portal energético del día --------------------- */
+  var PORTAL_NIVELES = {
+    ninguno:    { etiqueta: "Sin portal energético" },
+    leve:       { etiqueta: "Portal energético leve" },
+    normal:     { etiqueta: "Portal energético" },
+    importante: { etiqueta: "Portal energético importante" }
+  };
+
+  function reduccionNumerologica(n) {
+    var r = n;
+    while (r > 33 || (r > 9 && r !== 11 && r !== 22)) {
+      var s = 0;
+      while (r > 0) { s += r % 10; r = Math.floor(r / 10); }
+      r = s;
+    }
+    return r;
+  }
+
+  function portalDelDia(fecha) {
+    var f = fecha || new Date();
+    var dia = f.getDate();
+    var mes = f.getMonth() + 1;
+    var anio = f.getFullYear();
+    var fraccion = faseLunar(f);
+    var puntos = 0;
+
+    /* números maestros del día (11, 22) */
+    if (dia === 11 || dia === 22) puntos += 2;
+
+    /* día espejo (día == mes): 1/1, 2/2 ... 12/12, resonancia numérica */
+    if (dia === mes) puntos += 1;
+
+    /* la fecha completa reducida cae en número maestro (11, 22 o 33) */
+    if (reduccionNumerologica(dia + mes + anio) === 11 ||
+        reduccionNumerologica(dia + mes + anio) === 22 ||
+        reduccionNumerologica(dia + mes + anio) === 33) puntos += 1;
+
+    /* luna nueva o luna llena: ventanas de gran energía */
+    var distNueva = Math.min(fraccion, 1 - fraccion);
+    if (distNueva < 0.02 || Math.abs(fraccion - 0.5) < 0.02) puntos += 1;
+
+    if (puntos >= 3) return "importante";
+    if (puntos === 2) return "normal";
+    if (puntos === 1) return "leve";
+    return "ninguno";
+  }
+
   function renderCicloLunar() {
     var el = document.getElementById("barra-lunar");
     if (!el) return;
-    var f = faseLunar();
+    var hoy = new Date();
+    var f = faseLunar(hoy);
     var diaLunar = Math.floor(f * 29.53058867) + 1; /* 1..30 */
     var idx8 = Math.floor(f * 8) % 8;
     var fase = FASES[idx8];
-    var det = "· día " + diaLunar + " del ciclo lunar";
+    var fTexto = hoy.toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "short" });
+    var det = "· " + fTexto + " · día " + diaLunar + " del ciclo lunar";
 
     document.getElementById("lunar-icono").textContent = fase.ico;
     document.getElementById("lunar-fase").textContent = fase.nombre;
@@ -135,6 +184,14 @@ window.INICIO = (function () {
       s.title = p.nombre;
       pts.appendChild(s);
     });
+
+    /* portal energético del día, con color según su fuerza */
+    var portal = document.getElementById("lunar-portal");
+    if (portal) {
+      var nivel = portalDelDia(hoy);
+      portal.className = "lunar-portal portal-" + nivel;
+      portal.textContent = PORTAL_NIVELES[nivel].etiqueta;
+    }
   }
 
   /* --------------------- arcángel regente del día --------------------- */
@@ -172,6 +229,8 @@ window.INICIO = (function () {
     ARCANGELES: ARCANGELES,
     arcangelDelDia: arcangelDelDia,
     mensajeDelDia: mensajeDelDia,
-    faseLunar: faseLunar
+    faseLunar: faseLunar,
+    portalDelDia: portalDelDia,
+    reduccionNumerologica: reduccionNumerologica
   };
 })();

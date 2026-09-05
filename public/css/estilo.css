@@ -777,8 +777,43 @@ footer.pie .enlace { color: var(--dorado); text-decoration: none; }
 .barra-lunar .lunar-puntos { margin-left: auto; display: flex; gap: 4px; font-size: 0.95rem; }
 .barra-lunar .lunar-pt { opacity: 0.35; filter: grayscale(0.4); transition: 0.3s; }
 .barra-lunar .lunar-pt.activo { opacity: 1; transform: scale(1.35); filter: drop-shadow(0 0 6px rgba(212,175,55,0.9)); }
+.barra-lunar .lunar-portal {
+  flex-shrink: 0;
+  margin-left: 14px;
+  padding: 4px 14px;
+  border-radius: 999px;
+  border: 1px solid;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  white-space: nowrap;
+}
+.barra-lunar .lunar-portal.portal-importante {
+  color: #ff7a7a;
+  border-color: rgba(255, 90, 90, 0.7);
+  background: rgba(255, 80, 80, 0.16);
+  box-shadow: 0 0 14px rgba(255, 80, 80, 0.35);
+}
+.barra-lunar .lunar-portal.portal-normal {
+  color: #f5d76e;
+  border-color: rgba(245, 215, 110, 0.7);
+  background: rgba(245, 215, 110, 0.14);
+  box-shadow: 0 0 14px rgba(245, 215, 110, 0.3);
+}
+.barra-lunar .lunar-portal.portal-leve {
+  color: #6ee7a0;
+  border-color: rgba(110, 231, 160, 0.7);
+  background: rgba(110, 231, 160, 0.12);
+  box-shadow: 0 0 14px rgba(110, 231, 160, 0.28);
+}
+.barra-lunar .lunar-portal.portal-ninguno {
+  color: var(--lavanda-suave);
+  border-color: rgba(201, 182, 238, 0.4);
+  background: rgba(201, 182, 238, 0.1);
+}
 @media (max-width: 600px) {
   .barra-lunar .lunar-puntos { display: none; }
+  .barra-lunar .lunar-portal { margin-left: 0; }
 }
 
 /* ==================== arcángel regente del día ========================= */
