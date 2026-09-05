@@ -1,5 +1,7 @@
 /* ============================================================
-   ORÁCULO · Mazo completo de 78 cartas (Español)
+   ORÁCULO · Los 22 Arcanos Mayores (Español)
+   (Mazo en uso: únicamente los 22 arcanos mayores para todas
+   las modalidades de lectura)
    ============================================================ */
 
 const ORACULO = {
@@ -237,10 +239,13 @@ menores: function () {
 },
 
 /* ------------------------- funciones de acceso ------------------------- */
-mazoCompleto: function () {
-  const mayores = this.mayores.map(c => ({ n: c.n, nombre: c.nombre, palo: c.palo, emoji: c.emoji, img: c.img,
+soloMayores: function () {
+  return this.mayores.map(c => ({ n: c.n, nombre: c.nombre, palo: c.palo, emoji: c.emoji, img: c.img,
     palabras: c.palabras, derecho: c.derecho, invertida: c.invertida, arcana: "mayor" }));
-  return mayores.concat(this.menores());
+},
+
+mazoCompleto: function () {
+  return this.soloMayores().concat(this.menores());
 },
 
 encontrar: function (id) {

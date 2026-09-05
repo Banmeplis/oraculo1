@@ -8,7 +8,7 @@ const TIRADAS = {
   mazo: null,
 
   definirMazo() {
-    this.mazo = ORACULO.mazoCompleto();
+    this.mazo = ORACULO.soloMayores();
   },
 
   /* ------------------------- definición de tiradas ------------------------ */
@@ -56,7 +56,7 @@ const TIRADAS = {
     return { tirada: t, cartas };
   },
 
-  idDe(c) { return c.arcana === "mayor" ? "M" + c.n : c.paloClave + "-" + c.n; },
+  idDe(c) { return "M" + c.n; },
 
   /* figura de la carta: usa la imagen del arcano cuando existe, si no el emoji */
   figuraDe(c, cls) {
@@ -282,7 +282,7 @@ const TIRADAS = {
       html += `<div class="carta-grande vidrio">
         <div class="sello ${c.invertido ? "invertida" : ""}"><div>
           ${this.figuraDe(c)}
-          <small>${c.arcana === "mayor" ? "Arcano Mayor" : c.palo}</small>
+          <small>Arcano Mayor</small>
         </div></div>
         <div style="flex:1;min-width:240px">
           <h4>${pos[0]} <span style="font-weight:400;color:var(--lavanda-suave)">· ${pos[1]}</span></h4>
