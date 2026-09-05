@@ -24,7 +24,7 @@ mayores: [
   { n: 5,  nombre: "El Hierofante",   palo: "",  emoji: "📜", img: "/cartas/el-hierofante.png", palabras: ["Tradición", "Enseñanza", "Guía espiritual"],
     derecho: "Un maestro llega a tu camino, o tú te vuelves guía: busca sentido en la sabiduría que se comparte y transmite.",
     invertida: "Cuestiona los dogmas que ya no te sirven: honra la tradición sin renunciar a tu propia voz." },
-  { n: 6,  nombre: "Los Enamorados",  palo: "",  emoji: "💞", palabras: ["Amor", "Unión", "Elección"],
+  { n: 6,  nombre: "Los Enamorados",  palo: "",  emoji: "💞", img: "/cartas/los-enamorados.jpg", palabras: ["Amor", "Unión", "Elección"],
     derecho: "El corazón y la mente se encuentran: decide con amor y coherencia, porque esta elección marca tu destino.",
     invertida: "Desarmonía o duda: confía en tu verdad y no elijas por miedo a quedarte a solas." },
   { n: 7,  nombre: "El Carro",        palo: "",  emoji: "🐎", img: "/cartas/el-carro.png", palabras: ["Victoria", "Voluntad", "Avance"],
