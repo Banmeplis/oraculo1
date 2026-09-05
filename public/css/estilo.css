@@ -332,6 +332,24 @@ h3 { font-size: 1.25rem; }
 .minicarta .c-art { width: 54px; height: 54px; object-fit: cover; display: block; margin: 0 auto 4px; border-radius: 8px; }
 .minicarta .nom { font-size: 0.68rem; color: var(--lavanda); line-height: 1.3; font-family: var(--fuente-serif); }
 
+/* dorso real de la carta (reverso) para el mazo que se toca */
+.dorso-mini {
+  width: 58px; height: 80px;
+  margin: 0 auto 5px;
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(212, 175, 55, 0.28), transparent 62%),
+    linear-gradient(160deg, #2b1c66, #170f3c);
+  border: 1px solid rgba(212, 175, 55, 0.6);
+  display: grid; place-items: center;
+  box-shadow: inset 0 0 14px rgba(212, 175, 55, 0.25), 0 6px 14px rgba(0, 0, 0, 0.4);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+.minicarta:hover .dorso-mini { transform: rotate(-4deg) translateY(-4px); box-shadow: inset 0 0 14px rgba(212,175,55,0.4), 0 10px 20px rgba(212,175,55,0.25); }
+.dorso-mini::before { content: "✦"; color: var(--dorado); font-size: 1.5rem; text-shadow: 0 0 14px rgba(212, 175, 55, 0.9); }
+.dorso-mini::after { content: ""; position: absolute; inset: 7px; border: 1px solid rgba(212, 175, 55, 0.45); border-radius: 6px; }
+.dorso-mini { position: relative; }
+
 /* Escenario de tirada: cartas boca abajo */
 .escenario { display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; padding: 40px 0; }
 .carta-plaza {
@@ -456,6 +474,34 @@ h3 { font-size: 1.25rem; }
   color: var(--lavanda-suave); margin: 20px 0;
   font-size: 0.85rem;
 }
+
+/* revelado de cartas en la interpretación */
+@keyframes revelarCarta {
+  0%   { opacity: 0; transform: rotateY(-75deg) scale(0.7); filter: blur(6px); }
+  55%  { opacity: 1; transform: rotateY(12deg) scale(1.05); filter: blur(0); }
+  75%  { transform: rotateY(-4deg) scale(0.99); }
+  100% { opacity: 1; transform: rotateY(0) scale(1); filter: blur(0); }
+}
+.resultado .carta-grande {
+  opacity: 0;
+  animation: revelarCarta 0.9s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+  transform-origin: left center;
+}
+@keyframes apareceBloque {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.resultado .bloque-categoria, .resultado .mensaje-poderoso {
+  opacity: 0;
+  animation: apareceBloque 0.7s ease forwards;
+}
+.resultado .interpretacion-final { animation: apareceBloque 0.8s ease forwards; }
+@media (prefers-reduced-motion: reduce) {
+  .resultado .carta-grande, .resultado .bloque-categoria, .resultado .mensaje-poderoso, .resultado .interpretacion-final {
+    opacity: 1;
+    animation: none;
+  }
+}
 .separador::before, .separador::after { content: ""; flex: 1; height: 1px; background: var(--borde-vidrio); }
 
 /* ------------------------------- avisos --------------------------------- */
@@ -473,6 +519,7 @@ h3 { font-size: 1.25rem; }
 
 /* ------------------------------ lectura (resultado) --------------------- */
 .resultado .carta-grande { display: flex; gap: 22px; flex-wrap: wrap; align-items: flex-start; margin: 26px 0; padding: 22px; }
+.resultado .carta-grande .carta-texto { flex: 1; min-width: 0; overflow-wrap: break-word; }
 .resultado .sello {
   width: 92px; height: 92px; border-radius: 50%;
   display: grid; place-items: center;
@@ -480,11 +527,21 @@ h3 { font-size: 1.25rem; }
   border: 1px solid var(--dorado);
   color: var(--nocturno);
   flex: none;
+  position: relative;
+  overflow: hidden;
+}
+.resultado .sello > div {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  align-content: center;
+  border-radius: 50%;
 }
 .resultado .sello .c-nm { font-family: var(--fuente-deco); font-size: 1.7rem; }
 .resultado .sello.invertida { background: linear-gradient(160deg, #2b1c66, #170f3c); color: var(--lavanda); }
 .resultado .sello .c-art { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
 .resultado .sello.invertida .c-art { transform: rotate(180deg); filter: brightness(0.72) saturate(0.85); }
+.resultado .sello small { position: absolute; bottom: 6px; left: 0; right: 0; text-align: center; font-size: 0.52rem; letter-spacing: 0.6px; color: rgba(10, 6, 30, 0.75); text-shadow: 0 0 6px rgba(255,255,255,0.8); z-index: 2; }
+.resultado .sello.invertida small { color: var(--lavanda-suave); text-shadow: 0 0 6px rgba(0,0,0,0.6); }
 .resultado h4 { color: var(--dorado); margin-bottom: 6px; letter-spacing: 1px; font-size: 0.9rem; }
 .resultado h3 { color: var(--blanco); margin: 4px 0 8px; }
 .resultado .palabras { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
@@ -752,9 +809,13 @@ footer.pie .enlace { color: var(--dorado); text-decoration: none; }
   .panel-layout { grid-template-columns: 1fr; }
   .hero { padding: 50px 0 70px; }
   nav.menu { justify-content: center; width: 100%; }
-  .resultado .carta-grande { justify-content: center; text-align: center; }
-  .resultado .palabras { justify-content: center; }
+  .resultado .carta-grande { flex-direction: column; align-items: center; text-align: center; }
+  .resultado .carta-grande .sello { margin-bottom: 6px; }
+  .resultado .carta-grande .carta-texto { width: 100%; text-align: center; }
+  .resultado .carta-grande .palabras { justify-content: center; }
   .perfil-cabecera { flex-direction: column; text-align: center; }
+  .bloque-categoria { padding: 18px 14px; }
+  .bloque-categoria h4 { flex-wrap: wrap; justify-content: center; }
 }
 
 /* ============================ ciclo lunar ============================== */

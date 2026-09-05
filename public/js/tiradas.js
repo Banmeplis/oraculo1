@@ -150,53 +150,83 @@ const TIRADAS = {
       "linear-gradient(160deg, var(--nocturno) 0%, var(--nocturno2) 55%, #241650 100%)";
   },
 
-  /* interpretación final por categorías */
+/* interpretación final por áreas: cada arcángel habla de su área,
+     con contexto según las cartas que hayan salido en la lectura */
+  listaCartasTexto(resultado) {
+    return resultado.cartas
+      .map(c => "<strong>" + c.nombre + "</strong>" + (c.invertido ? " <span class='c-pos'>en sombra</span>" : ""))
+      .join(" y ");
+  },
+
   interpretacionFinal(resultado) {
     const cartas = resultado.cartas;
     const total = cartas.length;
     const bien = cartas.filter(c => !c.invertido).length;
     const propor = bien / total;
     const cita = this.citas[Math.floor(Math.random() * this.citas.length)];
+    const lista = this.listaCartasTexto(resultado);
+    const palabras = cartas.map(c => c.palabras.slice(0, 2).join(", ") + (c.invertido ? " en sombra" : "")).join(" · ");
+    const firma = ' <em class="cita">»' + palabras + '«</em>';
 
-    const tonoPalabra = (bueno, malo, medio) => propor >= 0.8 ? bueno : (propor >= 0.5 ? medio : malo);
-
-    const economia = {
-      catalizador: `El plano económico de tu vida se encuentra hoy en un momento de ${propor >= 0.5 ? "apertura y flujo" : "fragilidad y contención"} que no es casual, sino el reflejo directo del orden interior que el oráculo revela en tu lectura. Los movimientos de dinero que se aproximan no aparecen por azar: responden a decisiones que tomaste antes, a puertas que supiste abrir en silencio y a otras que aún no te atreves a tocar. Si llevas tiempo sintiendo que tu energía no se traduce en abundancia, es porque has estado esperando el "momento perfecto" que en realidad se construye con pequeños pasos firmes. La invitación del oráculo es clara: administra con calma, no des por sentado lo que entra ni entres en pánico por lo que sale, porque la estabilidad que buscas se forja ahora, en la manera tranquila con la que sostienes cada cuenta y cada promesa. Hay una oportunidad concreta cerca de ti que muchos no verán por mirar solo el ruido; tú sí puedes verla si bajas la ansiedad y subes la atención a los detalles que siempre pasan desapercibidos.`,
-      bloqueo: `El plano económico aparece teñido de advertencia, y tu lectura no lo oculta: hay fuga de energía, gastos que se repiten sin medida y promesas de prosperidad que hasta ahora han llegado con más ruido que sustancia. No es una condena, sino un aviso a tiempo. El dinero que se escurre suele irse por rendijas emocionales: compras de consuelo, préstamos que no se planean, límites que no se ponen con quienes se han acostumbrado a tu generosidad. Este es el momento de revisar números con honestidad, de distinguir entre lo que necesitas y lo que solo calma un vacío temporal, y de cerrar la puerta a lo que te drena sin aportarte. La carencia que sientes no es falta de abundancia del universo, sino espacio en tu vida para recibirla. Cuando ordenes ese espacio, el flujo volverá, y volverá con más fuerza porque ya no encontrará obstáculos. Confía en que este bache es la base de un cimiento más sólido, y no el techo de tus posibilidades.`
-    };
-    const economiaTexto = propor >= 0.5 ? economia.catalizador : economia.bloqueo;
-
-    const amor = {
-      bueno: `En el amor, tu lectura despliega una energía generosa y luminosa: se abren caminos de encuentro, de entendimiento y de entrega sincera. Si estás en pareja, se avecina un reencuentro en la intimidad, una conversación que lleva demasiado tiempo esperando y que traerá más luz que sombra; el vínculo que parecía distante está a punto de recuperar su calor. Si estás en soledad, una presencia interesante se está acercando a tu órbita, alguien que no llega con grandes discursos sino con una constancia que mereces reconocer. El oráculo te pide que bajes la guardia y abras el corazón al ritmo real de las cosas: no fuerces, no exijas pruebas innecesarias, deja que el afecto fluya con la naturalidad de quien ya sabe que merece ser amado. La paz que buscas en otra persona comienza, una vez más, en la paz que puedes darte a ti.`,
-      medio: `El amor te habla hoy con un lenguaje de matices: ni todo es fuego ni todo es silencio, y en ese punto medio está precisamente la clave que tu lectura quiere mostrarte. Puede que estés esperando palabras que llegan tarde, gestos que no terminan de concretarse o una claridad que la otra persona aún no sabe cómo entregar. Pero la lectura sugiere que el desorden no está en el corazón de los demás, sino en la conversación que aún no se ha atrevido a ocurrir: temores no dichos, expectativas no compartidas, silencios cargados de supuestos. Es momento de nombrar lo que sientes con la serenidad de quien no quiere encender una pelea, sino encender una puerta. Si estás en soledad, revisa qué tipo de amor has estado repitiendo y suelta el patrón que ya no te hace bien; lo que buscas no está tan lejos como tu miedo sugiere.`,
-      malo: `El amor se presenta envuelto en niebla, y tu lectura te pide que no tengas miedo al silencio ni a la distancia: a veces el oráculo despeja el camino retirando lo que no estaba destinado a quedarse. Si hay alguien que se ha vuelto esquivo, frío o contradictorio, escucha lo que su ausencia grita con más honestidad que sus palabras. No se trata de castigar ni de rendirse, sino de dejar de invertir tu corazón donde no está siendo recibido ni cuidado. Este momento de sombra en lo afectivo tiene un propósito: vaciar el espacio para que el amor que sí te corresponde pueda entrar sin tener que disputar tu atención. Date el permiso de sentir la tristeza sin que te defina, y recuerda que tu valía no depende de ser elegido por quien no sabe mirarte con respeto. La luz volverá, y lo hará en forma de una presencia que no tendrás que mendigar.`
-    };
-    const amorTexto = propor >= 0.8 ? amor.bueno : (propor >= 0.5 ? amor.medio : amor.malo);
-
-    const situacion = `Las situaciones que hoy envuelven tu camino son más profundas de lo que parecen a simple vista, y tu lectura te lo muestra sin adornos. Hay un movimiento invisible, de esos que se preparan bajo la superficie antes de hacerse visibles, y tú formas parte de él aunque aún no puedas nombrarlo. Todo lo que estás viviendo en estos días, por confuso o cotidiano que parezca, te está llevando a un reordenamiento necesario: personas que se alejan, compromisos que cambian de forma, cuestiones que piden ser revisadas. El oráculo te invita a no resistirte a ese ajuste con miedo, porque lo que se está reorganizando en tu vida lo hace para acomodarte mejor a la persona que estás destinado a ser. Observa tu entorno con calma, distingue lo que te sostiene de lo que te limita, y elige conscientemente dónde poner tu energía. Nada de lo que ocurre ahora es un desvío: todo es parte del mismo sendero que te conduce a un lugar más alineado con tu esencia.`;
-
-    const bloqueo = { alto: `Tu lectura detecta en tu camino un bloqueo que no es externo sino interior, y es importante que lo mires con honestidad para poder disolverlo: se trata de un miedo que ya cumplió su función y ahora te retiene en un lugar conocido pero agotador. Ese temor, que alguna vez te sirvió para protegerte, hoy se disfraza de rutina, de excusa cómoda, de "voy a esperar un poco más" o de "todavía no es el momento". El oráculo te asegura que el momento es ahora, y que lo único que lo separa de ti es esa resistencia silenciosa que has dejado de cuestionar. Las personas o situaciones que te agobian son el espejo de un límite que no has puesto contigo mismo primero. La salida no está en pelear contra el miedo, sino en caminar hacia adelante a pesar de él: cada paso que des con la duda encendida pero el rumbo claro irá desbloqueando, uno a uno, los cerrojos que creíste imposibles de abrir.`, bajo: `Aunque tu lectura brilla con fuerza, también te marca un punto de atención que conviene no ignorar: acostumbrarse a la calma no significa que no existan nudos que desatar en silencio. Hay un tema que llevas arrastrando sin darle el peso que merece, tal vez por comodidad o por no querer romper la paz que tanto te costó construir. Esa pequeña fisura, si no la atiendes con calma, puede crecer sin que la veas llegar. El oráculo no te pide dramatismo, sino prevención: dedica un tiempo honesto a cerrar lo que quedó abierto, a perdonar lo que aún pesa y a soltar lo que ya no te aporta. Los bloqueos de quien está en buena energía no son muros, sino puertas que con cuidado se abren solas. No dejes para mañana el cuidado de tu paz interior: eso es lo único que realmente nunca debes postergar.` };
-    const bloqueoTexto = propor >= 0.5 ? bloqueo.bajo : bloqueo.alto;
-
-    const trabajoTexto = `En el terreno del trabajo y la proyección, tu lectura apunta a ${propor >= 0.5 ? "una etapa de crecimiento y reconocimiento que se está gestando" : "una etapa de revisión y reajuste que no debes temer"}, y arroja luz sobre el camino profesional que tienes por delante. Si sientes que avanzas sin rumbo o que tu esfuerzo no es visto, entiende que lo que siembras ahora es la cosecha que recogerás en los meses que siguen: la constancia, la honestidad en el trabajo y la capacidad de aprender de cada tropiezo son tus mayores aliados, más poderosos que cualquier red de contactos o golpe de suerte. Hay oportunidades que están por llegar, y no siempre parecerán oportunidades: a veces llegan en forma de reto incómodo, de responsabilidad inesperada, de tarea que nadie quiere. Aquella que las abrace con seriedad encontrará en ellas un trampolín. Mantén tu mirada alta y tus pies en la tierra, deja de compararte con los tiempos de los demás y recuerda que tu talento, cuando se pone al servicio de algo mayor, no pasa desapercibido ante quienes realmente saben ver.`;
-
-    const futuro = { bueno: `De cara al futuro, el oráculo te dibuja un horizonte que merece ser mirado con esperanza y determinación: los próximos meses traerán la cosecha de lo que hoy estás cuidando con fe, una combinación de oportunidades personales y colectivas que se irán destapando como capas de una historia que siempre supo hacia dónde iba. Lo que tanto has pedido no vendrá de una sola vez, sino en un flujo constante de pequeños avances que, sumados, cambiarán tu panorama de forma irreversible. Habrá encuentros que parecerán casuales y no lo serán, decisiones que tomarás casi sin darte cuenta y que marcarán un antes y un después, y una sensación cada vez más clara de estar en el lugar correcto. Prepárate no con ansiedad sino con apertura: suelta lo que ya cumplió su ciclo, agradece el camino recorrido y camina hacia lo nuevo con la certeza de que el universo ya está alineando las piezas a tu favor. Tu futuro está escribiéndose ahora, y lo que escribas con tus manos y tu corazón será tan poderoso como todo lo que deseas.`, malo: `De cara al futuro, tus cartas no te traen malas noticias, sino una llamada a la acción mucho más urgente de lo que tu comodidad quisiera aceptar: el tiempo de la espera pasiva ha terminado, y todo lo que anhelas necesita que des un paso decidido, aunque no tengas todas las respuestas. Los próximos meses pondrán frente a ti las mismas puertas que ya viste antes, y estarán esperando saber si esta vez eres capaz de atravesarlas con la madurez de quien ya aprendió la lección. No habrá un día perfecto, ni una señal más clara que esta que ahora lees: el futuro no se recibe, se construye, y se construye con decisiones incómodas, con límites que duelen poner y con fe que se ejerce incluso cuando no se siente. Confía en que las dificultades que vislumbras son el precio de una transformación profunda, y que la persona que serás pasado mañana te agradecerá cada paso valiente que des hoy. El horizonte no está cerrado: está esperando que lo camines.` };
-    const futuroTexto = propor >= 0.5 ? futuro.bueno : futuro.malo;
+    const areas = [
+      {
+        icono: "🛡️", area: "situacion", clave: "miguel", titulo: "Situación y protección",
+        texto: propor >= 0.5
+          ? `En tu lectura, ${lista} iluminan el escenario de tu presente y tu camino laboral. Arcángel Miguel desenvaina su espada de luz y te asegura que estás protegida y sostenida: lo que hoy construyes, cuidas o decides avanza bajo su escudo. Avanza con paso firme y sin miedo, porque tu fuerza se consolida y tu posición se fortalece.${firma}`
+          : `En tu lectura, ${lista} marcan las tensiones que hoy envuelven tu presente y tu trabajo. Arcángel Miguel alza su espada y te habla con voz de guerrero: hay una batalla donde estás gastando tu energía sin ser valorada, una grieta que pides no ignorar. Repliega fuerzas, traza tus límites y no des explicaciones por defender tu lugar.${firma}`
+      },
+      {
+        icono: "💞", area: "amor", clave: "chamuel", titulo: "Amor y relaciones",
+        texto: propor >= 0.5
+          ? `Arcángel Chamuel, el ángel del amor puro, mira ${lista} y su luz rosa envuelve tus vínculos. Estas cartas confirman que el afecto sincero fluye hacia ti: hoy la puerta de tu corazón se abre a un encuentro, una reconciliación o una entrega que ya se sentía esperada. Abre la mano y recibe: mereces ser amada sin condiciones.${firma}`
+          : `Arcángel Chamuel contempla ${lista} y sostiene tu corazón con dulzura y verdad. Hay un aviso que no debes callar: repites patrones que te dejan con menos amor del que mereces, o entregas tu luz donde no es cuidada. No mendigues afecto ni confundas silencio con paz: nombra lo que sientes, ama desde tu dignidad y deja que el amor justo vuelva a ti.${firma}`
+      },
+      {
+        icono: "💚", area: "salud", clave: "rafael", titulo: "Salud y energía",
+        texto: propor >= 0.5
+          ? `Con ${lista} ante sí, Arcángel Rafael deja caer su luz esmeralda sobre tu cuerpo y tu alma. Estas cartas hablan de restauración: la sanación que pediste está en marcha y tu equilibrio vuelve a asentarse. Respira, descansa y confía en la medicina divina que ya trabaja en ti.${firma}`
+          : `Arcángel Rafael posa su mano sobre ${lista} y te advierte con serena severidad: hay una parte de ti que estás descuidando, un cansancio que callas o un dolor que pospones. No te demores: priorizarte no es egoísmo, es el único camino para volver a brillar. Tu sanación empieza hoy por detenerte.${firma}`
+      },
+      {
+        icono: "📯", area: "mensajes", clave: "gabriel", titulo: "Mensajes y propósito",
+        texto: propor >= 0.5
+          ? `Ante ${lista}, Arcángel Gabriel hace sonar su cuerno de plata: el mensaje que esperabas está en camino y tu propósito se aclara. Presta atención a las señales que hallarás en las palabras, los nombres y las coincidencias del día: el cielo te está hablando con total claridad.${firma}`
+          : `Arcángel Gabriel contempla ${lista} y aparta el ruido con su trompeta: llevas tiempo escuchando lo que quieres oír, no lo que necesitas. Dentro de tu lectura hay un mensaje que aún no te has atrevido a aceptar. Silencia la ansiedad, vuelve a preguntar con honestidad y la respuesta llegará cuando te calles.${firma}`
+      },
+      {
+        icono: "💰", area: "economia", clave: "uriel", titulo: "Economía y abundancia",
+        texto: propor >= 0.5
+          ? `Arcángel Uriel enciende su antorcha dorada sobre ${lista}: el plano de tus recursos se abre a un flujo que ya está en marcha. La abundancia que pediste está ordenándose para llegar a ti; administra con calma, actúa con decisión y mira los detalles que otros pasan por alto: ahí está tu puerta.${firma}`
+          : `Arcángel Uriel examina ${lista} con su mirada de fuego tranquilo y no te engaña: la energía de tu dinero pide revisión y orden. Hay fugas, gastos que se repiten y promesas que llegan con más ruido que sustancia. No es una condena, sino un aviso a tiempo: cierra las rendijas, pon límites a tu generosidad y deja espacio para que la abundancia real entre.${firma}`
+      },
+      {
+        icono: "🔓", area: "bloqueo", clave: "zadkiel", titulo: "Bloqueos a liberar",
+        texto: propor >= 0.5
+          ? `Con ${lista} en la mano, Arcángel Zadkiel abre sus alas violetas sobre ti: la misericordia está desatando lo que te tenía aprisionada. Suelta la culpa, perdona lo que sea necesario y siente cuánta libertad entra cuando dejas de cargar el pasado. Hay cadenas que solo tú mantienes puestas: esta es tu hora de soltarlas.${firma}`
+          : `Arcángel Zadkiel, señor de la liberación, mira ${lista} y te señala la cadena que llevas demasiado tiempo arrastrando: un rencor, un miedo ya vencido o una culpa que no te corresponde. Cada día sin perdonar pesa más. Suelta la piedra, perdónate y perdona: tu corazón no fue hecho para cargar tanto peso, y esta lectura te da la llave.${firma}`
+      },
+      {
+        icono: "🌟", area: "futuro", clave: "jofiel", titulo: "Futuro e inspiración",
+        texto: propor >= 0.5
+          ? `Arcángel Jofiel ilumina con su lámpara dorada el horizonte trazado por ${lista}: lo que viene está alineado con tu propósito y tu luz ya florece. Confía en el proceso, suelta lo que cumplió su ciclo y camina hacia lo nuevo con la certeza de que el universo está cuadrando las piezas a tu favor.${firma}`
+          : `Arcángel Jofiel apaga su lámpara un instante ante ${lista} y te regaña con dulzura exigente: lo que anhelas no llegará mientras sigas mirando atrás o comparándote con el camino de otros. Tu futuro no se recibe, se construye, y empieza en la decisión de hoy. Enciende tu propia luz y camina: el porvenir te está esperando.${firma}`
+      }
+    ];
 
     const cierrePoderoso = propor >= 0.5
-      ? `Recibe este mensaje como un llamado a tu grandeza: ya no eres quien espera afuera de su propia vida, sino quien abre la puerta y entra. Todo lo que te rodea está listo para cambiar porque tú estás listo para cambiar con ello. Confía, actúa y déjate sostener por la certeza de que el universo ya camina a tu lado.`
-      : `Este mensaje no es una advertencia, es un despertar: eres mucho más grande que el miedo que te ha estado frenando, y ha llegado el instante de demostrártelo. Cada obstáculo que hoy ves es en realidad una prueba que has superado en silencio muchas veces. Ahora elige a la persona valiente que ya eres, da el paso que el corazón viene pidiéndote, y deja que el universo te acompañe hacia la vida que mereces. No sigas posponiendo tu propio milagro: él te necesita en movimiento.`;
+      ? "Recibe este mensaje como un llamado a tu grandeza: ya no eres quien espera afuera de su propia vida, sino quien abre la puerta y entra. Todo lo que te rodea está listo para cambiar porque tú estás listo para cambiar con ello. Confía, actúa y déjate sostener por la certeza de que el universo ya camina a tu lado."
+      : "Este mensaje no es una advertencia, es un despertar: eres mucho más grande que el miedo que te ha estado frenando, y ha llegado el instante de demostrártelo. Cada obstáculo que hoy ves es en realidad una prueba que has superado en silencio muchas veces. Ahora elige a la persona valiente que ya eres, da el paso que el corazón viene pidiéndote y deja que el universo te acompañe hacia la vida que mereces.";
 
-    return [
-      { icono: "💼", area: "economia",  titulo: "Economía y abundancia", texto: economiaTexto },
-      { icono: "💞", area: "amor",      titulo: "Amor y relaciones",     texto: amorTexto },
-      { icono: "🌓", area: "situacion", titulo: "Situaciones actuales",  texto: situacion },
-      { icono: "🔓", area: "bloqueo",   titulo: "Bloqueos a liberar",     texto: bloqueoTexto },
-      { icono: "🕯️", area: "trabajo",   titulo: "Trabajo y proyección",   texto: trabajoTexto },
-      { icono: "🌟", area: "futuro",    titulo: "Lo que te espera a futuro", texto: futuroTexto }
-    ].concat([{ cierre: true, texto: cierrePoderoso, cita }]);
+    return areas.map(a => ({
+      icono: a.icono,
+      area: a.area,
+      titulo: a.titulo,
+      arcangel: this.arcangeles[a.clave],
+      regano: false,
+      presencia: this.fraseArea(this.arcangeles[a.clave], a.clave === "chamuel" ? "amor" : a.clave),
+      texto: a.texto
+    })).concat([{ cierre: true, texto: cierrePoderoso, cita }]);
   },
-
   /* ----------------------- GRAN TIRADA · 14 cartas ------------------------ */
   /* asigna cada tema de la gran tirada al arcángel que lo custodia */
   granTiradaArea: {
@@ -394,12 +424,12 @@ const TIRADAS = {
 
     resultadoHTML.cartas.forEach((c, i) => {
       const pos = t.posiciones[i];
-      html += `<div class="carta-grande vidrio">
+      html += `<div class="carta-grande vidrio" style="animation-delay:${(0.25 + i * 0.3).toFixed(2)}s">
         <div class="sello ${c.invertido ? "invertida" : ""}"><div>
           ${this.figuraDe(c)}
           <small>Arcano Mayor</small>
         </div></div>
-        <div style="flex:1;min-width:240px">
+        <div class="carta-texto">
           <h4>${pos[0]} <span style="font-weight:400;color:var(--lavanda-suave)">· ${pos[1]}</span></h4>
           <h3>${c.nombre} ${c.invertido ? '<small style="font-size:.8rem;color:#ffd7e0">(invertida)</small>' : ""}</h3>
           <div class="palabras">${c.palabras.map(p => "<span>" + p + "</span>").join("")}</div>
@@ -417,14 +447,14 @@ const TIRADAS = {
     finales.forEach((b, i) => {
       const arcDeArea = b.arcangel || this.arcangelDeArea(arcangeles, i);
       if (b.cierre) {
-        htmlFinal += `<div class="mensaje-poderoso vidrio">
+        htmlFinal += `<div class="mensaje-poderoso vidrio" style="animation-delay:${(1.2 + i * 0.25).toFixed(2)}s">
           <h3 style="color:var(--dorado)">El mensaje final</h3>
           <p class="presencia-arc">${this.fraseArea(this.arcangelUnido(arcangeles), "cierre")}</p>
           <p>${b.texto}</p>
           <p class="cita">"${b.cita}"</p>
         </div>`;
       } else {
-        htmlFinal += `<div class="bloque-categoria vidrio${b.regano ? " regano" : ""}">
+        htmlFinal += `<div class="bloque-categoria vidrio${b.regano ? " regano" : ""}" style="animation-delay:${(1.2 + i * 0.25).toFixed(2)}s">
           <h4><span class="cat-icono">${b.icono}</span> ${b.titulo}
             <span class="cat-arc" style="--chip:${arcDeArea.color}">${arcDeArea.emoji} ${this.nombreCorto(arcDeArea.nombre)}</span>
             ${b.regano ? '<span class="regano-tag">régano</span>' : ""}
@@ -540,7 +570,7 @@ function mostrarEleccion(r) {
     escenario.appendChild(slot);
   });
 
-  // mazo para tocar
+  // mazo para tocar: cartas boca abajo (dorso real) que el usuario toca
   const zonaMazo = document.createElement("div");
   zonaMazo.className = "mazo";
   zonaMazo.style.marginTop = "34px";
@@ -548,7 +578,7 @@ function mostrarEleccion(r) {
     const c = document.createElement("div");
     c.className = "minicarta";
     c.style.width = "84px";
-    c.innerHTML = "<span class='nm'>✦</span><span class='nom'>Toca para elegir</span>";
+    c.innerHTML = "<div class='dorso-mini'></div><span class='nom'>Toca para elegir</span>";
     c.addEventListener("click", () => elegirUna(c, r));
     zonaMazo.appendChild(c);
   }
