@@ -329,7 +329,7 @@ h3 { font-size: 1.25rem; }
 }
 .minicarta:hover { transform: translateY(-6px) scale(1.04); box-shadow: 0 14px 30px rgba(0,0,0,0.55); border-color: var(--dorado); }
 .minicarta .nm { font-family: var(--fuente-deco); font-size: 1.5rem; }
-.minicarta .c-art { width: 54px; height: 54px; object-fit: cover; display: block; margin: 0 auto 4px; border-radius: 8px; }
+.minicarta .c-art { width: 54px; height: 94px; object-fit: contain; display: block; margin: 0 auto 4px; border-radius: 8px; }
 .minicarta .nom { font-size: 0.68rem; color: var(--lavanda); line-height: 1.3; font-family: var(--fuente-serif); }
 
 /* dorso real de la carta (reverso) para el mazo que se toca */
@@ -387,7 +387,7 @@ h3 { font-size: 1.25rem; }
   padding: 8px;
 }
 .carta-plaza .cara .c-nm { font-size: 1.3rem; font-family: var(--fuente-deco); }
-.carta-plaza .cara .c-art { width: 96px; height: 128px; object-fit: cover; display: block; border-radius: 8px; }
+.carta-plaza .cara .c-art { width: auto; height: 132px; object-fit: contain; display: block; margin: 0 auto; border-radius: 8px; }
 .carta-plaza .cara .c-nombre { font-size: 0.62rem; line-height: 1.25; text-align: center; font-family: var(--fuente-serif); font-weight: 600; }
 .carta-plaza .cara .c-pos { font-size: 0.55rem; letter-spacing: 1px; color: #7a5c1e; margin-top: 4px; }
 .carta-plaza.girada .cara { transform: rotateY(0); }
@@ -521,7 +521,7 @@ h3 { font-size: 1.25rem; }
 .resultado .carta-grande { display: flex; gap: 22px; flex-wrap: wrap; align-items: flex-start; margin: 26px 0; padding: 22px; }
 .resultado .carta-grande .carta-texto { flex: 1; min-width: 0; overflow-wrap: break-word; }
 .resultado .sello {
-  width: 92px; height: 92px; border-radius: 50%;
+  width: 96px; height: 168px; border-radius: 10px;
   display: grid; place-items: center;
   background: linear-gradient(160deg, #fffdf6, #f4ecd6);
   border: 1px solid var(--dorado);
@@ -534,11 +534,10 @@ h3 { font-size: 1.25rem; }
   position: absolute; inset: 0;
   display: grid; place-items: center;
   align-content: center;
-  border-radius: 50%;
 }
 .resultado .sello .c-nm { font-family: var(--fuente-deco); font-size: 1.7rem; }
 .resultado .sello.invertida { background: linear-gradient(160deg, #2b1c66, #170f3c); color: var(--lavanda); }
-.resultado .sello .c-art { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+.resultado .sello .c-art { width: 100%; height: 100%; object-fit: contain; display: block; }
 .resultado .sello.invertida .c-art { transform: rotate(180deg); filter: brightness(0.72) saturate(0.85); }
 .resultado .sello small { position: absolute; bottom: 6px; left: 0; right: 0; text-align: center; font-size: 0.52rem; letter-spacing: 0.6px; color: rgba(10, 6, 30, 0.75); text-shadow: 0 0 6px rgba(255,255,255,0.8); z-index: 2; }
 .resultado .sello.invertida small { color: var(--lavanda-suave); text-shadow: 0 0 6px rgba(0,0,0,0.6); }
