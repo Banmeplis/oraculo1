@@ -16,11 +16,12 @@ const TIRADAS = {
     { id: "1-carta",   nombre: "Mensaje para hoy",   icono: "🕯️", corto: "Una carta, un mensaje: la guía del día.", n: 1, posiciones: [["Tu mensaje", "La energía central de tu momento"]] },
     { id: "3-cartas",  nombre: "Pasado · Presente · Futuro", icono: "💫", corto: "Tres cartas que revelan la línea del tiempo.", n: 3, posiciones: [["Pasado", "Lo que te trajo hasta aquí"], ["Presente", "Tu energía actual"], ["Futuro", "El rumbo que se aproxima"]] },
     { id: "5-cartas",  nombre: "La Estrella", icono: "🌟", corto: "Cinco cartas que trazan tu sendero hacia la meta.", n: 5, posiciones: [["Situación", "Dónde estás ahora"], ["Camino", "La mejor vía a seguir"], ["Obstáculo", "Lo que debes trascender"], ["Ayuda", "El apoyo que te sostiene"], ["Resultado", "Hacia dónde te encaminas"] ] },
+    { id: "gran-tirada", nombre: "La Gran Tirada", icono: "🛡️", corto: "Catorce cartas y los siete arcángeles regentes: la lectura total para cada rincón de tu vida.", n: 14, posiciones: [["Situación general", "El clima que envuelve tu presente"], ["Amor y relaciones", "El estado de tus vínculos"], ["Economía y abundancia", "El flujo de tus recursos"], ["Trabajo y proyecto", "Tu camino profesional"], ["Familia y hogar", "Tu entorno cercano"], ["Salud y energía", "Tu vitalidad y cuerpo"], ["Espiritualidad y fe", "Tu conexión con lo divino"], ["Bloqueo a liberar", "Lo que te frena en secreto"], ["Pasado que te marcó", "La raíz de tu historia"], ["Presente que te sostiene", "Tu energía de hoy"], ["Futuro que se acerca", "El rumbo que se prepara"], ["Consejo del cielo", "La guía que te dan"], ["Lección del alma", "Lo que este tiempo te enseña"], ["Resultado final", "La síntesis de todo"] ] },
     { id: "cruz-celta", nombre: "Cruz Celta", icono: "🕊️", corto: "La lectura clásica y profunda de diez cartas.", n: 10, posiciones: [["Corazón del asunto", "El centro de la consulta"], ["Lo que cruza", "Las influencias que la atraviesan"], ["Lo que está por encima", "Consciente o metas"], ["Lo que está por debajo", "Inconsciente o raíces"], ["Lo que pasó", "Pasado reciente"], ["Lo que viene", "Futuro cercano"], ["Tu actitud", "Cómo te enfrentas a ello"], ["El entorno", "Influencias externas"], ["Esperanzas y miedos", "Lo que anhelas y temes"], ["Resultado", "La síntesis final"] ] },
     { id: "si-no",     nombre: "Sí o No directo", icono: "🎯", corto: "Una carta, una respuesta clara para tu pregunta.", n: 1, posiciones: [["Tu respuesta", "El veredicto del oráculo"]] }
   ],
 
-  elegantIcono: { "1-carta": "🕯️", "3-cartas": "💫", "5-cartas": "🌟", "cruz-celta": "🕊️", "si-no": "🎯" },
+  elegantIcono: { "1-carta": "🕯️", "3-cartas": "💫", "5-cartas": "🌟", "gran-tirada": "🛡️", "cruz-celta": "🕊️", "si-no": "🎯" },
   estrellas: ["✦", "✧", "⋆", "✩", "·"],
 
   /* ------------------------------ utilidades ------------------------------ */
@@ -105,9 +106,13 @@ const TIRADAS = {
     chamuel: { nombre: "Arcángel Chamuel", emoji: "💗", regencia: "Paz y amor",               color: "240, 120, 150",     mensaje: "El ángel del amor puro trae paz a tus relaciones y reaviva los lazos más sinceros. A su calor, las puertas del corazón se abren a un afecto verdadero.", consejo: "Te doy amor y paz: abre el corazón y deja que el amor fluya sin miedo." }
   },
 
-  /* selecciona de 2 a 7 arcángeles, en proporción a la cantidad de cartas */
+  /* selecciona de 2 a 7 arcángeles, en proporción a la cantidad de cartas;
+     en la gran tirada (14 cartas) siempre participan los 7 en pleno */
   arcangelesDeLectura(resultado) {
     const n = (resultado.cartas || []).length;
+    if (resultado.tirada && resultado.tirada.id === "gran-tirada") {
+      return Object.keys(this.arcangeles).map(clave => ({ clave, ...this.arcangeles[clave] }));
+    }
     let min, max;
     if (n <= 1)      { min = 2; max = 3; }
     else if (n <= 3) { min = 3; max = 4; }
@@ -192,6 +197,110 @@ const TIRADAS = {
     ].concat([{ cierre: true, texto: cierrePoderoso, cita }]);
   },
 
+  /* ----------------------- GRAN TIRADA · 14 cartas ------------------------ */
+  /* asigna cada tema de la gran tirada al arcángel que lo custodia */
+  granTiradaArea: {
+    "Situación general": "miguel",
+    "Trabajo y proyecto": "miguel",
+    "Amor y relaciones": "chamuel",
+    "Familia y hogar": "chamuel",
+    "Salud y energía": "rafael",
+    "Lección del alma": "rafael",
+    "Espiritualidad y fe": "gabriel",
+    "Consejo del cielo": "gabriel",
+    "Economía y abundancia": "uriel",
+    "Presente que te sostiene": "uriel",
+    "Bloqueo a liberar": "zadkiel",
+    "Pasado que te marcó": "zadkiel",
+    "Futuro que se acerca": "jofiel",
+    "Resultado final": "jofiel"
+  },
+
+  /* voces de cada arcángel: opinión luminosa, aviso matizado o regaño firme */
+  voces: {
+    miguel: {
+      luz: "Arcángel Miguel desenvaina su espada de luz y sonríe ante {cartas}: estas cartas en tu camino confirman que estás siendo sostenido y protegido. Avanza con paso firme, porque tu fuerza se está consolidando y nada podrá derribarte mientras camines con fe y con límites bien puestos.",
+      mixto: "Arcángel Miguel observa {cartas} y te habla con la voz del soldado que conoce la batalla: hay protección, sí, pero también hay una grieta que no puedes ignorar. No te duermas: refuerza tus defensas, elige tus batallas y no dejes tu guardia a merced de quien no te cuida.",
+      sombra: "Arcángel Miguel alza la espada y te regaña con firmeza: {cartas} te muestran que has bajado el escudo demasiado pronto. Estás exponiéndote donde no hay protección, gastando tu fuerza donde no se te valora. Repliega tu energía, pon tus límites y no vuelvas a avanzar sin tu fuego encendido."
+    },
+    chamuel: {
+      luz: "Arcángel Chamuel envuelve {cartas} con la luz rosa del amor verdadero: tus vínculos son bendecidos y el afecto sincero fluye hacia ti y desde ti. Abre el corazón y deja que el amor se asiente donde ya está siendo recibido, porque hoy el cielo confirma la unión.",
+      mixto: "Arcángel Chamuel contempla {cartas} y sostiene tu corazón con dulzura y verdad: hay amor, pero también hay un nudo que pide ser hablado. No confundas silencio con paz ni distancia con indiferencia: nombra lo que sientes con honestidad y el vínculo encontrará su equilibrio.",
+      sombra: "Arcángel Chamuel cruza los brazos y te regaña con amor severo: {cartas} te muestran que estás entregando tu corazón donde no es cuidado, o cerrando la puerta a quien sí lo merecería. No mendigues afecto donde solo hay ego: ama desde la dignidad y el amor te devolverá la paz."
+    },
+    rafael: {
+      luz: "Arcángel Rafael deja su luz esmeralda sobre {cartas}: tu cuerpo, tu mente y tu alma están siendo sanados. Esta energía restauradora es real y está trabajando en ti: respira, descansa y confía en que la medicina divina ya está haciendo su obra.",
+      mixto: "Arcángel Rafael posa su mano sobre {cartas} y te habla como el médico que ve la herida y también la cura: hay sanación en camino, pero hay una atención que te estás negando. Atiende lo que tu cuerpo o tu alma te piden calladamente, y la guía te llevará a la plenitud.",
+      sombra: "Arcángel Rafael aparta la mano y te regaña con serena severidad: {cartas} te advierten que estás descuidando lo que más necesitas cuidar. No postergues más tu salud y tu paz, no sigas dándote a todos mientras no te queda nada para ti: la sanación empieza por detenerte y priorizarte."
+    },
+    gabriel: {
+      luz: "Arcángel Gabriel hace sonar su cuerno de plata ante {cartas}: el mensaje que esperabas está en camino y tu propósito se aclara. Escucha las señales, porque a través de ellas el cielo te habla con total claridad y tu llamado interior se hace más nítido.",
+      mixto: "Arcángel Gabriel te susurra con {cartas} delante: la verdad está cerca, pero llega mezclada con ruido. No te apresures a concluir: contrasta lo que oyes, revisa lo que crees y el mensaje puro terminará llegando a tu corazón sin necesidad de forzar nada.",
+      sombra: "Arcángel Gabriel te interrumpe con su trompeta y te regaña: {cartas} muestran que has dejado de escuchar, que repites palabras viejas y das por sentado lo que aún no ha sido dicho. Silencia el ruido, vuelve a preguntar y abre los oídos: tu respuesta no llegará hasta que te calles."
+    },
+    uriel: {
+      luz: "Arcángel Uriel enciende su antorcha sobre {cartas}: la sabiduría te ilumina y el discernimiento te acompaña. Confía en la certeza interior que ahora se enciende en ti, porque ves con claridad lo que otros no comprenden y tus decisiones hoy tienen luz propia.",
+      mixto: "Arcángel Uriel observa {cartas} con su mirada de fuego tranquilo: tienes la verdad cerca, pero el impulso te empuja a decidir antes de tiempo. Detente, examina y compara: la sabiduría que buscas no está en actuar más rápido, sino en mirar más profundo.",
+      sombra: "Arcángel Uriel posa su antorcha frente a ti y te regaña sin rodeos: {cartas} te muestran que estás actuando por impulso, sin mirar el conjunto. Has dejado que la emoción nuble el juicio y eso te está costando caro. Vuelve a la claridad, pide tiempo al mundo y decide desde la luz, no desde el miedo."
+    },
+    zadkiel: {
+      luz: "Arcángel Zadkiel abre sus alas violetas sobre {cartas}: la misericordia y el perdón están desatando lo que te tenía aprisionado. Suéltalo todo, perdona lo que sea necesario y siente cuánta libertad entra en tu alma cuando dejas de cargar el pasado.",
+      mixto: "Arcángel Zadkiel contempla {cartas} y te tiende la llave: la liberación es posible, pero hay una cadena que tú mismo mantienes puesta. No se trata solo de que otros te suelten: hay algo que debes soltar tú. Date permiso para dejar ir y el cielo te sostendrá.",
+      sombra: "Arcángel Zadkiel lanza una mirada compasiva y firme y te regaña: {cartas} revelan que llevas demasiado tiempo atado a la culpa, al rencor o a un pasado que ya no existe. Cada día que no perdonas, te encadenas más. Suelta la piedra, perdónate y perdona: tu corazón no fue hecho para cargar tanto peso."
+    },
+    jofiel: {
+      luz: "Arcángel Jofiel acaricia {cartas} con un rayo dorado de inspiración: la belleza y la luz que tanto buscas ya están floreciendo a tu alrededor. Rodeate de lo que te eleva, confía en tu creatividad y verás cómo tu mundo empieza a brillar con tus propios colores.",
+      mixto: "Arcángel Jofiel sostiene {cartas} y te habla como quien conoce el arte de los comienzos: hay luz, pero todavía tienes los ojos puestos en lo que no fue. Deja de mirar atrás y permite que la inspiración nueva entre: la belleza no llega donde la mirada anda nublada.",
+      sombra: "Arcángel Jofiel apaga su lámpara un instante y te regaña con dulzura exigente: {cartas} te muestran que has dejado de ver la luz que sí tienes, comparándote y ensombreciendo tu propio camino. Cuida lo que miras: la inspiración huye de quien no cree en su propia belleza. Enciende tu luz otra vez."
+    }
+  },
+
+  /* interpretación de la gran tirada: cada arcángel habla de sus dos temas,
+     con opinión o regaño según las cartas que hayan salido en sus áreas */
+  interpretacionGranTirada(resultado) {
+    const bloques = [];
+    const cita = this.citas[Math.floor(Math.random() * this.citas.length)];
+
+    Object.keys(this.granTiradaArea).forEach((tema, i) => {
+      const posiciones = resultado.tirada.posiciones.map(p => p[0]);
+      const idxTema = posiciones.indexOf(tema);
+      if (idxTema === -1) return;
+      const carta = resultado.cartas[idxTema];
+      const clave = this.granTiradaArea[tema];
+      let bloque = bloques.find(b => b.clave === clave);
+      if (!bloque) {
+        bloque = { clave, arcangel: this.arcangeles[clave], temas: [] };
+        bloques.push(bloque);
+      }
+      bloque.temas.push({ tema, carta });
+    });
+
+    return bloques.map(b => {
+      const inv = b.temas.filter(t => t.carta.invertido).length;
+      const tenor = inv === 0 ? "luz" : (inv === b.temas.length ? "sombra" : "mixto");
+      const listaCartas = b.temas.map(t => t.carta.nombre + (t.carta.invertido ? " (revertida)" : "")).join(" y ");
+      const palabras = b.temas.map(t => t.carta.palabras.slice(0, 2).join(", ") + (t.carta.invertido ? " en sombra" : "")).join(" · ");
+      const texto = this.voces[b.clave][tenor]
+        .replace("{cartas}", `<strong>${listaCartas}</strong>`)
+        + ` <em class="cita">»${palabras}«</em>`;
+      const arc = b.arcangel;
+      return {
+        icono: arc.emoji,
+        area: b.clave,
+        titulo: `${this.nombreCorto(arc.nombre)} · ${arc.regencia}`,
+        temas: b.temas.map(t => t.tema),
+        arcangel: arc,
+        regano: tenor === "sombra",
+        presencia: this.fraseArea(arc, b.clave),
+        texto
+      };
+    }).concat([{
+      cierre: true,
+      texto: "Los siete arcángeles han hablado, cada uno desde su don, y han sellado juntos esta lectura con una sola certeza: no estás sola ni desamparada. Todas las voces señalan el mismo camino, y todas te sostienen para que lo recorras con fe. Suelta el miedo, abraza el consejo que más te dolió escuchar y deja que la luz de este consejo celestial te guíe hacia la vida que mereces.",
+      cita
+    }]);
+  },
+
   /* una línea por área, con la personalidad del arcángel al frente */
   fraseArea(arcangel, area) {
     const f = this.fraseArcangel(arcangel);
@@ -208,7 +317,13 @@ const TIRADAS = {
       bloqueo: `${A} ilumina con su ${a.regencia.toLowerCase()} las cadenas invisibles que te retienen, y te da la fuerza para soltarlas una a una. Nada puede mantenerte atado cuando su luz te acompaña. ${C}`,
       trabajo: `Con la sabiduría de su ${a.regencia.toLowerCase()}, ${A} orienta tu camino profesional y despeja el sendero hacia el reconocimiento y la meta que persigues. ${C}`,
       futuro: `${A} despliega ante ti el mapa del porvenir: desde su ${a.regencia.toLowerCase()}, te asegura que lo que viene está alineado con tu propósito, si caminas con fe y decisión. ${C}`,
-      cierre: `${A} sella esta lectura con su presencia. No estás sola: un arcángel ha tomado tu mano para guiarte. Confía, actúa y deja que su luz te lleve. ${C}`
+      cierre: `${A} sella esta lectura con su presencia. No estás sola: un arcángel ha tomado tu mano para guiarte. Confía, actúa y deja que su luz te lleve. ${C}`,
+      miguel: `${A} toma la palabra en tu nombre: con su ${a.regencia.toLowerCase()}, te protege y te da valor para sostener tu posición en cada terreno de tu vida. ${C}`,
+      gabriel: `${A} trae luz a lo que debes escuchar: en estos temas, su ${a.regencia.toLowerCase()} despeja tu mente y te señala el propósito oculto. ${C}`,
+      rafael: `${A} extiende su mano sanadora sobre estos asuntos: su ${a.regencia.toLowerCase()} te devuelve el equilibrio y la claridad para seguir. ${C}`,
+      uriel: `${A} enciende su antorcha de ${a.regencia.toLowerCase()} en estas áreas: mira con luz interior, porque la respuesta que buscas está más cerca de lo que crees. ${C}`,
+      zadkiel: `${A} desata las cadenas que se ocultan aquí: su ${a.regencia.toLowerCase()} te libera de lo que ya cumplió su tiempo. ${C}`,
+      jofiel: `${A} ilumina estos senderos con su ${a.regencia.toLowerCase()}: busca la belleza y la inspiración, y ellas te guiarán. ${C}`
     };
   },
 
@@ -293,10 +408,14 @@ const TIRADAS = {
       </div>`;
     });
 
-    const finales = this.interpretacionFinal(resultadoHTML);
-    let htmlFinal = `<div class="interpretacion-final"><h3 class="titulo-interp-final">✨ Interpretación final de tu tirada ✨</h3>`;
+    const esGranTirada = t.id === "gran-tirada";
+    const finales = esGranTirada ? this.interpretacionGranTirada(resultadoHTML) : this.interpretacionFinal(resultadoHTML);
+    const tituloFinal = esGranTirada
+      ? "✨ La palabra de los siete arcángeles ✨"
+      : "✨ Interpretación final de tu tirada ✨";
+    let htmlFinal = `<div class="interpretacion-final"><h3 class="titulo-interp-final">${tituloFinal}</h3>`;
     finales.forEach((b, i) => {
-      const arcDeArea = this.arcangelDeArea(arcangeles, i);
+      const arcDeArea = b.arcangel || this.arcangelDeArea(arcangeles, i);
       if (b.cierre) {
         htmlFinal += `<div class="mensaje-poderoso vidrio">
           <h3 style="color:var(--dorado)">El mensaje final</h3>
@@ -305,11 +424,12 @@ const TIRADAS = {
           <p class="cita">"${b.cita}"</p>
         </div>`;
       } else {
-        htmlFinal += `<div class="bloque-categoria vidrio">
+        htmlFinal += `<div class="bloque-categoria vidrio${b.regano ? " regano" : ""}">
           <h4><span class="cat-icono">${b.icono}</span> ${b.titulo}
             <span class="cat-arc" style="--chip:${arcDeArea.color}">${arcDeArea.emoji} ${this.nombreCorto(arcDeArea.nombre)}</span>
+            ${b.regano ? '<span class="regano-tag">régano</span>' : ""}
           </h4>
-          <p class="presencia-arc">${this.fraseArea(arcDeArea, b.area)}</p>
+          <p class="presencia-arc">${b.presencia || this.fraseArea(arcDeArea, b.area)}</p>
           <p>${b.texto}</p>
         </div>`;
       }

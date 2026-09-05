@@ -42,7 +42,18 @@ app.use(session({
   cookie: { httpOnly: true, maxAge: 7 * 24 * 3600 * 1000 }
 }));
 
-app.use(express.static(path.join(__dirname, "public")));
+const ESTATICO = express.static(path.join(__dirname, "public"), {
+  maxAge: "30d",
+  immutable: true,
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith(".html")) {
+      res.setHeader("Cache-Control", "no-cache");
+    } else if (filePath.endsWith(".js") || filePath.endsWith(".css")) {
+      res.setHeader("Cache-Control", "public, max-age=3600");
+    }
+  }
+});
+app.use(ESTATICO);
 app.use("/uploads", express.static(UPLOADS));
 
 /* ------------------------------ utilitarios ----------------------------- */

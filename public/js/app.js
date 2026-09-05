@@ -130,8 +130,27 @@ function enLinea(s) {
   return s;
 }
 
+/* ------------------- precarga del mazo (arcanos mayores) ----------------- */
+function precargarCartas() {
+  try {
+    if (!window.ORACULO || !ORACULO.mayores) return;
+    const urls = ORACULO.mayores.map(c => c.img).filter(Boolean);
+    const lanzar = () => {
+      urls.forEach(u => {
+        const img = new Image();
+        img.decoding = "async";
+        img.src = u;
+      });
+    };
+    if ("requestIdleCallback" in window) requestIdleCallback(lanzar, { timeout: 2500 });
+    else if (document.readyState === "complete") lanzar();
+    else window.addEventListener("load", lanzar, { once: true });
+  } catch { /* si algo falla, la carga normal sigue */ }
+}
+
 /* ------------------------------- inicializa ----------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
   crearCielo(70);
   SESION.cargar();
+  precargarCartas();
 });

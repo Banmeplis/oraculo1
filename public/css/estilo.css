@@ -629,6 +629,19 @@ h3 { font-size: 1.25rem; }
   box-shadow: 0 3px 10px rgba(var(--chip), 0.45);
   vertical-align: middle;
 }
+.regano-tag {
+  display: inline-flex; align-items: center;
+  margin-left: 6px; padding: 3px 10px; border-radius: 999px;
+  font-size: 0.7rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(135deg, #a33, #6f1f1f);
+  box-shadow: 0 3px 10px rgba(163, 51, 51, 0.5);
+  vertical-align: middle;
+}
+.bloque-categoria.regano {
+  border: 1px solid rgba(255, 120, 120, 0.45);
+  box-shadow: 0 0 26px rgba(255, 90, 90, 0.12) inset;
+}
 .bloque-categoria p {
   font-family: var(--fuente-serif);
   font-size: 1.22rem;
