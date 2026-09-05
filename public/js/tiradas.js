@@ -353,7 +353,8 @@ const TIRADAS = {
       rafael: `${A} extiende su mano sanadora sobre estos asuntos: su ${a.regencia.toLowerCase()} te devuelve el equilibrio y la claridad para seguir. ${C}`,
       uriel: `${A} enciende su antorcha de ${a.regencia.toLowerCase()} en estas áreas: mira con luz interior, porque la respuesta que buscas está más cerca de lo que crees. ${C}`,
       zadkiel: `${A} desata las cadenas que se ocultan aquí: su ${a.regencia.toLowerCase()} te libera de lo que ya cumplió su tiempo. ${C}`,
-      jofiel: `${A} ilumina estos senderos con su ${a.regencia.toLowerCase()}: busca la belleza y la inspiración, y ellas te guiarán. ${C}`
+      jofiel: `${A} ilumina estos senderos con su ${a.regencia.toLowerCase()}: busca la belleza y la inspiración, y ellas te guiarán. ${C}`,
+      chamuel: `${A} envuelve estos asuntos con la luz rosa de su ${a.regencia.toLowerCase()}: el amor verdadero llega, se sana o se libera según lo que tu corazón necesita. ${C}`
     };
   },
 
