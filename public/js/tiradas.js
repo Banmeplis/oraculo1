@@ -607,7 +607,7 @@ function mostrarEleccion(r) {
     escenario.appendChild(slot);
   });
 
-  // mazo: las 22 cartas boca arriba para que elijas las de tu lectura
+  // mazo: las 22 cartas boca abajo; se revelan al tocarlas
   const zonaMazo = document.createElement("div");
   zonaMazo.className = "mazo mazo-eleccion";
   zonaMazo.style.marginTop = "34px";
@@ -616,7 +616,7 @@ function mostrarEleccion(r) {
     m.className = "minicarta";
     m.style.width = "84px";
     m.dataset.idx = String(i);
-    m.innerHTML = `${TIRADAS.figuraDe(c)}<span class="nom">${c.nombre}</span>`;
+    m.innerHTML = "<div class='dorso-mini'></div><span class='nom'>Toca para elegir</span>";
     m.addEventListener("click", () => elegirUna(m, r));
     zonaMazo.appendChild(m);
   });
@@ -631,8 +631,9 @@ function mostrarEleccion(r) {
     const carta = TIRADAS.construirCarta(c);
     r.cartas.push(carta);
     elegidas++;
+    elm.innerHTML = `${TIRADAS.figuraDe(carta)}<span class="nom">${carta.nombre}</span>`;
+    elm.classList.add("revelada");
     elm.style.pointerEvents = "none";
-    elm.style.opacity = "0.35";
     elm.style.animation = "flotar 1s ease-in-out infinite";
     const plaza = document.getElementById("plaza-" + (elegidas - 1));
     plaza.classList.add("girada");
@@ -644,9 +645,9 @@ function mostrarEleccion(r) {
     </div>`;
     contador.textContent = elegidas;
     if (elegidas === r.tirada.n) {
-      zonaMazo.querySelectorAll(".minicarta").forEach(x => {
+      zonaMazo.querySelectorAll(".minicarta:not(.revelada)").forEach(x => {
         x.style.pointerEvents = "none";
-        x.style.opacity = x.style.opacity || "0.2";
+        x.style.opacity = "0.2";
       });
       aviso.classList.remove("oculto");
       setTimeout(() => mostrarResultado(r), 1100);
