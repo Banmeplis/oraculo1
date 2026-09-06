@@ -108,18 +108,25 @@ const TIRADAS = {
     chamuel: { nombre: "Arcángel Chamuel", emoji: "💗", regencia: "Paz y amor",               color: "240, 120, 150",     mensaje: "El ángel del amor puro trae paz a tus relaciones y reaviva los lazos más sinceros. A su calor, las puertas del corazón se abren a un afecto verdadero.", consejo: "Te doy amor y paz: abre el corazón y deja que el amor fluya sin miedo." }
   },
 
-  /* selecciona de 2 a 7 arcángeles, en proporción a la cantidad de cartas;
-     en la gran tirada (14 cartas) siempre participan los 7 en pleno */
+/* selecciona arcángeles según el tipo de lectura:
+   - 1-3 cartas: 2-4 arcángeles
+   - 3-5 cartas: 1-7 arcángeles aleatorios
+   - Gran tirada (14): siempre 7
+   - Lectura fuerte: siempre 7 */
   arcangelesDeLectura(resultado) {
     const n = (resultado.cartas || []).length;
-    if (resultado.tirada && resultado.tirada.id === "gran-tirada") {
+    const esFuerte = resultado.fuerte === true;
+    const esGran = resultado.tirada && resultado.tirada.id === "gran-tirada";
+
+    if (esGran || esFuerte) {
       return Object.keys(this.arcangeles).map(clave => ({ clave, ...this.arcangeles[clave] }));
     }
+
     let min, max;
-    if (n <= 1)      { min = 2; max = 3; }
-    else if (n <= 3) { min = 3; max = 4; }
-    else if (n <= 5) { min = 4; max = 5; }
+    if (n <= 3)      { min = 2; max = 4; }     // 1-3 cartas: 2-4
+    else if (n <= 5) { min = 1; max = 7; }     // 3-5 cartas: 1-7 aleatorio
     else             { min = 5; max = 7; }
+
     const cantidad = min + Math.floor(Math.random() * (max - min + 1));
     const barajado = this.barajar(Object.keys(this.arcangeles));
     return barajado.slice(0, Math.min(cantidad, 7)).map(clave => ({ clave, ...this.arcangeles[clave] }));
@@ -162,7 +169,7 @@ const TIRADAS = {
     const propor = bien / total;
     const cita = this.citas[Math.floor(Math.random() * this.citas.length)];
 
-    const areas = [
+    const allAreas = [
       {
         icono: "🛡️", area: "situacion", clave: "miguel", titulo: "Situación y protección",
         texto: propor >= 0.5
@@ -206,6 +213,10 @@ const TIRADAS = {
           : "Jofiel apaga su lámpara un instante para que lo mires: lo que anhelas no llegará mientras sigas mirando atrás o comparándote con el camino de otros. Tu futuro no se recibe, se construye, y empieza en la decisión de hoy. Enciende tu propia luz y camina: el porvenir te espera."
       }
     ];
+
+    /* filtra solo las áreas de los arcángeles que participan en esta lectura */
+    const elegidos = (resultado.__arcangeles || this.arcangelesDeLectura(resultado)).map(a => a.clave);
+    const areas = allAreas.filter(a => elegidos.includes(a.clave));
 
     const cierrePoderoso = propor >= 0.5
       ? "Este es el final, y es un llamado a tu grandeza: deja de mirar tu vida desde afuera y entra en ella con todo. Lo que hoy es semilla se vuelve fruto, lo que hoy es herida se vuelve fuerza. Confía, actúa y deja que este mensaje te sostenga cada día."
@@ -630,12 +641,12 @@ function iniciarTirada(tipo) {
   const interval = setInterval(() => {
     mezclar();
     mezclas++;
-    if (mezclas >= 4) {
+    if (mezclas >= 3) {
       clearInterval(interval);
       sp.classList.add("oculto");
-      setTimeout(() => mostrarEleccion(d), 600);
+      setTimeout(() => mostrarEleccion(d), 400);
     }
-  }, 500);
+  }, 300);
 }
 
 /* Paso 2 · elegir las cartas tocando el mazo */
