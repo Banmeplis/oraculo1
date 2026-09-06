@@ -674,9 +674,12 @@ function mostrarEleccion(r) {
     const m = document.createElement("div");
     m.className = "minicarta";
     m.style.width = "84px";
+    m.style.pointerEvents = "auto";
     m.dataset.idx = String(i);
     m.innerHTML = "<div class='dorso-mini'></div><span class='nom'>Toca para elegir</span>";
-    m.addEventListener("click", () => elegirUna(m, r));
+    const onPick = () => elegirUna(m, r);
+    m.addEventListener("click", onPick);
+    m.addEventListener("touchstart", onPick, { passive: true });
     zonaMazo.appendChild(m);
   });
   escenario.appendChild(zonaMazo);
