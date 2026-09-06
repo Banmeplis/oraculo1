@@ -607,14 +607,13 @@ function iniciarTirada(tipo) {
 
   /* mezcla visual: cada carta cambia de lugar con un rebote */
   const mezclar = () => {
-    const arr = mazoFan.slice();
+    const arr = mazoFan.slice(0, cards.length);
     for (let i = arr.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [arr[i], arr[j]] = [arr[j], arr[i]];
     }
     arr.forEach((_, k) => {
       const card = cards[k];
-      const srcIdx = Number(card.dataset.idx);
       card.style.transition = "transform 0.6s ease, opacity 0.6s ease";
       card.style.transform = `rotate(${((Math.random() - 0.5) * 12).toFixed(1)}deg) translateY(${-20 + Math.random() * 10}px)`;
       card.style.opacity = "0.5";
