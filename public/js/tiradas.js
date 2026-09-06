@@ -582,8 +582,61 @@ function iniciarTirada(tipo) {
 
   escena.innerHTML = "";
 
-  /* Paso 1 · elegir las cartas (el mazo ya viene barajado) */
-  mostrarEleccion(d);
+  /* Animación de barajeo: las cartas cambian de lugar */
+  escena.innerHTML = `
+    <div class="centrado">
+      <p style="margin-bottom:18px">Cierra los ojos, respira profundo y piensa en tu pregunta</p>
+      <div class="spinner oculto" id="spinner-barajo"></div>
+      <div class="mazo" id="mazo-barajeo" style="margin-top:26px"></div>
+    </div>`;
+
+  const mazoFan = TIRADAS.barajar(TIRADAS.mazo.slice());
+  const mazoEl = document.getElementById("mazo-barajeo");
+  const cards = [];
+  for (let i = 0; i < 14; i++) {
+    const c = mazoFan[i % mazoFan.length];
+    const m = document.createElement("div");
+    m.className = "minicarta barajeo";
+    m.style.width = "84px";
+    m.innerHTML = "<div class='dorso-mini'></div><span class='nom'>✦</span>";
+    m.dataset.idx = String(i);
+    m.style.animationDelay = `${(i * 0.12).toFixed(2)}s`;
+    mazoEl.appendChild(m);
+    cards.push(m);
+  }
+
+  /* mezcla visual: cada carta cambia de lugar con un rebote */
+  const mezclar = () => {
+    const arr = mazoFan.slice();
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    arr.forEach((_, k) => {
+      const card = cards[k];
+      const srcIdx = Number(card.dataset.idx);
+      card.style.transition = "transform 0.6s ease, opacity 0.6s ease";
+      card.style.transform = `rotate(${((Math.random() - 0.5) * 12).toFixed(1)}deg) translateY(${-20 + Math.random() * 10}px)`;
+      card.style.opacity = "0.5";
+      setTimeout(() => {
+        card.dataset.idx = String(arr[k]);
+        card.style.transform = "rotate(0deg) translateY(0)";
+        card.style.opacity = "1";
+      }, 400 + Math.random() * 400);
+    });
+  };
+
+  const sp = document.getElementById("spinner-barajo");
+  let mezclas = 0;
+  const interval = setInterval(() => {
+    mezclar();
+    mezclas++;
+    if (mezclas >= 4) {
+      clearInterval(interval);
+      sp.classList.add("oculto");
+      setTimeout(() => mostrarEleccion(d), 600);
+    }
+  }, 500);
 }
 
 /* Paso 2 · elegir las cartas tocando el mazo */

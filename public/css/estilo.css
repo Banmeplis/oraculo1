@@ -880,6 +880,19 @@ footer.pie .enlace { color: var(--dorado); text-decoration: none; }
 }
 @keyframes girar { to { transform: rotate(360deg); } }
 
+/* animación de barajeo: cada carta rebota y rota */
+@keyframes barajar {
+  0% { transform: rotate(-12deg) translateY(-22px) scale(0.9); opacity: 0.4; }
+  40% { transform: rotate(8deg) translateY(-6px) scale(1.08); opacity: 1; }
+  70% { transform: rotate(-4deg) translateY(4px) scale(0.97); opacity: 1; }
+  100% { transform: rotate(0deg) translateY(0) scale(1); opacity: 1; }
+}
+.mazo .barajeo {
+  display: inline-block;
+  animation: barajar 0.7s ease forwards;
+  transform-origin: center bottom;
+}
+
 /* ------------------------------ comentarios ----------------------------- */
 .comentario { padding: 16px 20px; margin-bottom: 12px; }
 .comentario-cab { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
