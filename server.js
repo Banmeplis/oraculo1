@@ -53,6 +53,7 @@ const ESTATICO = express.static(path.join(__dirname, "public"), {
     }
   }
 });
+app.use("/vendor", express.static(path.join(__dirname, "node_modules")));
 app.use(ESTATICO);
 app.use("/uploads", express.static(UPLOADS));
 
@@ -138,6 +139,86 @@ app.get("/api/sesion", (req, res) => {
   res.json({ user: usuarioActual(req) });
 });
 
+app.get("/api/auth/check", (req, res) => {
+  const u = usuarioActual(req);
+  if (u) {
+    res.json({ authenticated: true, user: { id: u.id, nombre: u.nombre, email: u.email, rol: u.rol, picture: u.picture || undefined } });
+  } else {
+    res.json({ authenticated: false });
+  }
+});
+
+app.post("/api/ia/reflexion", async (req, res) => {
+  try {
+    const { cartas, tirada, area, usuario } = req.body || {};
+    if (!cartas || !cartas.length) return res.status(400).json({ error: "No hay cartas" });
+
+    // Preparamos el prompt con la información de la lectura
+    const cartasDesc = cartas.map(c => `${c.nombre} ${c.invertido ? "(invertida)" : ""}`.trim()).join(", ");
+    
+    // Contexto del área
+    const areaContext = {
+      salud: "salud y cuerpo",
+      amor: "relaciones y corazón", 
+      trabajo: "carrera y finanzas",
+      economia: "abundancia y recursos",
+      mensajes: "señales y guía",
+      bloqueo: "obstáculos y miedos",
+      situacion: "circunstancias generales"
+    }[area] || "tu situación";
+
+    const prompt = `Soy un/a ${usuario ? usuario.nombre : "consultante"} y he sacado una tirada de ${tirada || "tarot"}. Las cartas son: ${cartasDesc}. 
+    
+    Estoy buscando orientación sobre ${areaContext}. 
+    
+    Por favor dame una reflexión profunda de máximo 3 líneas que una el significado de estas cartas con mi pregunta sobre ${areaContext}. Sé conciso, espiritual pero práctico. No uses estructura de lista, escribe un párrafo continuo.`;
+
+    // Llamada a Hugging Face Inference API (nivel gratuito)
+    const HF_TOKEN = process.env.HF_TOKEN || "hf_tu_token_aqui";
+    const model = "facebook/bart-large-cnn"; // Modelo gratuito y efectivo para resúmenes
+    
+    const response = await fetch(`https://api.huggingface.co/models/${model}`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${HF_TOKEN}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ inputs: prompt, parameters: { max_new_tokens: 100, temperature: 0.7 } })
+    });
+
+    if (!response.ok) {
+      // Si falla la API, usar fallback deterministic
+      throw new Error("API error");
+    }
+
+    const result = await response.json();
+    const reflexion = typeof result === "string" ? result : result.generated_text || result[0]?.summary_text || "";
+    
+    // Limpiar y formatear
+    const limpia = reflexion.replace(/<[^>]+>/g, "").trim().slice(0, 300);
+    
+    res.json({ reflexion: limpia || fallbackReflexion(area, cartas.length) });
+
+  } catch (e) {
+    // Fallback: mensaje determinístico basado en las cartas
+    res.json({ reflexion: fallbackReflexion(req.body?.area, req.body?.cartas?.length) });
+  }
+});
+
+/* Mensaje de fallback determinístico cuando la IA falla */
+function fallbackReflexion(area, numCartas) {
+  const bases = {
+    salud: `Con ${numCartas} cartas, tu sanación está en proceso. Es momento de escuchar a tu cuerpo y liberar viejos patrones.`,
+    amor: `Con ${numCartas} cartas, el amor busca fluir hacia ti. Mantén el corazón abierto y no temas recibir.`,
+    trabajo: `Con ${numCartas} cartas, nuevas oportunidades están surgiendo. Mantén la mirada en tus metas.`,
+    economia: `Con ${numCartas} cartas, el flujo abundante está alineándose. Administra con sabiduría.`,
+    mensajes: `Con ${numCartas} cartas, las señales del universo están claras. Presta atención a las sincronías.`,
+    bloqueo: `Con ${numCartas} cartas, los obstáculos tienen propósito. Son maestros que te ayudan a crecer.`,
+    situacion: `Con ${numCartas} cartas, tu situación se revela con honestidad. Confía en el proceso.`
+  };
+  return (bases[area] || "Las cartas siempre hablan: escucha con el corazón.") + " Este es un mensaje de apoyo mientras se desarrolla tu lectura completa.";
+}
+
 /* --------------------------------- Google -------------------------------- */
 function getJSON(url) {
   return new Promise((res, rej) => {
@@ -212,8 +293,8 @@ app.get("/auth/google/callback", async (req, res) => {
         ).run(info.name || info.email.split("@")[0], correo, rol).lastInsertRowid)
       };
     }
-    req.session.user = { id: u.id, nombre: u.nombre || info.name || "Oráculo", email: correo, rol: u.rol || rol };
-    res.redirect("/tarot.html?bienvenido=google");
+    req.session.user = { id: u.id, nombre: u.nombre || info.name || "Oráculo", email: correo, rol: u.rol || rol, picture: info.picture };
+    res.redirect("/tarot.html?bienve@nido=google");
   } catch (e) {
     res.redirect("/login.html?err=google-error");
   }

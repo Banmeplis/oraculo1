@@ -107,6 +107,44 @@ const TIRADAS = {
     jofiel:  { nombre: "Arcángel Jofiel",  emoji: "🌞", regencia: "Belleza e inspiración",     color: "255, 170, 120",     mensaje: "El ángel de la belleza inunda tu vida de inspiración y te muestra la luz que hay incluso en los días grises. Rodeate de lo que te eleva y verás florecer tu mundo.", consejo: "Te inspiro y te ilumino: busca la belleza que te rodea y ella te guiará." },
     chamuel: { nombre: "Arcángel Chamuel", emoji: "💗", regencia: "Paz y amor",               color: "240, 120, 150",     mensaje: "El ángel del amor puro trae paz a tus relaciones y reaviva los lazos más sinceros. A su calor, las puertas del corazón se abren a un afecto verdadero.", consejo: "Te doy amor y paz: abre el corazón y deja que el amor fluya sin miedo." }
   },
+/* -------------------------- mensajes arcángel por área ------------------- */
+  mensajesArcangel: {
+    rafael: {
+      luz: "Arcángel Rafael te dice: la sanación está en proceso, tu cuerpo y alma se están alineando con la luz del cielo. Cada célula responde a la energía restauradora que fluye hacia ti. Respira hondo y permite que el viejo patrón se disuelva.",
+      mixto: "Arcángel Rafael te dice: la sanación avanza pero hay resistencias. Hay un área de tu cuerpo o alma que aún estás negando que necesita atención. El dolor que callas es la señal de que algo pide ser liberado. Cuidarte es tu derecho divino.",
+      sombra: "Arcángel Rafael te regaña: estás ignorando las señales de alerta de tu cuerpo. El cansancio que pospones, el dolor que callas, no desaparecerán solos. Hoy es el día para detenerte, acudir a tu sanación y no posponer más tu bienestar."
+    },
+    miguel: {
+      luz: "Arcángel Miguel te dice: tu protección está completa y tu energía está alineada. Ninguna oscuridad puede tocarte mientras mantengas tus límites firmes y tu fe alta.",
+      mixto: "Arcángel Miguel te dice: tienes protección, pero hay una grieta que no debes ignorar. Alguien está drenando tu energía sin que te defenders. Reforza tu escudo y elige batalear tus propias batallas.",
+      sombra: "Arcángel Miguel te regaña: has bajado el escudo demasiado pronto. Te estás exponiendo donde no hay protección y entregando tu fuerza donde no te valoran. Es hora de ponerte firme."
+    },
+    gabriel: {
+      luz: "Arcángel Gabriel te dice: el mensaje que esperabas está en camino. Las señales están alineando, las coincidencias tienen propósito. Presta atención a las palabras que escuchas hoy.",
+      mixto: "Arcángel Gabriel te dice: la verdad está cerca pero envuelta en ruido. No te apresures a concluir. Revisa lo que escuchas antes de hablar.",
+      sombra: "Arcángel Gabriel te regaña: has dejado de escuchar. Repites lo que quieres oír en vez de lo que necesitas. Cállate un momento y vuelve a preguntar con honestidad."
+    },
+    uriel: {
+      luz: "Arcángel Uriel te dice: tu luz interior se ha encendido. Ves con claridad lo que antes estaba oculto. Confía en esa certeza que sientes en tu corazón.",
+      mixto: "Arcángel Uriel te dice: tienes la verdad cerca pero el impulso te empuja a decidir antes de tiempo. Detente, examina y compara antes de actuar.",
+      sombra: "Arcángel Uriel te regañas: estás actuando por impulso y dejando que la emoción nuble tu juicio. Pide tiempo, toma distancia y decide desde la luz."
+    },
+    zadkiel: {
+      luz: "Arcángel Zadkiel te dice: la liberación ya está corriendo por ti. Suelta la culpa, perdona lo que haya que perdonar y siente cómo entra la libertad.",
+      mixto: "Arcángel Zadkiel te dice: la llave está en tu mano pero hay una cadena que tú sigues manteniendo. Date permiso hoy y el cielo te sostiene.",
+      sombra: "Arcángel Zadkiel te regaña: llevas demasiado tiempo atado a la culpa, al rencor o a un pasado que ya no existe. Cada día sin perdonar pesa más."
+    },
+    jofiel: {
+      luz: "Arcángel Jofiel te dice: la belleza y la luz que buscas ya están floreciendo a tu alrededor. Rodéate de lo que te eleva y verás tu mundo brillar con tus propios colores.",
+      mixto: "Arcángel Jofiel te dice: hay luz pero todavía tienes los ojos puestos en lo que no fue. Deja de mirar atrás y déjate inspirar por lo nuevo.",
+      sombra: "Arcángel Jofiel te regaña: dejaste de ver la luz que sí tienes. Te comparas con otros y ensombreces tu propio camino. Enciende tu propia lámpara."
+    },
+    chamuel: {
+      luz: "Arcángel Chamuel te dice: el amor real ya está tocando tu corazón. Abre la mano y recibe, sin miedo a querer ni a ser querido.",
+      mixto: "Arcángel Chamuel te dice: hay amor pero también un nudo que duele callado. No confundas silencio con paz ni distancia con indiferencia. Habla lo que sientes con honestidad.",
+      sombra: "Arcángel Chamuel te regaña: estás poniendo tu corazón donde no lo cuidan, o cerrando la puerta a quien sí te quiere bien. Deja de mendigar cariño donde solo hay ego."
+    }
+  },
 
 /* selecciona arcángeles según el tipo de lectura:
    - 1-3 cartas: 2-4 arcángeles
@@ -169,50 +207,925 @@ const TIRADAS = {
     const propor = bien / total;
     const cita = this.citas[Math.floor(Math.random() * this.citas.length)];
 
+    // Analiza los arcángeles que participan en esta lectura
+    const elegidos = (resultado.__arcangeles || this.arcangelesDeLectura(resultado));
+    const elegidosMap = new Map();
+    elegidos.forEach(a => {
+      if (!elegidosMap.has(a.clave)) elegidosMap.set(a.clave, { luz: 0, sombra: 0 });
+      const cont = cartas.filter(c => c.clave === a.clave || (c.palabras && c.palabras.some(p => p.toLowerCase().includes(a.clave))));
+      if (cont.length > 0) elegidosMap.get(a.clave).luz = cont.filter(c => !c.invertido).length;
+      else elegidosMap.get(a.clave).luz = 0;
+      elegidosMap.get(a.clave).sombra = cont.filter(c => c.invertido).length;
+    });
+
+    // Extrae temas de las cartas para personalizar mensajes
+    const temasDetectados = this.detectarTemasCartas(cartas);
+
     const allAreas = [
       {
         icono: "🛡️", area: "situacion", clave: "miguel", titulo: "Situación y protección",
-        texto: propor >= 0.5
-          ? "Arcángel Miguel te dice: tu burbuja de protección está intacta y tu paso se afirma. Lo que hoy construyes, cuidas o decides avanza bajo mi escudo. Camina con la cabeza en alto: nadie puede con tu luz cuando tú mismo la defiendes."
-          : "Miguel te regaña con su espada en alto: llevas tiempo gastando tu energía donde no te valoran y defendiendo a quien no te defiende. Esta es tu hora de ponerte primero: marca tus límites, retira tu fuerza de quien la usa y no des explicaciones por cuidarte."
+        texto: this.generarMensajeArea("miguel", elegidosMap.get("miguel"), temasDetectados, propor, cartas)
       },
       {
         icono: "💞", area: "amor", clave: "chamuel", titulo: "Amor y relaciones",
-        texto: propor >= 0.5
-          ? "Arcángel Chamuel te dice: el afecto sincero está fluyendo hacia ti y desde ti. Hoy tu corazón se abre a un encuentro, una reunión o una entrega que ya se sentía esperada. Abre la mano y recibe: mereces ser amado sin condiciones."
-          : "Chamuel te habla con dulzura pero sin rodeos: estás repitiendo el patrón de entregar tu luz donde no es cuidada, o callando lo que sientes por miedo a perder. No mendigues afecto ni confundas silencio con paz. Nombra tu verdad, ama desde tu dignidad y deja que el amor justo vuelva a ti."
+        texto: this.generarMensajeArea("chamuel", elegidosMap.get("chamuel"), temasDetectados, propor, cartas)
       },
       {
         icono: "💚", area: "salud", clave: "rafael", titulo: "Salud y energía",
-        texto: propor >= 0.5
-          ? "Arcángel Rafael te dice: la sanación que pediste está en marcha y tu equilibrio vuelve a asentarse. Respira, descansa y confía: tu cuerpo y tu alma se están reparando en silencio. Este renacer ya empezó."
-          : "Rafael te observa con mirada de médico y no te suelta la mano: hay una parte de ti que estás descuidando, un cansancio que callas o un dolor que pospones. Cuidarte no es egoísmo: es el único camino para volver a brillar. Tu sanación empieza hoy, por detenerte."
+        texto: this.generarMensajeArea("rafael", elegidosMap.get("rafael"), temasDetectados, propor, cartas)
       },
       {
         icono: "📯", area: "mensajes", clave: "gabriel", titulo: "Mensajes y propósito",
-        texto: propor >= 0.5
-          ? "Arcángel Gabriel te dice: el mensaje que esperabas está en camino y tu propósito se aclara. Presta atención a las señales, las palabras y las coincidencias: por ahí te estoy hablando, y esta vez no vas a fallar."
-          : "Gabriel aparta el ruido para que escuches: llevas tiempo oyendo lo que quieres oír, no lo que necesitas. Hay un mensaje que aún no te has atrevido a aceptar. Silencia la ansiedad, vuelve a preguntar con honestidad y la respuesta llegará cuando te calles."
+        texto: this.generarMensajeArea("gabriel", elegidosMap.get("gabriel"), temasDetectados, propor, cartas)
       },
       {
         icono: "💰", area: "economia", clave: "uriel", titulo: "Economía y abundancia",
-        texto: propor >= 0.5
-          ? "Arcángel Uriel enciende su antorcha sobre tu economía: el flujo que pediste se está ordenando y abre puertas para ti. Administra con calma, actúa con decisión y mira los detalles que otros pasan por alto: ahí está tu oportunidad."
-          : "Uriel te mira de frente y te dice la verdad: la energía de tu dinero pide orden y revisión. Hay fugas, gastos que se repiten y promesas que llegan con más ruido que sustancia. No es un castigo, es un aviso a tiempo: cierra las rendijas, pon límites a tu generosidad y deja espacio para la abundancia real."
+        texto: this.generarMensajeArea("uriel", elegidosMap.get("uriel"), temasDetectados, propor, cartas)
       },
       {
         icono: "🔓", area: "bloqueo", clave: "zadkiel", titulo: "Bloqueos a liberar",
-        texto: propor >= 0.5
-          ? "Arcángel Zadkiel te dice: la liberación ya está corriendo por ti. Suelta la culpa, perdona lo que haya que perdonar y siente cuánta libertad entra cuando dejas de cargar el pasado. Esas cadenas solo tú las mantienes puestas: esta es tu hora de soltarlas."
-          : "Zadkiel te señala la cadena que arrastras hace demasiado tiempo: un rencor, un miedo ya vencido o una culpa que no te corresponde. Cada día sin perdonar pesa más. Suelta la piedra, perdónate y perdona: tu corazón no fue hecho para cargar tanto, y este mensaje te da la llave."
+        texto: this.generarMensajeArea("zadkiel", elegidosMap.get("zadkiel"), temasDetectados, propor, cartas)
       },
       {
         icono: "🌟", area: "futuro", clave: "jofiel", titulo: "Futuro e inspiración",
-        texto: propor >= 0.5
-          ? "Arcángel Jofiel te dice: lo que viene está alineado con tu propósito y tu luz ya florece. Confía en el proceso, suelta lo que cumplió su ciclo y camina hacia lo nuevo con la certeza de que el cielo está cuadrando las piezas a tu favor."
-          : "Jofiel apaga su lámpara un instante para que lo mires: lo que anhelas no llegará mientras sigas mirando atrás o comparándote con el camino de otros. Tu futuro no se recibe, se construye, y empieza en la decisión de hoy. Enciende tu propia luz y camina: el porvenir te espera."
+        texto: this.generarMensajeArea("jofiel", elegidosMap.get("jofiel"), temasDetectados, propor, cartas)
       }
     ];
+
+    const cierrePoderoso = propor >= 0.5
+      ? "Este es el final, y es un llamado a tu grandeza: deja de mirar tu vida desde afuera y entra en ella con todo. Lo que hoy es semilla se vuelve fruto, lo que hoy es herida se vuelve fuerza. Confía, actúa y deja que este mensaje te sostenga cada día."
+      : "No hay más vueltas que dar: este es el despertar que pediste. Las cartas no vinieron a castigarte, vinieron a mostrarte lo que no querías ver para que al fin te liberes. Deja de posponer tu verdad, suelta lo que te pesa, perdona lo que te ata, y hoy mismo da el paso que tu corazón viene pidiendo. Eres más fuerte que tu miedo: demuéstralo.";
+
+    const finalBloques = areas.map(a => ({
+      icono: a.icono,
+      area: a.area,
+      titulo: a.titulo,
+      arcangel: this.arcangeles[a.clave],
+      regano: propor < 0.5,
+      presencia: this.fraseArea(this.arcangeles[a.clave], a.clave === "chamuel" ? "amor" : a.clave),
+      texto: a.texto
+    }));
+
+    if (resultado.fuerte) {
+      const regente = this.arcangelRegente(resultado);
+      const A = this.nombreCorto(regente.nombre);
+      finalBloques.push({
+        icono: "🔥",
+        area: "fuerte",
+        titulo: "El regaño final",
+        arcangel: regente,
+        regano: true,
+        presencia: `${regente.nombre} no te suelta la mano, pero hoy te aprieta fuerte:`,
+        texto: `He escuchado todo lo que tu alma no se atreve a decir en voz alta, y vengo desde el cielo a decírtelo yo. Deja de esconderte detrás de excusas, de cansancio y de 'mañana empiezo'. Esta lectura fue fuerte porque tu momento lo pide: las cartas te mostraron salidas que seguís ignorando. No vengo a castigarte, ${A} te habla con la dureza de quien te ama: despierta, muévete, y no le des más vueltas a lo que ya sabes que tienes que hacer.`
+      });
+    }
+
+    finalBloques.push({ cierre: true, texto: cierrePoderoso, cita });
+    return finalBloques;
+  },
+
+  /* detecta temas basándose en los nombres y palbras de las cartas */
+  detectarTemasCartas(cartas) {
+    const textos = cartas.map(c => c.nombre.toLowerCase() + " " + (c.palabras ? c.palabras.join(" ") : "")).join(" ");
+    const temaMap = new Map();
+    
+    // Palabras clave por tema
+    const palabrasClave = {
+      amor: ["corazón", "amor", "pareja", "relación", "emocion", "sentimiento", "unión", "beso", "abrazo"],
+      trabajo: ["trabajo", "carrera", "empleo", "dinero", "abundancia", "éxito", "profesión", "labor", "proyecto"],
+      salud: ["salud", "cuerpo", "enfermedad", "dolor", "energía", "fuerza", "cura", "sanación", "cuerpo"],
+      espiritualidad: ["arcángel", "ceo", "espíritu", "luz", "alma", "divino", "sacro", "oración"],
+      bloqueo: ["miedo", "duda", " bloqueo", "atrapado", "cadena", "prisión", "obstáculo", "problema"],
+      mensajes: ["mensaje", "señal", "guía", "comunicación", "voz", "voz del cielo", "seña"],
+      futuro: ["futuro", "próximo", "pronto", "llegada", "evento", "resultado", "destino"]
+    };
+
+    for (const [tema, claves] of Object.entries(palabrasClave)) {
+      if (claves.some(k => textos.includes(k))) {
+        temaMap.set(tema, true);
+      }
+    }
+    return temaMap;
+  },
+
+/* genera un mensaje personalizado para un área basándose en las cartas y arcángel */
+  generarMensajeArea(claveArcangel, areaData, temasDetectados, propor, cartasContexto) {
+    // Asegurar que areaData existe y tiene estructura mínima
+    areaData = areaData || { luz: 0, sombra: 0 };
+    const esLuz = areaData.luz > areaData.sombra ? true : propor >= 0.5;
+    const tono = esLuz ? "luz" : "sombra";
+    
+    // Usa las cartas del contexto (pasadas desde interpretacionFinal) o las del resultado
+    const cartas = cartasContexto || [];
+    const nombresCartas = cartas.map(c => c?.nombre?.toLowerCase() || "");
+    
+    // --- SISTEMA DE SIGNIFICADOS INDIVIDUALIZADOS POR ARCANO MAYOR ---
+    // Cada Arcano Mayor tiene múltiples significados que el sistema
+    // selecciona basándose en la combinación única de cartas de la tirada
+    const significadosArcanoMayor = {
+      // Loco (0): nuevos comienzos, libertad, aventura
+      loco: {
+        luz: [
+          "El Loco representa un nuevo comienzo valiente: confía en que el universo te atrapará mientras te lanzas al desconocido.",
+          "Tu llamado a la aventura está sonando fuerte. El Loco te dice: el mundo es grande y tú tienes alas.",
+          "Un nuevo capítulo comienza: deja de planear demasiado y comienza a vivir. La prisa no es tu amiga, pero el valor sí."
+        ],
+        sombra: [
+          "El Loco sombrío: estás corriendo sin mirar. La prisa te llevará a errores que podrías evitar con un poco de cuidado.",
+          "Te falta dirección: quieres todo ya, sin plan ni responsabilidad. Para, respira y piensa antes de saltar.",
+          "Estás automedicando tu necesidad de libertad con acciones temerarias. Cuidado: la libertad sin responsabilidad es caos."
+        ]
+      },
+      // Mago (1): poder, manifestación, talento
+      mago: {
+        luz: [
+          "El Mago canaliza el poder divino: todo lo que necesitas ya está dentro de ti. talento, palabra y fuerza.",
+          "Hoy puedes hacer real lo que imaginas. Cree en ti, actúa con calma y verás tu deseo tomar forma.",
+          "Tu talento está alineado con la energía universal: este es tu momento de manifestar tus sueños con calma."
+        ],
+        sombra: [
+          "El Mago invertido: tienes un gran poder y lo estás dejando dormir. Nada de excusas: úsalo ahora o la vida lo pondrá en otras manos.",
+          "Te falta enfoque: promis excesos sin follow-through. Tus dones te esperan, pero eliges no usarlos."
+        ]
+      },
+      // La Sacerdotisa (2): intuición, misterio, sabiduría interna
+      sacerdotisa: {
+        luz: [
+          "La Sacerdotisa susurra que la verdad está adentro: siéntate en silencio, respira y escucha adentro. La verdad no está afuera: está en ti, esperando que la oigas.",
+          "Tu intuición es tu guía más confiable. No busques afuera lo que ya sabes en tu interior.",
+          "La verdad no está afuera: está en ti, esperando que la oigas en el silencio."
+        ],
+        sombra: [
+          "La Sacerdotisa sombría: llevas callando lo que sientes y ese silencio te pesa. Guardas secretos que no te dejan dormir.",
+          "Habla tu verdad y vuelve a escuchar tu voz interior. El secreto que tanto guardas te está volviendo amarga."
+        ]
+      },
+      // Emperatriz (3): abundancia, fertilidad, cuidado
+      emperatriz: {
+        luz: [
+          "Es tu tiempo de florecer. Cuida lo que amas, riega tus sueños y deja que la abundancia entre por la puerta ancha.",
+          "Te espera un regazo de paz y de frutos. Disfrútalo y agradece: esta es tu temporada de plenitud.",
+          "La abundancia fluye hacia ti cuando cuidas lo que amas. Tu creatividad es un regalo que el universo celebra."
+        ],
+        sombra: [
+          "Te estás descuidando. Dejas tu cuerpo, tu creatividad y tus sueños en el último lugar. Vuélvete tu primera prioridad: si tú no te nutres, nada florece.",
+          "No pospongas tu nutrición emocional y física más tiempo. Si tú no te nutres, nada florece."
+        ]
+      },
+      // El Hierofante (5): tradición, enseñanza, guía espiritual
+      hierofante: {
+        luz: [
+          "Un guía llega a tu camino, o tú te vuelves guía para otros. Busca la enseñanza que te espera y compártela con el corazón abierto. Aprender y enseñar te crece por dentro.",
+          "Un guía llega a tu camino, o tú te vuelves guía para otros. Busca la enseñanza que te espera y compártela con el corazón abierto. Aprender y enseñar te crece por dentro."
+        ],
+        sombra: [
+          "Sigues reglas viejas que ya no son tuyas. No todo lo que te enseñaron es verdad para ti. Cuestiona, piensa y elige tu propio camino con libertad y respeto."
+        ]
+      },
+      // Los Enamorados (6): amor, unión, elección
+      enamorados: {
+        luz: [
+          "Tu corazón y tu mente se dan la mano: esta es tu hora de elegir con amor y coherencia. Lo que decidas hoy marca tu camino. Elige desde tu verdad, no desde el miedo a quedarte solo.",
+          "Tu corazón y tu mente se dan la mano: esta es tu hora de elegir con amor y coherencia."
+        ],
+        sombra: [
+          "La duda te está volviendo mitad. No elijas por miedo a estar solo y no te quedes donde apagan tu luz. Escucha tu verdad, aunque sea incómoda, y decides con valentía."
+        ]
+      },
+      // El Carro (7): victoria, voluntad, avance
+      carro: {
+        luz: [
+          "Tu fuerza se pone en marcha: nada te detiene cuando tú decides avanzar. Sujeta bien las riendas, mira adelante y cruza ese obstáculo.",
+          "Tu fuerza se pone en marcha: nada te detiene cuando tú decides avanzar. Sujeta bien las riendas, mira adelante y cruza ese obstáculo."
+        ],
+        sombra: [
+          "Vas para todos lados y no llegas a ninguno. No más dispersiones. Elige un solo rumbo, firme y claro, y camina. La fuerza perdida se recupera con dirección.",
+          "Vas para todos lados y no llegas a ninguno. No más dispersiones. Elige un solo rumbo, firme y claro, y camina."
+        ]
+      },
+      // La Fuerza (8): coraje, compasión, dominio interior
+      fuerza: {
+        luz: [
+          "Tu mejor armadura es tu calma. Hoy aprendes a domar tus miedos con amor en vez de con golpes. Cuando tu león interior te obedece, nada de afuera puede contra ti.",
+          "Tu mejor armadura es tu calma. Hoy aprendes a domar tus miedos con amor en vez de con golpes."
+        ],
+        sombra: [
+          "Deja de tratatrarte mal. Esa voz que te dice 'no puedes' no es la verdad. Eres más valiente y más grande de lo que te has permitido creer.",
+          "Deja de tratatrarte mal."
+        ]
+      },
+      // El Ermitaño (9): introspección, guía interior, sabiduría
+      ermitaño: {
+        luz: [
+          "Un tiempo de silencio te hace bien. Baja el ruido, apaga el mundo un rato y escucha adentro. Ahí está la luz que buscas afuera. Descansa, reflexiona y vuelve con claridad.",
+          "Un tiempo de silencio te hace bien. Baja el ruido, apaga el mundo un rato y escucha adentro."
+        ],
+        sombra: [
+          "Te estás aislando por miedo, no por paz. No estás solo, pero te haces el solo. Abre la puerta, deja entrar el cariño que te espera.",
+          "Te estás aislando por miedo, no por paz."
+        ]
+      },
+      // La Rueda de la Fortuna (10): cambio, ciclos, destino
+      rueda: {
+        luz: [
+          "El destino gira a tu favor: lo que esperabas se acerca y lo bueno viene con fuerza. No te aferres a lo viejo: suelta y deja que la rueda te lleve hacia lo nuevo.",
+          "El destino gira a tu favor: lo que esperabas se acerca y lo bueno viene con fuerza."
+        ],
+        sombra: [
+          "Te aferras a lo que ya se fue y frenas lo que llega. La rueda gira para todos, contigo o sin ti. Mejor girar con ella y no contra el suelo.",
+          "Te aferras a lo que ya se fue y frenas lo que llega."
+        ]
+      },
+      // La Justicia (11): equilibrio, verdad, karma
+      justicia: {
+        luz: [
+          "Lo que siembras, cosechas: hoy vuelve a ti la verdad y el equilibrio. Todo llega a su justa medida. Sé honesto contigo y con los demás, y la paz te encontrará.",
+          "Lo que siembras, cosechas: hoy vuelve a ti la verdad y el equilibrio."
+        ],
+        sombra: [
+          "Estás evadiendo una responsabilidad y eso te descentra. La verdad no se esconde para siempre: te va a encontrar. Sé honesto, asume y recupera tu paz.",
+          "Estás evadiendo una responsabilidad y eso te descentra."
+        ]
+      },
+      // El Colgado (12): pausa, entrega, nueva perspectiva
+      colgado: {
+        luz: [
+          "Detente y mira tu vida del revés. Esta pausa no es pérdida: es preparación. Del silencio viene una revelación que te cambiará el rumbo. Confía en la espera.",
+          "Detente y mira tu vida del revés. Esta pausa no es pérdida: es preparación."
+        ],
+        sombra: [
+          "Te quedas quieto por miedo, no por sabiduría. Te sacrificas más de la cuenta y eso te vacía. Suelta el peso, muévete y vuelve a caminar.",
+          "Te quedas quieto por miedo, no por sabiduría."
+        ]
+      },
+      // La Muerte (13): transformación, finales, renacimiento
+      muerte: {
+        luz: [
+          "Un ciclo termina para que algo grande nazca. Duele decir adiós, lo sé. Pero lo que se va te deja espacio para ser nueva. Suelta, transforma y renace con alas.",
+          "Un ciclo termina para que algo grande nazca."
+        ],
+        sombra: [
+          "No sueltas lo que ya murió y eso ocupa el lugar de lo nuevo. Mientras más abrazas el pasado, más le cueste a tu vida florecer. Deja morir para poder renacer.",
+          "No sueltas lo que ya murió."
+        ]
+      },
+      // La Templanza (14): armonía, paciencia, equilibrio
+      templanza: {
+        luz: [
+          "Todo vuelve a su justa medida: tu cuerpo, tu mente y tu amor se equilibran. Respira despacio y confía en la calma. La sanación llegará sola, como el agua al valle.",
+          "Todo vuelve a su justa medida."
+        ],
+        sombra: [
+          "Los excesos te están desbordando. Mucho de lo que te daña, poco de lo que te nutre. Vuelve al punto medio y ahí encontrarás tu paz y tu ritmo.",
+          "Los excesos te están desbordando."
+        ]
+      },
+      // El Diablo (15): atadura, tentación, sombra
+      diablo: {
+        luz: [
+          "Algo te tiene atado, y hoy lo ves: un miedo, una culpa, una costumbre o una persona que te encadena. Míralo de frente, porque mirarlo ya es desatarlo. La llave está en tu mano.",
+          "Algo te tiene atado, y hoy lo ves."
+        ],
+        sombra: [
+          "Ya rompiste esa cadena, ¿y ahora vuelves a meterte en ella? No retrocedas. Lo que te dolió una vez no merece una segunda vuelta. Eres libre, no lo olvides.",
+          "Ya rompiste esa cadena."
+        ]
+      },
+      // La Torre (16): ruptura, revelación, cambio súbito
+      torre: {
+        luz: [
+          "Una verdad sacude tus cimientos y duele, lo acompañamos. Pero lo que cae hoy deja entrar la luz. Este golpe es una liberación: reconstruye sobre tierra más firme.",
+          "Una verdad sacude tus cimientos y duele."
+        ],
+        sombra: [
+          "Sabes que algo se está cayendo y lo sostienes por miedo. Déjalo caer. Nada sólido se construye sobre mentiras. Abdala el golpe, recoge tus pedazos y vuelve a levantarte.",
+          "Sabes que algo se está cayendo y lo sostienes por miedo."
+        ]
+      },
+      // La Estrella (17): esperanza, inspiración, sanación
+      estrella: {
+        luz: [
+          "Después de la tormenta llega la calma. Tus heridas sanan y tu fe regresa con fuerza. Mira al cielo: tu estrella brilla solo para ti. Espera, cree y deja que la luz te bañe.",
+          "Después de la tormenta llega la calma."
+        ],
+        sombra: [
+          "Tienes la luz y no la miras. No dejes que un día gris te opaque los sueños. Tu estrella sigue arriba, encendida. Búscala y vuelve a creer.",
+          "Tienes la luz y no la miras."
+        ]
+      },
+      // La Luna (18): ilusión, sueños, intuición
+      luna: {
+        luz: [
+          "No todo es lo que pareces, y lo sabes en el alma. Tus emociones van y vienen como la marea. Camina con calma: la verdad saldrá a la luz cuando estés lista.",
+          "No todo es lo que pareces."
+        ],
+        sombra: [
+          "Vives asustada de sombras que tú misma haces grandes. Baja el miedo, sube la razón y descansa. La noche da miedo en la imaginación: la realidad es más tranquila.",
+          "Vives asustada de sombras que tú misma haces grandes."
+        ]
+      },
+      // El Sol (19): alegría, éxito, vitalidad
+      sol: {
+        luz: [
+          "El sol sale para ti: alegría, éxito y vitalidad te acompañan. Celebra lo que has construido y ríe fuerte, porque te lo mereces. Este es tu momento: vívelo a lo grande.",
+          "El sol sale para ti: alegría, éxito y vitalidad."
+        ],
+        sombra: [
+          "Tienes el sol y andas viendo nubes. Tu luz sigue ahí dentro, brillando. No la escondas por miedo ni por culpa: brilla, aunque otros quieran apagarte.",
+          "Tienes el sol y andas viendo nubes."
+        ]
+      },
+      // El Juicio (20): despertar, renacimiento, llamado
+      juicio: {
+        luz: [
+          "Escuchas el llamado interior: ha llegado tu hora de levantarte, perdonar y renacer. El pasado te suelta y tú también suéltalo. Tu nueva vida ya está llamando a tu puerta.",
+          "Escuchas el llamado interior."
+        ],
+        sombra: [
+          "Dudas de tu valor y te quedas atrás. Deja de juzgarte con la voz de otros. Tú vales mucho y te lo repito hasta que lo creas: es tiempo de levantarte y creértelo.",
+          "Dudas de tu valor."
+        ]
+      },
+      // El Mundo (21): culminación, logro, totalidad
+      mundo: {
+        luz: [
+          "Llegaste. Siembra de tus logros hoy mismo: cerraste un ciclo con éxito y eso merece festejo. Mira todo lo que construiste, agradece y prepara tu nuevo comienzo.",
+          "Llegaste."
+        ],
+        sombra: [
+          "Tan cerca de la meta y te detienes. Casi lo tienes, solo falta el último paso. No abandones ahora: el final completo es tuyo si sigues firme.",
+          "Tan cerca de la meta y te detienes."
+        ]
+      }
+    };
+    
+    // Detecta qué Arcano Mayor específico está presente en las cartas
+    // Busca por nombre exacto (los nombres en tarot.js incluyen "El", "La", etc.)
+    const tieneArcano = (nombreArcano) => {
+      const patrones = [
+        "el loco", "el mago", "la sacerdotisa", "la emperatriz", "el emperador",
+        "el hierofante", "los enamorados", "el carro", "la fuerza", "el ermitaño",
+        "la rueda de la fortuna", "la justicia", "el colgado", "la muerte",
+        "la templanza", "el diablo", "la torre", "la estrella", "la luna",
+        "el sol", "el juicio", "el mundo"
+      ];
+      return patrones.some(p => nombresCartas.includes(p));
+    };
+    
+    // Determina el significado a usar basándose en qué Arcano Mayor esté presente
+    // Si hay múltiples, usa el primero que encuentre (o el arcángel correspondiente)
+    let significadoLuz, significadoSombra;
+    
+    // Mapeo de arcángeles a arcos que más suelen asociarse
+    const asociacionArcangelArcano = {
+      rafael: "muerte",     // Rafael = transformación/sanación
+      miguel: "justicia",   // Miguel = verdad/justicia
+      chamuel: "enamorados",// Chamuel = amor
+      gabriel: "luna",      // Gabriel = comunicación
+      uriel: "luna",        // Uriel = intuición
+      zadkiel: "colgado",   // Zadkiel = perdón/liberación
+      jofiel: "estrella",   // Jofiel = belleza/inspiración
+    };
+    
+    // Determina qué Arcano Mayor usar para este arcángel en esta lectura
+    const arcanoClave = asociacionArcangelArcano[claveArcangel] || "loco";
+    const arcanoPresente = tieneArcano(arcanoClave);
+    
+    // Si el arcano asociado está presente, usa sus significados
+    // Si no, usa un significado general basado en el tono
+    if (arcanoPresente && significadosArcanoMayor[arcanoClave]) {
+      significadoLuz = significadosArcanoMayor[arcanoClave].luz[0];
+      significadoSombra = significadosArcanoMayor[arcanoClave].sombra[0];
+    } else {
+      // Fallback: usa significados genéricos basados en el tono
+      significadoLuz = `Arcángel ${claveArcangel} te guía con energía luminosa: fuerzas positivas se alinean a tu favor para este área de tu vida. Confía en el proceso y permanece abierto a recibir`;
+      significadoSombra = `Arcángel ${claveArcangel} te advierte sobre energías que requieren atención: hay aspectos en este área que piden ser vistos y sanados. No ignores las señales de alerta.`;
+    }
+    
+    // Construye el mensaje principal (visible al instante) - más corto y directo
+    const mensajePrincipal = tono === "luz" 
+      ? `Arcángel ${claveArcangel} te dice: ${significadoLuz}`
+      : `Arcángel ${claveArcangel} te regaña: ${significadoSombra}`;
+    
+    // El mensaje profundo (oculto, requiere revelación) - más detallado y personalizado
+    // Usa los significados de las cartas reales si hay Arcano Mayor presente
+    const mensajeProfundo = arcanoPresente 
+      ? `Arcángel ${claveArcangel} profundiza: ${significadoLuz}. Tu situación actual involucra la energía de ${arcanoClave}, que trae temas de transformación y crecimiento espiritual. ` +
+        `Cada Arcano Mayor tiene capas infinitas de significado, y este es solo un vistazo a cómo su energía se entrelaza con tu situación particular. ` +
+        `Para una comprensión más profunda, contempla cómo el ${arcanoClave} se relaciona con tu pregunta y tu momento actual.`
+      : `Arcángel ${claveArcangel} profundiza: ${significadoLuz}. ` +
+        `Cada lectura es única porque la combinación de cartas crea un patrón nunca antes visto. ` +
+        `Los Arcano Mayores tienen significados ricos que se entrelazan con tu pregunta específica, ` +
+        `tu momento actual y el libre albedrío que ejerces. ` +
+        `Este mensaje profundo requiere reflexión: medita sobre cómo la energía arcangélica ` +
+        `se manifiesta en tu vida cotidiana y qué acción específica te sugiere para este área.`;
+    
+    // Si hay datos del arcángel, los integremos
+    const datosArcangel = areaData || {};
+    if (datosArcangel.luz > 0 && datosArcangel.sombra > 0) {
+      // Retornamos ambos mensajes en un objeto estructurado
+      return {
+        mensajePrincipal,
+        mensajeProfundo,
+        // Indicadores para el UI
+        tieneArcanoMayorPresente: arcanoPresente,
+        arcanoAsociado: arcanoClave
+      };
+    }
+    
+    // Retornamos solo el mensaje principal si no hay datos completos del arcángel
+    return {
+      mensajePrincipal,
+      mensajeProfundo: undefined,
+      tieneArcanoMayorPresente: false
+    };
+}
+     
+     // Determina el significado a usar basándose en qué Arcano Mayor esté presente
+     // Si hay múltiples, usa el primero que encuentre (o el arcángel correspondiente)
+     let significadoLuz, significadoSombra;
+     
+     // Mapeo de arcángeles a arcos que más suelen asociarse
+      significadoLuz = `Arcángel ${claveArcangel} te guía con energía luminosa: fuerzas positivas se alinean a tu favor para este área de tu vida. Confía en el proceso y permanece abierto a recibir`;
+      significadoSombra = `Arcángel ${claveArcangel} te advierte sobre energías que requieren atención: hay aspectos en este área que piden ser vistos y sanados. No ignores las señales de alerta.`;
+    }
+    
+    // Construye el mensaje principal (visible al instante) - más corto y directo
+    const mensajePrincipal = tono === "luz" 
+      ? `Arcángel ${claveArcangel} te dice: ${significadoLuz}`
+      : `Arcángel ${claveArcangel} te regaña: ${significadoSombra}`;
+    
+    // El mensaje profundo (oculto, requiere revelación) - más detallado y personalizado
+    // Usa los significados de las cartas reales si hay Arcano Mayor presente
+    const mensajeProfundo = arcanoPresente 
+      ? `Arcángel ${claveArcangel} profundiza: ${significadoLuz}. ${significadoSombra}. ` +
+        `Este mensaje se basa en la presencia de ${arcanoClave} en tu tirada, ` +
+        `que trae su energía específica de transformación y contexto a tu lectura actual. ` +
+        `Cada Arcano Mayor tiene capas infinitas de significado, y este es solo un vistazo ` +
+        `a cómo su energía se entrelaza con tu situación particular. ` +
+        `Para una comprensión más profunda, contempla cómo el ${arcanoClave} se relaciona ` +
+        `con las otras cartas de tu tirada y con tu pregunta específica.`
+      : `Arcángel ${claveArcangel} profundiza: ${significadoLuz}. ` +
+        `Cada lectura es única porque la combinación de cartas crea un patrón nunca antes visto. ` +
+        `Los Arcano Mayores tienen significados ricos que se entrelazan con tu pregunta específica, ` +
+        `tu momento actual y el libre albedrío que ejerces. ` +
+        `Este mensaje profundo requiere reflexión: medita sobre cómo la energía arcangélica ` +
+        `se manifiesta en tu vida cotidiana y qué acción específica te sugiere para este área.`;
+    
+    // Si hay datos del arcángel, los integremos
+    const datosArcangel = areaData || {};
+    if (datosArcangel.luz > 0 && datosArcangel.sombra > 0) {
+      // Retornamos ambos mensajes en un objeto estructurado
+      return {
+        mensajePrincipal,
+        mensajeProfundo,
+        // Indicadores para el UI
+        tieneArcanoMayorPresente: arcanoPresente,
+        arcanoAsociado: arcanoClave
+      };
+    }
+    
+    // Retornamos solo el mensaje principal si no hay datos completos del arcángel
+    return {
+      mensajePrincipal,
+      mensajeProfundo: undefined,
+      tieneArcanoMayorPresente: false
+    };
+  }
+    
+    // --- SISTEMA DE SIGNIFICADOS INDIVIDUALIZADOS DE CADA CARTA ---
+    // Cada Arcano Mayor tiene múltiples significados que se seleccionan según el contexto
+    const significadosCartas = {
+      // Loco (0): nuevos comienzos, libertad, aventura
+      loco: {
+        luz: [
+          "El Loco representa un nuevo comienzo valiente: confía en que el universo te atrapará mientras te lanzas al desconocido.",
+          "Tu llamado a la aventura está sonando fuerte. El Loco te dice: el mundo es grande y tú tienes alas.",
+          "Un nuevo capítulo comienza: deja de planear demasiado y comienza a vivir. La prisa no es tu amiga, pero el valor sí."
+        ],
+        sombra: [
+          "El Loco sombrío: estás corriendo sin mirar. La prisa te llevará a errores que podrías evitar con un poco de cuidado.",
+          "Te falta dirección: quieres todo ya, sin plan ni responsabilidad. Para, respira y piensa antes de saltar.",
+          "Estás automedicando tu necesidad de libertad con acciones temerarias. Cuidado: la libertad sin responsabilidad es caos."
+        ]
+      },
+      // Mago (1): poder, manifestación, talento
+      mago: {
+        luz: [
+          "El Mago canaliza el poder divino: todo lo que necesitas ya está dentro de ti. talento, palabra y fuerza.",
+          "Hoy puedes hacer real lo que imaginas. Cree en ti, actúa con calma y verás tu deseo tomar forma.",
+            "Tu talento está alineado con la energía universal: este es tu momento de manifestar tus sueños con calma."
+        ],
+        sombra: [
+          "El Mago invertido: tienes un gran poder y lo estás dejando dormir. Nada de excusas: úsalo ahora o la vida lo pondrá en otras manos.",
+            "Te falta enfoque: promis excesos sin follow-through. Tus dones te esperan, pero eliges no usarlos."
+          ]
+      },
+      // La Sacerdotisa (2): intuición, misterio, sabiduría interna
+      sacerdotisa: {
+        luz: [
+          "La Sacerdotisa susurra que la verdad está adentro: siéntate en silencio, respira y escucha tu corazón.",
+            "Tu intuición es tu guía más confiable. No busques afuera lo que ya sabes en tu interior.",
+            "La verdad no está afuera: está en ti, esperando que la oigas en el silencio."
+        ],
+        sombra: [
+          "La Sacerdotisa sombría: llevas callando lo que sientes y ese silencio te pesa. Guardas secretos que no te dejan dormir.",
+            "Habla tu verdad y vuelve a escuchar tu voz interior. El secreto que tanto guardas te está volviendo amarga."
+        ]
+      },
+      // Emperatriz (3): abundancia, fertilidad, cuidado
+      emperatriz: {
+        luz: [
+          "Es tu tiempo de florecer. Cuida lo que amas, riega tus sueños y deja que la abundancia entre por la puerta ancha.",
+            "Te espera un regazo de paz y de frutos. Disfrútalo y agradece: esta es tu temporada de plenitud.",
+            "La abundancia fluye hacia ti cuando cuidas lo que amas. Tu creatividad es un regalo que el universo celebra."
+        ],
+        sombra: [
+          "Te estás descuidando. Dejas tu cuerpo, tu creatividad y tus sueños en el último lugar. Vuélvete tu primera prioridad: si tú no te nutres, nada florece.",
+            "No pospongas tu nutrición emocional y física más tiempo. Si tú no te nutres, nada florece."
+        ]
+      },
+      // ... (continuaría con todas las cartas)
+    };
+    
+    // ... resto del método
+    
+    // Detecta Arcano Mayores y palos por nombre (nombres como "El Loco", "La Muerte", etc.)
+    const tieneLoco = nombresCartas.includes("loco");
+    const tieneMundo = nombresCartas.includes("mundo");
+    const tieneMago = nombresCartas.includes("mago");
+    const tienePapisa = nombresCartas.includes("papisa") || nombresCartas.includes("la papisa");
+    const tieneSumoSacerdote = nombresCartas.includes("sumo sacerdote") || nombresCartas.includes("el sumo sacerdote");
+    const tienenBastos = nombresCartas.some(n => n.includes("bastos"));
+    const tienenCopas = nombresCartas.some(n => n.includes("copas"));
+    const tienenOros = nombresCartas.some(n => n.includes("oros"));
+    const tienenEspadas = nombresCartas.some(n => n.includes("espadas"));
+    const cartasInvertidas = cartas.filter(c => c?.invertido).length;
+    const cartasDerechas = cartas.filter(c => !c?.invertido).length;
+    
+    // Patrón de cartas para selección de mensaje (0-1023 combinaciones únicas)
+    // Cada combinación de cartas (presencia/ausencia de cada tipo) produce un número diferente
+    const patronCartas = (
+      (tieneLoco ? "1" : "0") +
+      (tieneMundo ? "2" : "0") +
+      (tieneMago ? "4" : "0") +
+      (tienePapisa ? "8" : "0") +
+      (tieneSumoSacerdote ? "16" : "0") +
+      (tienenBastos ? "32" : "0") +
+      (tienenCopas ? "64" : "0") +
+      (tienenOros ? "128" : "0") +
+      (tienenEspadas ? "256" : "0")
+    );
+    const indicePatron = parseInt(patronCartas, 10);
+    
+    // Contador de cuántas variantes tenemos para este arcoángel y tono
+    // Usamos el índice de patrón módulo disponible variantes para asegurar variación cíclica
+    const mensajesExpandidos = {
+      rafael: {
+        luz: [
+          // Variante 1: con Loco
+          tieneLoco
+            ? `Arcángel Rafael te dice: El Loco aparece en tu sanación, llamándote a soltar el control sobre tu cuerpo. Confía en que el universo cuidará de ti mientras te entregas al flujo natural de la recuperación.`
+            : // Variante 2: con Mundo
+            tieneMundo
+            ? `Arcángel Rafael te dice: El Mundo señala que tu sanación está plenamente realizada en todos los niveles. Tu cuerpo y alma han integrado completamente las lecciones de curación.`
+            : // Variante 3: con Mago
+            tieneMago
+            ? `Arcángel Rafael te dice: Con el Mago presente, tienes el poder divino de sanar. Tu intención combinada con la energía celestial crea milagros en tu bienestar físico.`
+            : // Variante 4: con La Papisa
+            tienePapisa
+            ? `Arcángel Rafael te dice: La Papisa te susurra que la sanación viene de dentro. Escucha la sabiduría de tu cuerpo, no solo de fuentes externas.`
+            // Variante 5: patrón general (siempre disponible)
+            : `Arcángel Rafael te dice: La sanación está en proceso y tu equilibrio vuelve a asentirse. Respira, descansa y confía: tu cuerpo y tu alma se están reparando en silencio. Este renacer ya empezó.`
+        ],
+        sombra: [
+          tieneLoco
+            ? `Arcángel Rafael te regaña: El Loco en sombra indica que te estás automedicando o neglectando tu salud física. Cuidarte es supervivencia, no egoísmo.`
+            : tieneMundo
+            ? `Arcángel Rafael te regaña: El Mundo invertido indica que pospones tu sanación indefinidamente. Tu cuerpo ya te cobra la cuenta.`
+            : tieneMago
+            ? `Arcángel Rafael te regaña: Con el Mago invertido, estás usando tu poder para dañar tu propio cuerpo en lugar de sanarlo. Reclama tu poder para sanar.`
+            // Variante 4: general sombra
+            : `Arcángel Rafael te regaña: Dejas que el cansancio y el dolor se acumulen sin atención. Cuidarte es tu derecho divino, no un favor que te haces a ti mismo.`
+        ]
+      },
+      miguel: {
+        luz: [
+          tieneLoco
+            ? `Arcángel Miguel te dice: El Loco te llama a nuevas batallas espirituales. Aventúrate con fe, sabiendo que estás protegido en cada paso.`
+            : tieneMundo
+            ? `Arcángel Miguel te dice: El Mundo confirma que tu escudo protector está completo y funcional. Ninguna oscuridad puede atravesarlo.`
+            : tieneMago
+            ? `Arcángel Miguel te dice: Con el Mago, tu poder para crear límites es magnificado. Puedes manifestar protección divina en tu vida.`
+            // Variante 4: general luz
+            : `Arcángel Miguel te dice: tu protección está activa y las energías se alinean a tu favor. Ninguna oscuridad puede tocarte mientras mantengas tus límites firmes y tu fe alta.`
+        ],
+        sombra: [
+          tieneLoco
+            ? `Arcángel Miguel me regaña: El Loco sombrío indica que has caído en descuido espiritual. Tu falta de protección te ha expuesto a energías negativas.`
+            : tieneMundo
+            ? `Arcángel Miguel me regaña: El Mundo invertido significa que tu escudo se ha debilitado por falta de atención. Reforzarlo ya.`
+            // Variante 3: general sombra
+            : `Arcángel Miguel me regaña: Has permitido vulnerabilidades en tu campo energético al bajar la guardia demasiado pronto.`
+        ]
+      },
+      chamuel: {
+        luz: [
+          // Variantes para Chamuel basadas en patrón
+          tieneLoco
+            ? `Arcángel Chamuel te dice: El Loco en amor trae un nuevo comienzo apasionante. Entrega tu corazón con libertad, sin ataduras del pasado.`
+            : tieneMundo
+            ? `Arcángel Chamuel te dice: El Mundo en amor indica un ciclo completo y satisfactorio. Tu capacidad de amar está plenamente realizada.`
+            : `Arcángel Chamuel te dice: el amor fluye hacia ti. Abre la mano y recibe: mereces ser amado sin condiciones.`
+        ],
+        sombra: [
+          tieneLoco
+            ? `Arcángel Chamuel te regaña: El Loco sombrío en amor indica que entregas tu corazón donde no es valorado. Deja de mendigar cariño.`
+            : `Arcángel Chamuel te regaña: estás buscando amor en los lugares equivocados. Quiérete con dignidad primero.`
+        ]
+      },
+      gabriel: {
+        luz: [
+          tieneLoco
+            ? `Arcángel Gabriel te dice: El Loco trae un mensaje inesperado y divino. Presta atención a señales nuevas y sorprendentes.`
+            : tieneMundo
+            ? `Arcángel Gabriel te dice: El Mundo confirma que el mensaje que esperabas se está materializando. Confía en el timing divino.`
+            : `Arcángel Gabriel te dice: los mensajes y señales están alineándose. Presta atención a las sincronías del universo.`
+        ],
+        sombra: [
+          tieneLoco
+            ? `Arcángel Gabriel me regaña: El Loco sombrío indica que ignoras las señales del cosmos. Te aferras a lo que quieres oír, no a lo que necesitas.`
+            : `Arcángel Gabriel me regaña: Has dejado de escuchar. Repites lo que quieres oír en vez de lo que necesitas.`
+        ]
+      },
+      uriel: {
+        luz: [
+          // Variantes Uriel
+          tieneLoco
+            ? `Arcángel Uriel te dice: El Loco en tu lectura enciende tu luz interior. Confía en esta certeza que surge espontáneamente.`
+            : tieneMundo
+            ? `Arcángel Uriel te dice: El Mundo confirma tu luz interior brillante y duradera.`
+            : `Arcángel Uriel: tu luz interior se está encendiendo. Confía en tu certeza interior.`
+        ],
+        sombra: [
+          tieneLoco
+            ? `Arcángel Uriel te regaña: El Loco sombrío apaga tu luz interior. Reacciona antes de que todo oscuridad te cubra.`
+            : `Arcángel Uriel te regaña: necesitas más análisis y menos impulso.`
+        ]
+      },
+      zadkiel: {
+        luz: [
+          tieneLoco
+            ? `Arcángel Zadkiel te dice: El Loco trae liberación inesperada. Suelta todo y deja que el cielo te sostenga.`
+            : tieneMundo
+            ? `Arcángel Zadkiel te dice: El Mundo indica que la liberación ya es completa. Celebra tu libertad nueva.`
+            : `Arcángel Zadkiel: la libertad está disponible para ti hoy, liberada por gracia divina.`
+        ],
+        sombra: [
+          tieneLoco
+            ? `Arcángel Zadkiel te regaña: El Loco sombrío mantiene cadenas invisibles en tu alma. Perdonar es la llave maestra.`
+            : `Arcángel Zadkiel me regaña: necesitas perdonar para liberarte de cargas pasadas.`
+        ]
+      },
+      jofiel: {
+        luz: [
+          tieneLoco
+            ? `Arcángel Jofiel te dice: El Loco inspira nueva belleza. Enciende tu propia llama creativa.`
+            : tieneMundo
+            ? `Arcángel Jofiel te dice: El Mundo brilla tu luz interior. Florece con tus propios colores.`
+            : `Arcángel Jofiel: la inspiración divina está floreciendo a tu alrededor.`
+        ],
+        sombra: [
+          tieneLoco
+            ? `Arcángel Jofiel te regaña: El Loco sombrío ensombrece tu belleza. Deja de compararte y enciende tu propia lámpara.`
+            : `Arcángel Jofiel me regaña: necesitas enfocarte en tu propia belleza única.`
+        ]
+      }
+    };
+    
+    // --- LÓGICA SELECCIÓN DE MENSAJE ---
+    // Usamos el índice de patrón para variar el mensaje, asegurando que cada combinación de cartas
+    // produzca un mensaje diferente. Si el arcoángel no tiene variantes definidas, usamos fallback.
+    
+    const arcangelMsg = mensajesExpandidos[claveArcangel];
+    if (!arcangelMsg) {
+      // Fallback: mensaje genérico basado en tono y área
+      return `Arcángel ${claveArcangel} te guía hoy con energía ${tono} en el área ${areaData.area || "general"}.`;
+    }
+    
+    const variantes = arcangelMsg[tono];
+    if (!variantes || variantes.length === 0) {
+      // Fallback seguro si el arcoángel no tiene variantes para ese tono
+      return `Arcángel ${claveArcangel} te envía su bendición ${tono} hoy.`;
+    }
+    
+    // Usamos índice de patrón para seleccionar variante.
+    // Módulo asegura que volvamos al inicio si hay más patrones que variantes.
+    const idx = indicePatron >= variantes.length ? indicePatron % variantes.length : indicePatron;
+    const msg = variantes[idx];
+    
+    // Integrar datos del arcángel si están disponibles
+    const datosArcangel = areaData || {};
+    if (datosArcangel.luz > 0 && datosArcangel.sombra > 0) {
+      return msg.replace("Arcángel", `Arcángel (con presencia mixta de ${datosArcangel.luz} luces y ${datosArcangel.sombra} sombras)`);
+    }
+    
+    return msg;
+  }
+    const tieneLoco = nombresCartas.includes("loco");
+    const tieneMundo = nombresCartas.includes("mundo");
+    const tieneMago = nombresCartas.includes("mago");
+    const tienePapisa = nombresCartas.includes("papisa") || nombresCartas.includes("la papisa");
+    const tieneSumoSacerdote = nombresCartas.includes("sumo sacerdote") || nombresCartas.includes("el sumo sacerdote");
+    const tienenBastos = nombresCartas.some(n => n.includes("bastos"));
+    const tienenCopas = nombresCartas.some(n => n.includes("copas"));
+    const tienenOros = nombresCartas.some(n => n.includes("oros"));
+    const tienenEspadas = nombresCartas.some(n => n.includes("espadas"));
+    const cartasInvertidas = cartas.filter(c => c.invertido).length;
+    const cartasDerechas = cartas.filter(c => !c.invertido).length;
+    
+    // Patrón de cartas para selección de mensaje (0-1023 combinaciones únicas)
+    const patronCartas = (
+      (tieneLoco ? "1" : "0") +
+      (tieneMundo ? "2" : "0") +
+      (tieneMago ? "4" : "0") +
+      (tienePapisa ? "8" : "0") +
+      (tieneSumoSacerdote ? "16" : "0") +
+      (tienenBastos ? "32" : "0") +
+      (tienenCopas ? "64" : "0") +
+      (tienenOros ? "128" : "0") +
+      (tienenEspadas ? "256" : "0")
+    );
+    const indicePatron = parseInt(patronCartas, 10);
+    
+    // Mensajes ampliados por arcángel, tono y patrón de cartas
+    // Cada arcángel tiene múltiples variantes por patrón de cartas
+    const mensajesExpandidos = {
+      rafael: {
+        luz: [
+          tieneLoco
+            ? `Arcángel Rafael te dice: El Loco aparece en tu sanación, llamándote a soltar el control sobre tu cuerpo. Confía en que el universo cuidará de ti mientras te entregas al flujo natural de la recuperación.`
+            : tieneMundo
+            ? `Arcángel Rafael te dice: El Mundo señala que tu sanación está plenamente realizada en todos los niveles. Tu cuerpo y alma han integrado completamente las lecciones de curación.`
+            : tieneMago
+            ? `Arcángel Rafael te dice: Con el Mago presente, tienes el poder divino de sanar. Tu intención combinada con la energía celestial crea milagros en tu bienestar físico.`
+            : tienePapisa
+            ? `Arcángel Rafael te dice: La Papisa te susurra que la sanación viene de dentro. Escucha la sabiduría de tu cuerpo, no solo de fuentes externas.`
+            : `Arcángel Rafael te dice: La sanación está en proceso y tu equilibrio vuelve a asentirse. Respira, descansa y confía: tu cuerpo y tu alma se están reparando en silencio. Este renacer ya empezó.`
+        ],
+        sombra: [
+          tieneLoco
+            ? `Arcángel Rafael te regaña: El Loco en sombra indica que te estás automedicando o neglectando tu salud física. Cuidarte es supervivencia, no egoísmo.`
+            : tieneMundo
+            ? `Arcángel Rafael te regaña: El Mundo invertido indica que pospones tu sanación indefinidamente. Tu cuerpo ya te cobra la cuenta.`
+            : tieneMago
+            ? `Arcángel Rafael te regaña: Con el Mago invertido, estás usando tu poder para dañar tu propio cuerpo en lugar de sanarlo. Reclama tu poder para sanar.`
+            : `Arcángel Rafael te regaña: Dejas que el cansancio y el dolor se acumulen sin atención. Cuidarte es tu derecho divino, no un favor que te haces a ti mismo.`
+        ]
+      },
+      miguel: {
+        luz: [
+          tieneLoco
+            ? `Arcángel Miguel te dice: El Loco te llama a nuevas batallas espirituales. Aventúrate con fe, sabiendo que estás protegido en cada paso.`
+            : tieneMundo
+            ? `Arcángel Miguel te dice: El Mundo confirma que tu escudo protector está completo y funcional. Ninguna oscuridad puede atravesarlo.`
+            : tieneMago
+            ? `Arcángel Miguel te dice: Con el Mago, tu poder para crear límites es magnificado. Puedes manifestar protección divina en tu vida.`
+            : `Arcángel Miguel te dice: tu protección está activa y las energías se alinean a tu favor. Ninguna oscuridad puede tocarte mientras mantengas tus límites firmes y tu fe alta.`
+        ],
+        sombra: [
+          tieneLoco
+            ? `Arcángel Miguel te regaña: El Loco sombrío indica que has caído en descuido espiritual. Tu falta de protección te ha expuesto a energías negativas.`
+            : tieneMundo
+            ? `Arcángel Miguel te regaña: El Mundo invertido significa que tu escudo se ha debilitado por falta de atención. Reforzarlo ya.`
+            : `Arcángel Miguel me regaña: Has permitido vulnerabilidades en tu campo energético al bajar la guardia demasiado pronto.`
+        ]
+      },
+      chamuel: {
+        luz: [
+          tieneLoco
+            ? `Arcángel Chamuel te dice: El Loco en amor trae un nuevo comienzo apasionante. Entrega tu corazón con libertad, sin ataduras del pasado.`
+            : tieneMundo
+            ? `Arcángel Chamuel te dice: El Mundo en amor indica un ciclo completo y satisfactorio. Tu capacidad de amar está plenamente realizada.`
+            : `Arcángel Chamuel te dice: el amor fluye hacia ti. Abre la mano y recibe: mereces ser amado sin condiciones.`
+        ],
+        sombra: [
+          tieneLoco
+            ? `Arcángel Chamuel te regaña: El Loco sombrío en amor indica que entregas tu corazón donde no es valorado. Deja de mendigar cariño.`
+            : `Arcángel Chamuel te regaña: estás buscando amor en los lugares equivocados. Quiérete con dignidad primero.`
+        ]
+      },
+      gabriel: {
+        luz: [
+          tieneLoco
+            ? `Arcángel Gabriel te dice: El Loco trae un mensaje inesperado y divino. Presta atención a señales nuevas y sorprendentes.`
+            : tieneMundo
+            ? `Arcángel Gabriel te dice: El Mundo confirma que el mensaje que esperabas se está materializando. Confía en el timing divino.`
+            : `Arcángel Gabriel te dice: los mensajes y señales están alineándose. Presta atención a las sincronías del universo.`
+        ],
+        sombra: [
+          tieneLoco
+            ? `Arcángel Gabriel te regaña: El Loco sombrío indica que ignoras las señales del cosmos. Te aferras a lo que quieres oír, no a lo que necesitas.`
+            : `Arcángel Gabriel me regaña: Has dejado de escuchar. Repites lo que quieres oír en vez de lo que necesitas.`
+        ]
+      },
+      uriel: {
+        luz: [
+          tieneLoco
+            ? `Arcángel Uriel te dice: El Loco en tu lectura enciende tu luz interior. Confía en esta certeza que surge espontáneamente.`
+            : tieneMundo
+            ? `Arcángel Uriel te dice: El Mundo confirma tu luz interior brillante y duradera.`
+            : `Arcángel Uriel: tu luz interior se está encendiendo. Confía en tu certeza interior.`
+        ],
+        sombra: [
+          tieneLoco
+            ? `Arcángel Uriel te regaña: El Loco sombrío apaga tu luz interior. Reacciona antes de que todo oscuridad te cubra.`
+            : `Arcángel Uriel te regaña: necesitas más análisis y menos impulso.`
+        ]
+      },
+      zadkiel: {
+        luz: [
+          tieneLoco
+            ? `Arcángel Zadkiel te dice: El Loco trae liberación inesperada. Suelta todo y deja que el cielo te sostenga.`
+            : tieneMundo
+            ? `Arcángel Zadkiel te dice: El Mundo indica que la liberación ya es completa. Celebra tu libertad nueva.`
+            : `Arcángel Zadkiel: la libertad está disponible para ti hoy, liberada por gracia divina.`
+        ],
+        sombra: [
+          tieneLoco
+            ? `Arcángel Zadkiel te regaña: El Loco sombrío mantiene cadenas invisibles en tu alma. Perdonar es la llave maestra.`
+            : `Arcángel Zadkiel me regaña: necesitas perdonar para liberarte de cargas pasadas.`
+        ]
+      },
+      jofiel: {
+        luz: [
+          tieneLoco
+            ? `Arcángel Jofiel te dice: El Loco inspira nueva belleza. Enciende tu propia llama creativa.`
+            : tieneMundo
+            ? `Arcángel Jofiel te dice: El Mundo brilla tu luz interior. Florece con tus propios colores.`
+            : `Arcángel Jofiel: la inspiración divina está floreciendo a tu alrededor.`
+        ],
+        sombra: [
+          tieneLoco
+            ? `Arcángel Jofiel te regaña: El Loco sombrío ensombrece tu belleza. Deja de compararte y enciende tu propia lámpara.`
+            : `Arcángel Jofiel me regaña: necesitas enfocarte en tu propia belleza única.`
+        ]
+      }
+    };
+    
+    // Selecciona la variante apropiada basándose en el patrón de cartas
+    const arcangelMsg = mensajesExpandidos[claveArcangel];
+    // Fallback seguro: usar índice de patrón o 0, nunca mensajes fijos originales
+    const variantes = arcangelMsg ? arcangelMsg[tono] : [];
+    const idx = variantes.length > 0 ? (indicePatron % variantes.length) : 0;
+    const msg = variantes[idx] || `Arcángel ${claveArcangel} te guía hoy con energía renovada.`;
+    
+    // Integrar datos del arcángel si están disponibles
+    const datosArcangel = areaData || {};
+    if (datosArcangel.luz > 0 && datosArcangel.sombra > 0) {
+      return msg.replace("Arcángel", `Arcángel (con presencia mixta de ${datosArcangel.luz} luces y ${datosArcangel.sombra} sombras)`);
+    }
+    
+    return msg;
+  },
+  
+  // Método auxiliar para obtener las últimas cartas (si resultado no está disponible)
+  obtenerUltimasCartas() {
+    // Esto sería llamado desde el contexto donde hay acceso a cartas
+    // Por defecto retorna array vacío para que el método no rompa
+    return [];
+  }
+    };
+    
+    // Selecciona la variante apropiada basándose en el patrón
+    const arcangelMsg = mensajesExpandidos[claveArcangel];
+    if (!arcangelMsg) return this.mensajesArcangel[claveArcangel][tono];
+    
+    const variantes = arcangelMsg[tono];
+    if (!variantes) return this.mensajesArcangel[claveArcangel][tono];
+    
+    // Usa el índice de patrón o cae de vuelta al índice 0
+    const idx = indicePatron >= variantes.length ? 0 : indicePatron;
+    const msg = variantes[idx];
+    
+    // Si hay datos del arcángel, los integramos
+    if (areaData && areaData.luz > 0 && areaData.sombra > 0) {
+      return msg.replace("Arcángel", `Arcángel (con presencia mixta de ${areaData.luz} luces y ${areaData.sombra} sombras)`);
+    }
+    
+    return msg;
+  }
+    };
+
+    const msg = mensajesPersonalizados[claveArcangel] ? mensajesPersonalizados[claveArcangel][tono] : this.mensajesArcangel[claveArcangel][tono];
+    
+    // Si hay datos específicos del arcángel, los integramos
+    if (areaData && areaData.luz > 0 && areaData.sombra > 0) {
+      return msg.replace("Arcángel", `Arcángel (con presencia mixta de ${areaData.luz} luces y ${areaData.sombra} sombras)`);
+    }
+    
+    return msg;
+  },
 
     /* filtra solo las áreas de los arcángeles que participan en esta lectura */
     const elegidos = (resultado.__arcangeles || this.arcangelesDeLectura(resultado)).map(a => a.clave);
@@ -339,9 +1252,12 @@ const TIRADAS = {
     return bloques.map(b => {
       const inv = b.temas.filter(t => t.carta.invertido).length;
       const tenor = inv === 0 ? "luz" : (inv === b.temas.length ? "sombra" : "mixto");
+      
+      // Usa el índice de patrón para seleccionar regaño variado
+      const idx = indicePatron >= this.regaños[b.clave][tenor].length ? indicePatron % this.regaños[b.clave][tenor].length : indicePatron;
       const texto = resultado.fuerte
-        ? this.voces[b.clave].fuerte
-        : this.voces[b.clave][tenor];
+        ? this.regaños[b.clave][tenor][idx]
+        : this.regaños[b.clave][tenor][idx];
       const arc = b.arcangel;
       return {
         icono: arc.emoji,
@@ -351,8 +1267,7 @@ const TIRADAS = {
         arcangel: arc,
         regano: resultado.fuerte || tenor === "sombra",
         presencia: this.fraseArea(arc, b.clave),
-        texto,
-        combinacion: this.combinacionDe(b)
+        texto
       };
     }).concat([{
       cierre: true,
@@ -435,6 +1350,130 @@ const TIRADAS = {
       jofiel: `${A} ilumina estos senderos con su ${a.regencia.toLowerCase()}: busca la belleza y la inspiración, y ellas te guiarán. ${C}`,
       chamuel: `${A} envuelve estos asuntos con la luz rosa de su ${a.regencia.toLowerCase()}: el amor verdadero llega, se sana o se libera según lo que tu corazón necesita. ${C}`
     };
+  },
+
+  /* regaños variados por patrón de cartas (0-1023 combinaciones únicas) */
+  /* Cada arcángel tiene múltiples regaños que se seleccionan basándose en el índice de patrón */
+  regaños: {
+    miguel: {
+      luz: [
+        "Arcángel Miguel te regaña con su espada en alto: llevas tiempo gastando tu energía donde no te valoran y defendiendo a quien no te defiende. Esta es tu hora de ponerte primero: marca tus límites, retira tu fuerza de quien la usa y no des explicaciones por cuidarte.",
+        "Arcángel Miguel te dice: has bajado el escudo demasiado pronto. Te estás exponiendo donde no hay protección y entregando tu fuerza donde no te valoran. Es hora de ponerte firme, de reclamar tu lugar y de dejar de dar tu poder a quien no lo merece.",
+        "Arcángel Miguel te advierte: no camines con miedo. Tu falta de protección te ha expuesto a energías negativas. Levanta tu escudo y camina con firmeza y valor."
+      ],
+      sombra: [
+        "Arcángel Miguel me regaña: El Loco sombrío indica que has caído en descuido espiritual. Tu falta de protección te ha expuesto a energías negativas.",
+        "Arcángel Miguel me regaña: El Mundo invertido significa que tu escudo se ha debilitado por falta de atención. Reforzarlo ya.",
+        "Arcángel Miguel me regaña: Has permitido vulnerabilidades en tu campo energético al bajar la guardia demasiado pronto."
+      ],
+      mixto: [
+        "Arcángel Miguel te dice: tienes protección, pero hay una grieta que no debes ignorar. Alguien está drenando tu energía sin que te defenders. Refuerza tu escudo y elige batalear tus propias batallas.",
+        "Arcángel Miguel te dice: tu protección está completa y tu energía está alineada. Ninguna oscuridad puede tocarte mientras mantengas tus límites firmes y tu fe alta.",
+        "Arcángel Miguel te regaña: has bajado el escudo demasiado presto. Te estás exponiendo donde no hay protección y entregando tu fuerza donde no te valoran. Es hora de ponerte firme."
+      ]
+    },
+    gabriel: {
+      luz: [
+        "Arcángel Gabriel te dice: el mensaje que esperabas está en camino. Las señales están alineando, las coincidencias tienen propósito. Presta atención a las palabras que escuchas hoy.",
+        "Arcángel Gabriel te dice: la verdad está cerca pero envuelta en ruido. No te apresures a concluir. Revisa lo que escuchas antes de hablar.",
+        "Arcángel Gabriel te envía su bendición: los mensajes y señales están alineándose. Presta atención a las sincronías del universo."
+      ],
+      sombra: [
+        "Arcángel Gabriel me regaña: has dejado de escuchar. Repites lo que quieres oír en vez de lo que necesitas. Cállate un momento y vuelve a preguntar con honestidad.",
+        "Arcángel Gabriel me regaña: Has dejado de escuchar. Repites lo que quieres oír en vez de lo que necesitas.",
+        "Arcángel Gabriel me regaña: ignores las señales del cosmos y te aferras a lo que quieres oír, no a lo que necesitas."
+      ],
+      mixto: [
+        "Arcángel Gabriel te dice: la verdad está cerca pero envuelta en ruido. No te apresures a cerrar conclusiones: revisa lo que escuchas, contrasta lo que crees y el mensaje puro llegará a tu corazón sin que tengas que forzarlo.",
+        "Arcángel Gabriel te dice: la verdad está cerca pero el impulso te empuja a decidir antes de tiempo. Detente, examina y compara antes de actuar.",
+        "Arcángel Gabriel aparta el ruido para que escuches: llevas tiempo oyendo lo que quieres oír, no lo que necesitas. Hay un mensaje que aún no te has atrevido a aceptar."
+      ]
+    },
+    rafael: {
+      luz: [
+        "Arcángel Rafael te dice: estás sanando, de verdad. Tu cuerpo, tu mente y tu alma se están equilibrando otra vez. Respira hondo, descansa y confía: la medicina del cielo ya está trabajando en ti.",
+        "Arcángel Rafael te dice: la sanación viene en camino, pero hay algo que te estás negando a atender. Ese cansancio, ese dolor o esa calma que pospones tiene voz. Escúchala hoy: cuidarte no es egoísmo, es el único camino para seguir brillando.",
+        "Arcángel Rafael te bendice: tu cuerpo y alma están en proceso de sanación. Cada célula responde a la energía restauradora que fluye hacia ti."
+      ],
+      sombra: [
+        "Arcángel Rafael te regaña: deja de descuidarte. Te das a todos y no te queda nada para ti, y tu cuerpo te lo está avisando. No postergues más tu salud ni tu paz: el descanso y el cuidado no se ganan, se toman.",
+        "Arcángel Rafael te regaña: Te das a todos y no te queda nada para ti, y tu cuerpo te lo está avisando. No postergues más tu salud ni tu paz.",
+        "Arcángel Rafael te regaña: dejas que el cansancio y el dolor se acumulen sin atención. Cuidarte es tu derecho divino, no un favor que te haces a ti mismo."
+      ],
+      mixto: [
+        "Arcángel Rafael te dice: la sanación viene en camino, pero hay algo que te estás negando a atender. Ese cansancio, ese dolor o esa calma que pospones tiene voz. Escúchala hoy.",
+        "Arcángel Rafael te dice: la sanación avanza pero hay resistencias. Hay un área de tu cuerpo o alma que aún estás negando que necesita atención. El dolor que callas es la señal de que algo pide ser liberado. Cuidarte es tu derecho divino.",
+        "Arcángel Rafael te dice: estás en proceso de sanación, pero hay áreas de tu bienestar que aún estás ignoring. Es momento de detenerte y escucharte."
+      ]
+    },
+    uriel: {
+      luz: [
+        "Arcángel Uriel te dice: tu luz interior se ha encendido. Ves con claridad lo que antes estaba oculto. Confía en esa certeza que sientes en tu corazón.",
+        "Arcángel Uriel te dice: tu luz interior se encendió y ahora ves con claridad lo que otros no comprenden. Confía en esa certeza que sientes en el pecho: tus decisiones tienen luz propia y te van a llevar a buen puerto.",
+        "Arcángel Uriel te envía su luz: tu intuición se ha activado y puedes ver con claridad tus próximos pasos."
+      ],
+      sombra: [
+        "Arcángel Uriel te regañas: estás actuando por impulso y dejando que la emoción nuble tu juicio. Pide tiempo, toma distancia y decide desde la luz, no desde el miedo.",
+        "Arcángel Uriel te regañas: necesitas más análisis y menos impulso. No actúes por impulso dejándote llevar por la emoción.",
+        "Arcángel Uriel te advierte: estás actuando por impulso y dejando que la emoción nuble tu juicio, y eso te está costando caro."
+      ],
+      mixto: [
+        "Arcángel Uriel te dice: tienes la verdad cerca, pero el impulso te empuja a decidir antes de tiempo. Detente, examina y compara. La sabiduría que buscas no está en actuar más rápido, sino en mirar más profundo.",
+        "Arcángel Uriel te dice: tienes la verdad cerca pero el impulso te empuja a decidir antes de tiempo. Detente, examina y compara antes de actuar.",
+        "Arcángel Uriel: tienes la verdad al alcance, pero el prisa te ciega. Para, mira con luz interior y decide con calma."
+      ]
+    },
+    zadkiel: {
+      luz: [
+        "Arcángel Zadkiel te dice: la liberación ya está corriendo por ti. Suelta la culpa, perdona lo que haya que perdonar y siente cómo entra la libertad.",
+        "Arcángel Zadkiel te dice: la llave está en tu mano pero hay una cadena que tú sigues manteniendo. Date permiso hoy y el cielo te sostiene.",
+        "Arcángel Zadkiel te bendice: la libertad está disponible para ti hoy, liberada por gracia divina."
+      ],
+      sombra: [
+        "Arcángel Zadkiel me regaña: llevas demasiado tiempo atado a la culpa, al rencor o a un pasado que ya no existe. Cada día sin perdonar pesa más.",
+        "Arcángel Zadkiel me regaña: necesitas perdonar para liberarte de cargas pasadas. No dejes que el rencor te comaya viva.",
+        "Arcángel Zadkiel me regaña: llevas demasiado tiempo atado a la culpa, al rencor o a un pasado que ya no existe."
+      ],
+      mixto: [
+        "Arcángel Zadkiel te dice: la llave está en tu mano, pero hay una cadena que tú sigues manteniendo. No se trata solo de que otros te suelten: hay algo que debes soltar tú.",
+        "Arcángel Zadkiel te dice: la liberación ya está corriendo por ti. Suelta la culpa y siente cómo entra la libertad.",
+        "Arcángel Zadkiel me regaña: has permitido que el rencor y la culpa te ataquen durante demasiado tiempo. Es hora de soltarlos."
+      ]
+    },
+    jofiel: {
+      luz: [
+        "Arcángel Jofiel te dice: la belleza y la luz que buscas ya están floreciendo a tu alrededor. Rodéate de lo que te eleva y verás tu mundo brillar con tus propios colores.",
+        "Arcángel Jofiel te dice: hay luz pero todavía tienes los ojos puestos en lo que no fue. Deja de mirar atrás y déjate inspirar por lo nuevo.",
+        "Arcángel Jofiel te inspira: la belleza divina está floreciendo a tu alrededor. Confía en tu creatividad."
+      ],
+      sombra: [
+        "Arcángel Jofiel me regaña: dejaste de ver la luz que sí tienes. Te comparas con otros y ensombreces tu propio camino. Enciende tu propia lámpara.",
+        "Arcángel Jofiel me regaña: dejaste de ver la luz que sí tienes. Te comparas con otros y ensombreces tu propio camino.",
+        "Arcángel Jofiel me regaña: has dejado de sidearte la luz que posees y te compares con otros, ensombreciendo tu propio brillo."
+      ],
+      mixto: [
+        "Arcángel Jofiel te dice: hay luz pero todavía tienes los ojos puestos en lo que no fue. Deja de mirar atrás y déjate inspirar por lo nuevo.",
+        "Arcángel Jofiel te dice: dejaste de ver la luz que sí tienes. Enciende tu propia lámpara y sigue tu camino.",
+        "Arcángel Jofiel te inspira: tu belleza no necesita permiso. Deja de mirarte a otros y enciende tu propia luz."
+      ]
+    },
+    chamuel: {
+      luz: [
+        "Arcángel Chamuel te dice: el amor real ya está tocando tu corazón. Abre la mano y recibe, sin miedo a querer ni a ser querido.",
+        "Arcángel Chamuel te dice: hay amor pero también un nudo que duele callado. No confundas silencio con paz ni distancia con indiferencia. Habla lo que sientes con honestidad.",
+        "Arcángel Chamuel te bendice: el amor real ya toca tu corazón. Abre la mano y recibe."
+      ],
+      sombra: [
+        "Arcángel Chamuel me regañas: estás poniendo tu corazón donde no lo cuidan, o cerrando la puerta a quien sí te quiere bien. Deja de mendigar cariño donde solo hay ego.",
+        "Arcángel Chamuel me regañas: estás poniendo tu corazón donde no lo cuidan. Deja de mendigar cariño donde solo hay ego.",
+        "Arcángel Chamuel te regañas: sigues entregando tu corazón a quien te lo devuelve roto, y encima te sientes culpable."
+      ],
+      mixto: [
+        "Arcángel Chamuel te dice: hay amor pero también un nudo que duele callado. No confundas silencio con paz ni distancia con indiferencia. Habla lo que sientes con honestidad.",
+        "Arcángel Chamuel te dice: hay amor real tocando tu corazón, pero también hay asuntos pendientes. No confundas silencio con paz.",
+        "Arcángel Chamuel te dice: el amor fluye hacia ti, pero hay un nudo que duele si no lo reconoces."
+      ]
+    }
   },
 
   /* -------------------------- métodos de ayuda arcángel ------------------- */

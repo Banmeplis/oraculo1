@@ -16,3 +16,9 @@ uploads/
 .DS_Store
 Thumbs.db
 *.log
+
+# Herramienta local
+opencode.exe
+
+# Configuración del editor
+.vscode/

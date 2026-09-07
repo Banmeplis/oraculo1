@@ -3,7 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Artículo · Oráculo</title>
+  <title>Artículo · El ORA🌙ULO de ZIGURATH Y ANAIA</title>
+  <meta name="description" content="Artículo de tarot, espiritualidad y guía angelical de El ORA🌙ULO de ZIGURATH Y ANAIA.">
+  <meta name="keywords" content="tarot, espiritualidad, rituales, arcángeles, luna, sol, portales energéticos">
+  <meta name="author" content="El ORA🌙ULO de ZIGURATH Y ANAIA">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="El ORA🌙ULO de ZIGURATH Y ANAIA">
+  <meta property="og:title" content="Artículo · El ORA🌙ULO de ZIGURATH Y ANAIA">
+  <meta property="og:description" content="Información práctica sobre espiritualidad, rituales, arcángeles, luna y sol.">
+  <meta property="og:url" content="https://oraculo1-hhwc.onrender.com/articulo.html">
+  <meta property="og:image" content="https://oraculo1-hhwc.onrender.com/og-imagen.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Artículo · El ORA🌙ULO de ZIGURATH Y ANAIA">
+  <meta name="twitter:description" content="Información práctica sobre espiritualidad, rituales, arcángeles, luna y sol.">
+  <link id="canonical-articulo" rel="canonical" href="https://oraculo1-hhwc.onrender.com/articulo.html">
+  <script id="datos-articulo" type="application/ld+json">{}</script>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔮</text></svg>">
   <link rel="stylesheet" href="/css/estilo.css?v=12">
 </head>
@@ -11,7 +25,7 @@
 
   <header class="nav">
     <div class="nav-inner">
-      <a class="logo" href="/"><span>☾</span> Oráculo</a>
+      <a class="logo" href="/"><span>☾</span> El ORA🌙ULO de ZIGURATH Y ANAIA</a>
       <nav class="menu">
         <a href="/tarot.html">Tarot</a>
         <a href="/blog.html">Blog</a>
@@ -36,6 +50,15 @@
       <a class="btn btn-dorado" href="/blog.html">Ir al blog</a>
     </div>
 
+    <section id="relacionados-seccion" class="oculto relacionados-articulos">
+      <div class="titulo-seccion" style="margin-top:54px;margin-bottom:22px">
+        <div class="deco">✧ ✦ ✧</div>
+        <h2>También te puede interesar</h2>
+        <p>Continúa explorando información y prácticas relacionadas.</p>
+      </div>
+      <div id="articulos-relacionados" class="rejilla rejilla-3"></div>
+    </section>
+
     <section id="comentarios-seccion" class="oculto" style="margin-top:40px">
       <div class="titulo-seccion" style="margin-top:0;margin-bottom:20px">
         <div class="deco">💬</div>
@@ -57,16 +80,54 @@
   </main>
 
   <footer class="pie">
-    <div class="logo"><span>☾</span> Oráculo</div>
+    <div class="logo"><span>☾</span> El ORA🌙ULO de ZIGURATH Y ANAIA</div>
     <p>Que la luz te acompañe</p>
   </footer>
 
-  <script src="/js/app.js?v=7"></script>
+  <script src="/js/app.js?v=10"></script>
   <script>
     const id = new URLSearchParams(location.search).get("id");
+
+    function optimizarSEO(post) {
+      const grupos = [
+        { coincide: /vela|ritual/i, palabras: ["ritual con velas", "seguridad con velas", "vela blanca", "vela dorada", "limpieza energética"] },
+        { coincide: /arcángel/i, palabras: ["arcángeles", "Arcángel Miguel", "Arcángel Rafael", "Arcángel Gabriel", "guía espiritual"] },
+        { coincide: /portal/i, palabras: ["portales energéticos", "portal 11:11", "equinoccio", "solsticio", "intención espiritual"] },
+        { coincide: /luna|cuarto creciente/i, palabras: ["fases de la luna", "luna nueva", "luna llena", "ciclo lunar", "ritual lunar"] },
+        { coincide: /sol|solar/i, palabras: ["energía solar", "Sol", "solsticio", "vitalidad", "observación segura del Sol"] }
+      ];
+      const grupo = grupos.find(item => item.coincide.test(post.titulo + " " + post.cuerpo)) || grupos[2];
+      const descripcion = (post.resumen || post.cuerpo || "").replace(/\s+/g, " ").trim().slice(0, 155);
+      const url = `${location.origin}/articulo.html?id=${post.id}`;
+      document.title = `${post.titulo} · El ORA🌙ULO de ZIGURATH Y ANAIA`;
+      document.querySelector('meta[name="description"]').setAttribute("content", descripcion);
+      document.querySelector('meta[name="keywords"]').setAttribute("content", grupo.palabras.join(", "));
+      document.querySelector('meta[property="og:title"]').setAttribute("content", post.titulo);
+      document.querySelector('meta[property="og:description"]').setAttribute("content", descripcion);
+      document.querySelector('meta[property="og:url"]').setAttribute("content", url);
+      document.querySelector('meta[property="og:image"]').setAttribute("content", post.portada || `${location.origin}/og-imagen.png`);
+      document.querySelector('meta[name="twitter:title"]').setAttribute("content", post.titulo);
+      document.querySelector('meta[name="twitter:description"]').setAttribute("content", descripcion);
+      document.getElementById("canonical-articulo").setAttribute("href", url);
+      document.getElementById("datos-articulo").textContent = JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: post.titulo,
+        description: descripcion,
+        image: post.portada ? [post.portada] : [],
+        author: { "@type": "Person", name: post.autor },
+        publisher: { "@type": "Organization", name: "El ORA🌙ULO de ZIGURATH Y ANAIA" },
+        datePublished: post.creado_en,
+        dateModified: post.actualizado || post.creado_en,
+        mainEntityOfPage: url,
+        keywords: grupo.palabras
+      });
+    }
+
     fetch("/api/posts/" + id)
       .then(r => r.ok ? r.json() : Promise.reject())
       .then(p => {
+        optimizarSEO(p);
         document.getElementById("articulo").classList.remove("oculto");
         document.getElementById("a-titulo").textContent = p.titulo;
         document.getElementById("a-meta").innerHTML =
@@ -78,8 +139,28 @@
           <source src="${p.video}"></video></div>`;
         c += `<div class="articulo-cuerpo">${marcarComoHTML(p.cuerpo || "")}</div>`;
         document.getElementById("a-contenido").innerHTML = c;
+        cargarRelacionados(p.id);
       })
       .catch(() => document.getElementById("a-vacio").classList.remove("oculto"));
+
+    async function cargarRelacionados(actualId) {
+      try {
+        const posts = await fetchJSON("/api/posts");
+        const relacionados = posts.filter(post => post.id !== Number(actualId)).slice(0, 3);
+        const caja = document.getElementById("articulos-relacionados");
+        if (!relacionados.length) return;
+        caja.innerHTML = relacionados.map(post => `
+          <article class="tarjeta post relacionado-post">
+            ${post.portada ? `<img class="portada" src="${post.portada}" alt="${escapHtml(post.titulo)}" loading="lazy">` : ""}
+            <div class="cuerpo-post">
+              <h3><a href="/articulo.html?id=${post.id}">${escapHtml(post.titulo)}</a></h3>
+              <p class="resumen">${escapHtml(post.resumen || "")}</p>
+              <a class="leer-mas" href="/articulo.html?id=${post.id}">Leer artículo →</a>
+            </div>
+          </article>`).join("");
+        document.getElementById("relacionados-seccion").classList.remove("oculto");
+      } catch {}
+    }
 
     /* ------------------------- comentarios ------------------------- */
     let postId = id;

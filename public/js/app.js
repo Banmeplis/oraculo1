@@ -9,6 +9,52 @@ async function fetchJSON(url, opciones) {
   return d;
 }
 
+function fechaLegible(valor) {
+  if (!valor) return "";
+  const fecha = new Date(String(valor).replace(" ", "T") + "Z");
+  if (Number.isNaN(fecha.getTime())) return String(valor);
+  return fecha.toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" });
+}
+
+function escapHtml(valor) {
+  return String(valor ?? "").replace(/[&<>"']/g, caracter => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[caracter]));
+}
+
+function marcarComoHTML(texto) {
+  const lineas = escapHtml(texto).replace(/\r/g, "").split("\n");
+  const salida = [];
+  let listaAbierta = false;
+
+  const cerrarLista = () => {
+    if (listaAbierta) { salida.push("</ul>"); listaAbierta = false; }
+  };
+
+  lineas.forEach(linea => {
+    if (!linea.trim()) { cerrarLista(); return; }
+    if (/^- /.test(linea)) {
+      if (!listaAbierta) { salida.push("<ul>"); listaAbierta = true; }
+      salida.push("<li>" + linea.slice(2) + "</li>");
+      return;
+    }
+    cerrarLista();
+    if (/^### /.test(linea)) salida.push("<h3>" + linea.slice(4) + "</h3>");
+    else if (/^## /.test(linea)) salida.push("<h2>" + linea.slice(3) + "</h2>");
+    else if (/^# /.test(linea)) salida.push("<h2>" + linea.slice(2) + "</h2>");
+    else if (/^&gt; /.test(linea)) salida.push("<blockquote>" + linea.slice(5) + "</blockquote>");
+    else {
+      const imagen = linea.match(/^!\[([^\]]*)\]\((https?:\/\/[^\s)]+|\/[^\s)]+)\)$/);
+      if (imagen) salida.push(`<img src="${imagen[2]}" alt="${imagen[1]}" loading="lazy">`);
+      else salida.push("<p>" + linea
+        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>') + "</p>");
+    }
+  });
+  cerrarLista();
+  return salida.join("");
+}
+
 /* ------------------------------- estrellas ----------------------------- */
 function crearCielo(cantidad = 70) {
   if (document.querySelector(".cielo")) return;
@@ -52,6 +98,40 @@ const SESION = {
 
   get usuario() { return this._usuario; },
 
+  async verificarAuth() {
+    try {
+      const data = await fetchJSON("/api/auth/check");
+      if (data.authenticated) {
+        const zona = document.getElementById("zona-usuario");
+        if (zona) {
+          zona.innerHTML = `
+            <div class="user-menu">
+              <img src="${data.user.picture || '/img/default-avatar.png'}" 
+                   alt="${data.user.name}" 
+                   class="user-avatar" 
+                   onerror="this.style.display='none'"
+                   style="width:32px;height:32px;border-radius:50%;margin-right:8px;">
+              <span class="user-name">${data.user.name}</span>
+              <a href="/logout" class="btn-logout" title="Cerrar sesión">Cerrar sesión</a>
+            </div>
+          `;
+        }
+      } else {
+        const zona = document.getElementById("zona-usuario");
+        if (zona) {
+          zona.innerHTML = `
+            <a href="/login.html" class="btn-nav">Iniciar sesión</a>
+            <a href="/registro.html" class="btn-destacado">Crear cuenta</a>
+          `;
+        }
+      }
+    } catch (e) {
+      console.error("Error verificando auth:", e);
+      const zona = document.getElementById("zona-usuario");
+      if (zona) zona.innerHTML = `<a href="/login.html">Iniciar sesión</a>`;
+    }
+  },
+
   renderizar() {
     const zona = document.getElementById("zona-usuario");
     if (!zona) return;
@@ -78,79 +158,10 @@ const SESION = {
     }
   }
 };
-
 /* -------------------------------- fecha --------------------------------- */
-function fechaLegible(iso) {
-  if (!iso) return "";
-  const f = new Date(iso.replace(" ", "T") + (iso.includes("Z") ? "" : "Z"));
-  return f.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
-}
-
-/* ------------------------------- markdown ------------------------------- */
-function escapHtml(s) {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-}
-
-function marcarComoHTML(texto) {
-  const lineas = texto.split(/\r?\n/);
-  let html = "";
-  let bloque = [];
-  const cerrar = (tag) => { if (bloque.length) { html += "<" + tag + "><li>" + bloque.join("</li><li>") + "</li></" + tag + ">"; bloque = []; } };
-
-  for (let l of lineas) {
-    l = l.replace(/\s+$/, "");
-    if (!l.trim()) { cerrar("ul"); html += "<br>"; continue; }
-
-    if (/^```/.test(l.trim())) { cerrar("ul"); html += "<pre><code>"; continue; }
-
-    const encabezado = l.match(/^(#{1,3})\s+(.*)/);
-    if (encabezado) { cerrar("ul"); const nl = encabezado[1].length; html += "<h" + nl + ">" + enLinea(escapHtml(encabezado[2])) + "</h" + nl + ">"; continue; }
-
-    const cita = l.match(/^\s*&gt;\s?/);
-    if (l.trim().startsWith(">")) { cerrar("ul"); html += "<blockquote>" + enLinea(escapHtml(l.trim().slice(1))) + "</blockquote>"; continue; }
-
-    const img = l.match(/^!\[(.*?)\]\((.*?)\)$/);
-    if (img) { cerrar("ul"); html += `<img src="${escapHtml(img[2])}" alt="${escapHtml(img[1])}" loading="lazy">`; continue; }
-
-    if (/^\s*[-*+]\s+/.test(l)) { bloque.push(enLinea(escapHtml(l.replace(/^\s*[-*+]\s+/, "")))); continue; }
-    if (/^\s*\d+\.\s/.test(l)) { cerrar("ul"); bloque.push(enLinea(escapHtml(l.replace(/^\s*\d+\.\s/, "")))); html += "<ol><li>" + bloque[0] + "</li></ol>"; bloque = []; continue; }
-
-    cerrar("ul");
-    html += "<p>" + enLinea(escapHtml(l.trim())) + "</p>";
-  }
-  cerrar("ul");
-  return html;
-}
-
-function enLinea(s) {
-  s = s.replace(/\*\*(.+?)\*\*/g, '<span class="resaltar">$1</span>');
-  s = s.replace(/\*(.+?)\*/g, "<em>$1</em>");
-  s = s.replace(/(^|[^\w])(https?:\/\/[^\s]+)/g, '$1<a href="$2" target="_blank" rel="noopener">$2</a>');
-  return s;
-}
-
-/* ------------------- precarga del mazo (arcanos mayores) ----------------- */
-function precargarCartas() {
-  try {
-    if (!window.ORACULO || !ORACULO.mayores) return;
-    const urls = ORACULO.mayores.map(c => c.img).filter(Boolean);
-    const lanzar = () => {
-      urls.forEach(u => {
-        const img = new Image();
-        img.decoding = "async";
-        img.src = u;
-      });
-    };
-    if ("requestIdleCallback" in window) requestIdleCallback(lanzar, { timeout: 2500 });
-    else if (document.readyState === "complete") lanzar();
-    else window.addEventListener("load", lanzar, { once: true });
-  } catch { /* si algo falla, la carga normal sigue */ }
-}
-
-/* ------------------------------- inicializa ----------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
   crearCielo(70);
   SESION.cargar();
-  precargarCartas();
+  SESION.verificarAuth();
+  if (typeof precargarCartas === "function") precargarCartas();
 });
