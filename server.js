@@ -294,7 +294,7 @@ app.get("/auth/google/callback", async (req, res) => {
       };
     }
     req.session.user = { id: u.id, nombre: u.nombre || info.name || "Oráculo", email: correo, rol: u.rol || rol, picture: info.picture };
-    res.redirect("/tarot.html?bienve@nido=google");
+    res.redirect("/tarot.html?bienvenid@s=google");
   } catch (e) {
     res.redirect("/login.html?err=google-error");
   }
