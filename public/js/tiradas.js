@@ -561,96 +561,96 @@ const TIRADAS = {
     const propor = bien / total;
     const cita = this.citas[Math.floor(Math.random() * this.citas.length)];
 
-    const allAreas = [
+const allAreas = [
       {
         icono: "🛡️", area: "situacion", clave: "miguel", titulo: "Situación y protección",
         luz: [
-          "Arcángel Miguel te dice: hoy estás bien protegida. Lo que empiezas hoy va por buen camino. Camina con la cabeza en alto: tu luz es fuerte y nadie la puede apagar.",
-          "Arcángel Miguel te dice: los problemas que te preocupaban ya están perdiendo fuerza. Tu camino se arregla poco a poco. Sigue adelante sin mirar atrás.",
-          "Arcángel Miguel te dice: tu escudo está firme, pero hoy no es día de pelear: es día de construir. Lo que empiezas ahora está a salvo. No dudes de tu fuerza, el cielo te acompaña."
+          "Estás entrando en una etapa en la que las cosas empiezan a resolverse solas, como si alguien hubiera movido las piezas por ti. Los problemas que te quitaron el sueño están perdiendo fuerza y el terreno que pisas se vuelve más seguro. No hace falta pelear de más: sostén tu rumbo y deja que lo trabado se destrabe. Tu momento es de construcción, no de guerra.",
+          "Hay una protección que no ves actuando a tu favor, y por eso lo que intentas hoy tiene más posibilidades de las que crees. Alguien o algo te está cuidando en la sombra, y se nota en las oportunidades que llegan en el momento justo. Camina con la cabeza en alto: lo que empiezas ahora tiene base firme. Confía en tu fuerza, que el cielo está de tu lado.",
+          "Las preocupaciones que te rodeaban están cediendo de a poco, como quien baja la marea. Lo que antes te dejaba en vela hoy tiene menos peso, aunque todavía no lo creas del todo. Es el momento de apostar por ti sin mirar atrás: tu camino se arregla solo cuando caminas con confianza. La puerta que se abre hoy no se cierra tan pronto."
         ],
         sombra: [
-          "Miguel te regaña con cariño pero en serio: llevas tiempo dando tu energía a gente que no te valora. Deja de cuidar tanto a los demás y empieza a cuidarte tú. Hoy di \"no\" a lo que te hace daño.",
-          "Miguel te mira serio: peleas las peleas de otros y abandonas las tuyas. Defiendes a quien no te defiende. Elige hoy: tu energía es tuya, y solo tú decides quién la recibe.",
-          "Miguel pone su mano en tu hombro y te habla claro: dejaste una puerta abierta y por ahí entran personas que te cansan. Ciérrala sin culpa. Cuidarte no ofende a nadie: es tu deber."
+          "Hay una puerta que dejaste abierta y por ella están entrando personas y situaciones que te agotan. No es mala suerte: es falta de límites, y tu energía se está yendo por donde no debe. Hoy tienes que elegir de quién te rodeas y a qué le das tu tiempo. Decir que no no ofende: te protege.",
+          "Has estado defendiendo a los demás más de lo que te defiendes a ti, y tu escudo está del lado equivocado. Peleas las batallas de otros mientras las tuyas se quedan sin dueño, y eso te tiene agotada y un paso atrás. Vuelve tu energía hacia ti: quien te valora no necesita que te sacrifiques, y quien no te valora no merece tu esfuerzo.",
+          "Hay gente cerca tuya que se alimenta de tu tiempo sin devolverte nada, y tú lo permites por costumbre o por pena. Ese patrón no se rompe con paciencia: se rompe con una decisión. Hoy pon un límite claro y sostenlo sin explicarlo tanto. Cuidarte no es egoísmo: es el único camino para que lo demás no te desborde."
         ]
       },
       {
         icono: "💞", area: "amor", clave: "chamuel", titulo: "Amor y relaciones",
         luz: [
-          "Arcángel Chamuel te dice: el amor bueno está llegando a tu vida. Abre tu corazón y deja que entre. Tú mereces que te quieran sin condiciones.",
-          "Arcángel Chamuel te dice: el amor que sembraste con paciencia está dando fruto. Alguien te quiere más de lo que crees. Recibir amor no te hace débil: te hace fuerte.",
-          "Arcángel Chamuel abraza tus vínculos con su luz rosa: vienen encuentros que sanan viejas heridas. El amor verdadero está cerca: dale espacio y abre la puerta."
+          "El amor que esperas está más cerca de lo que piensas, y no se anuncia con fuegos artificiales: llega quieto, en una conversación, en una persona que ya conoces o en la forma en que un vínculo actual se profundiza. Lo que sembraste con paciencia está dando fruto, y alguien te quiere más de lo que admite. Abre las manos y recibe sin miedo: recibir también es parte del amor.",
+          "Hay un encuentro que viene a sanarte, y no tiene que ser romántico para sentirse así: puede ser una reconciliación, una amistad que vuelve o un amor que se confirma. Lo importante es que tu corazón está listo para abrirse otra vez. Deja espacio para lo bueno y no desprecies las señales por pequeñas. El cariño verdadero está cerca y espera tu permiso.",
+          "Estás rodeada de cariño y a veces no lo ves porque buscas el amor donde no está. Quien te quiere de verdad está más cerca de lo que crees, mostrándotelo a su manera, quizá no con la intensidad que tu mente pide. Abre los ojos a las señales que ya tienes: el amor que mereces ya está tocando tu vida. Recíbelo sin condiciones."
         ],
         sombra: [
-          "Chamuel te habla con dulzura pero sin dar la vuelta: sigues dando tu amor a quien no lo cuida, o callando lo que sientes por miedo a perder. No ruegues cariño. Di lo que sientes y quiérete tú primero: el amor justo volverá a ti.",
-          "Chamuel te mira con tristeza: hay un cariño que da todo y un cariño que solo recibe. Tú ya sabes cuál das. El amor no se gana sufriendo. Quiérete tú primero: todo lo demás se acomoda.",
-          "Chamuel te habla firme: estás esperando que alguien te dé el amor que tú no te das. Nadie puede llenar tu vacío desde afuera. Date hoy lo que les pides a otros, y el amor justo encontrará su lugar."
+          "Hay un cariño que está dando todo y otro que solo recibe, y tú sabes exactamente cuál es el tuyo. Te quedas donde no te valoran por miedo a la soledad y confundes aguantar con querer. El amor no se gana sufriendo, y nadie te va a querer mejor porque tú sufras más. Quiérete tú primero: del amor que te des nace el que te dan los demás.",
+          "Estás esperando que alguien te dé la seguridad que tú no te das, y por eso cualquier distancia te desarma. Nadie puede llenar desde afuera el vacío que llevas dentro: eso solo lo haces tú. Deja de buscar en otros lo que te niegas a ti y empieza hoy a darte eso que les pides. El amor justo encuentra su lugar cuando dejas de pedir prestado el tuyo.",
+          "Hay algo que callas en tu relación o en tu deseo, y ese silencio está pesando más que cualquier palabra. Dejas de decir lo que sientes para no romper la paz, pero la paz que nace del silencio no es paz: es espera. Habla con honestidad, sin drama y a tiempo. Lo que se nombra se arregla; lo que se calla se desgasta."
         ]
       },
       {
         icono: "💚", area: "salud", clave: "rafael", titulo: "Salud y energía",
         luz: [
-          "Arcángel Rafael te dice: estás sanando, de verdad. Tu cuerpo y tu mente vuelven a estar en paz. Respira, descansa y confía: el cielo ya trabaja en tu salud.",
-          "Arcángel Rafael extiende su mano verde: tu energía está volviendo, día a día. No apures las cosas: sanar lleva su tiempo. Descansa algo que has estado negando y celebra cada mejora.",
-          "Arcángel Rafael te dice: el cansancio que te pesaba empieza a irse. Escucha a tu cuerpo: es tu mejor amigo. Cuando descansas, comes bien y te mueves, tu fuerza regresa."
+          "Tu cuerpo y tu mente están volviendo a alinearse, y la mejoría que notas no es casualidad: es el fruto de lo que has ido corrigiendo sin darle importancia. Sanar lleva su tiempo y tú estás justo en ese tramo de mejoría. No apures las cosas ni exijas señales grandes: cada descanso, cada comida y cada respiro cuenta. Estás sanando de verdad, aunque no lo sientas todos los días.",
+          "La energía que te faltaba está regresando de a poco, y con ella vuelven las ganas. Tu cuerpo te está pidiendo algo concreto y simple — dormir un poco más, moverte, bajar el ritmo — y si lo escuchas hoy, la recuperación se acelera. Celebra las pequeñas mejoras: son la prueba de que el equilibrio se está reconstruyendo. Vas bien, más de lo que crees.",
+          "Hay una calma que vuelve a instalarse en tu cuerpo después de un tiempo de tensión. Lo que te agotaba está soltando peso, y se nota en tu descanso y en tu respiración. Sostén ese cuidado en lo pequeño: agua, sueño, pausas. Tu salud se construye en el día a día, y a favor tuyo ya está trabajando el cielo en ese frente."
         ],
         sombra: [
-          "Rafael te toma la mano y te habla claro: hay una parte tuya que estás descuidando. Ese cansancio, ese dolor que callas... Cuidarte no es egoísmo: es lo que necesitas para brillar. Empieza hoy.",
-          "Rafael te habla serio: llevas tiempo agotando tu cuerpo como si no se cansara. Quitas tu salud para dársela a otros. Pon tu descanso y tus citas primero: nadie va a cuidarte si tú no empiezas.",
-          "Rafael enciende la luz y te muestra lo que niegas: hay un dolor que ya se volvió normal para ti y no debería serlo. Sanar también es dejar de hacerte daño. Detente antes de caer, no después."
+          "Hay una parte tuya que llevas descuidando con la excusa de que no hay tiempo: el descanso, el chequeo que pospones, el dolor que volviste normal. Tu cuerpo te está avisando, y cada señal que ignoras hoy se convierte en un problema mañana. Cuidarte no es egoísmo: es la base de todo lo demás. Empieza hoy con una sola cosa que pospones.",
+          "Te das a todos y al final no te queda nada, y tu cuerpo ya está cobrando esa cuenta con cansancio, irritabilidad o dolores que callas. Nadie va a venir a cuidarte si tú no empiezas: tú eres la primera en tu lista, no la última. Pon tu descanso y tus citas primero, aunque te sientas egoísta. La sanación empieza por ti.",
+          "Has normalizado un malestar que no deberías estar viviendo, y ya no recuerdas cómo se sentía estar bien. Sanar también es dejar de tratar lo anormal como normal y de poner tu salud en fila detrás de todo lo demás. No esperes a caer para cuidarte: detente antes. Un cuerpo cuidado hoy es una vida distinta mañana."
         ]
       },
       {
         icono: "📯", area: "mensajes", clave: "gabriel", titulo: "Mensajes y propósito",
         luz: [
-          "Arcángel Gabriel te dice: la respuesta que esperas viene en camino. Presta atención a las señales, a las palabras y a las coincidencias: por ahí te está hablando el cielo.",
-          "Arcángel Gabriel te trae la palabra que esperabas, antes de que la pidas: la respuesta va a llegar en un mensaje o una conversación. Escucha con atención: el cielo te habla hoy.",
-          "Arcángel Gabriel limpia tu mente: tu camino se aclara y vuelves a saber por qué haces lo que haces. No busques el gran anuncio: mira las señales pequeñas y repetidas. Ahí está tu mensaje."
+          "La respuesta que esperas viene en camino, y llegará por donde menos la esperas: una conversación, un mensaje, una coincidencia que se repite. Presta atención a lo que se repite, porque ahí está el cielo hablándote de frente. Tu propósito se está aclarando y ya no necesitas el gran anuncio: las señales pequeñas marcan el paso. Escucha, y esta vez no fallarás.",
+          "Se acerca un mensaje que va a aclarar tus dudas, y quizá ya lo tengas delante sin reconocerlo: hay palabras que alguien te dijo, un texto que pasaste rápido o una idea que se te apareció dos veces. Ese es el hilo que debes tirar. No busques la gran revelación: cuenta las señales repetidas, y ahí está tu respuesta.",
+          "Tu mente se está ordenando y ya puedes ver con claridad por qué haces lo que haces. El mensaje que buscabas afuera lo tienes adentro, y los próximos días lo van a confirmar con señales externas. Escucha tu propia voz con más atención: esa también es la voz del cielo. Cuando alinees lo que sientes con lo que haces, la respuesta se vuelve evidente."
         ],
         sombra: [
-          "Gabriel te pide silencio para que escuches: llevas tiempo oyendo solo lo que quieres oír, no lo que necesitas. Cállate un momento, vuelve a preguntar y la respuesta llegará.",
-          "Gabriel te mira con franqueza: escuchas solo lo que te consuela y por eso la verdad te sorprende. Hay un mensaje que evitas porque te obligaría a cambiar. Cállate y escúchalo: te habla.",
-          "Gabriel alza la voz: dejas palabras sin decir y mensajes sin enviar, y eso te tiene dando vueltas. No es que el cielo calle: eres tú quien se tapa los oídos. Di lo que sientes y la señal aparecerá."
+          "Llevas tiempo escuchando solo lo que quieres oír y descartando lo que te incomoda, y por eso te sorprenden verdades que ya te estaban avisando. El mensaje que evitas es justo el que necesitas: te obligaría a cambiar algo. Deja de taparte los oídos y vuelve a escuchar lo que se repite. La respuesta no llega hasta que haces silencio y la aceptas.",
+          "Hay palabras que no estás diciendo y mensajes que no envías, y ese silencio te tiene dando vueltas. No es que el cielo no te hable: es que te desconectaste de tu propia voz y de tu propia verdad. Di lo que sientes, aunque quede expuesto, y verás cómo aparece la señal. La claridad llega cuando avanzas con lo que ya sabes.",
+          "Te distraes con ruido para no oír la verdad que ya conoces, y cada pregunta nueva es una manera de no obedecer la que ya te respondieron. La respuesta no cambia porque no te guste: lo que falta es ponerla en práctica. Deja de pedir señales nuevas y camina con la que ya tienes en la mano."
         ]
       },
       {
         icono: "💰", area: "economia", clave: "uriel", titulo: "Economía y abundancia",
         luz: [
-          "Arcángel Uriel enciende su antorcha sobre tu dinero: el flujo que pediste se está ordenando y se abren puertas para ti. Administra con calma, decide con claridad y mira los detalles: ahí está tu oportunidad.",
-          "Uriel enciende su antorcha sobre tu dinero: el caos que temías se está calmando y tu dinero vuelve a fluir. Mira con ojos claros las oportunidades que otros no ven: están cerca. Actúa con orden y la abundancia responde.",
-          "Arcángel Uriel te da claridad para tu bolsillo: lo que hoy administras bien se vuelve lo que mañana te sostiene. No mires cuánto hay, mira hacia dónde va. Abre una puerta hoy, con calma."
+          "El dinero está volviendo a fluir, y no por casualidad: lo que ordenaste y cuidaste en silencio empieza a devolverte. Hay oportunidades cerca que otros no ven todavía, y tú sí: una puerta está por abrirse en lo laboral o en un ingreso nuevo. Adminístrate con calma y decide con claridad. No mires cuánto hay a un lado del camino: mira hacia dónde va.",
+          "Se está abriendo una puerta económica que no habías previsto, y te va a pedir una decisión rápida pero clara. Lo que hoy administras bien se vuelve lo que mañana te sostiene, así que cuida los detalles: ahí está tu oportunidad. No se trata de esperar un golpe de suerte: se trata de estar lista cuando tu puerta llame. Ordena una cosa hoy y el flujo responde.",
+          "El caos económico que temías se está calmando y tu dinero vuelve a tener rumbo. Hay una claridad en el frente material que no tenías hace un tiempo, y esa claridad se va a notar en oportunidades concretas. Aunque la cifra no sea grande todavía, la dirección cuenta más que la cantidad. Da un paso con orden hoy: la abundancia responde a quien administra."
         ],
         sombra: [
-          "Uriel te mira de frente: tu dinero pide orden. Hay gastos que se repiten y promesas que suenan fuerte pero no llegan. No es castigo, es aviso: cierra las fugas, pon límites a tu generosidad y deja espacio para lo bueno.",
-          "Uriel te habla sin vueltas: tu dinero refleja tus decisiones repetidas, no tu suerte. Hay gastos que tapan vacíos y deudas que sostienen apariencias. Ordena tu casa: el dinero también necesita límites.",
-          "Uriel levanta la antorcha y ve lo que escondes: te da miedo mirar los números, pedir lo que vales o soltar lo que ya no te conviene. Lo bueno no llega donde hay engaño. Mira tus cuentas hoy y deja espacio para lo nuevo."
+          "Tus números piden orden, y lo sabes: hay gastos que se repiten, promesas que suenan fuerte y no llegan, y una sensación de que el dinero se te escapa. No es castigo, es aviso. Cierra las fugas, pon límites a tu generosidad y mira tus cuentas de frente, hoy. El dinero también necesita reglas, y tú mereces tenerlas.",
+          "Tu dinero refleja tus decisiones repetidas, no tu suerte: hay gastos que tapan vacíos y apariencias que te cuestan caras. Ordena tu casa antes de pedirle al cielo: la abundancia no llega donde hay desorden o engaño. Escribe lo que entra y lo que sale, corta lo que no suma y deja espacio para lo bueno. Cambia una decisión hoy y el patrón empieza a romperse.",
+          "Hay algo que evitas mirar en tu economía: el miedo a ver los números, a pedir lo que vales o a soltar lo que ya no te conviene. Esa ceguera te cuesta más que el problema que evitas. Mira la hoja, la cifra, la conversación que pospones: nombrarlo es el primer paso para arreglarlo. No es tu valor, es un número: se ordena, se corrige y se mejora."
         ]
       },
       {
         icono: "🔓", area: "bloqueo", clave: "zadkiel", titulo: "Bloqueos a liberar",
         luz: [
-          "Arcángel Zadkiel te dice: la liberación ya empezó. Suelta la culpa, perdona lo que haya que perdonar y siente cuánta paz entra cuando dejas de cargar el pasado. Solo tú sostienes esa cadena: hoy puedes soltarla.",
-          "Arcángel Zadkiel desata tus cadenas: lo que te ataba está perdiendo fuerza porque dejaste de alimentarlo. Perdonar hoy, a otros y a ti, abre todo lo demás. Caminarás más ligera de lo que recuerdas.",
-          "Arcángel Zadkiel disuelve el rencor guardado: soltar no es olvidar, es dejar de cargar lo que ya cumplió. Recoge tu energía del pasado y ponla en el presente. La paz no depende de que el otro cambie: depende de que sueltes."
+          "La liberación ya empezó, aunque todavía no lo notes del todo. El peso que cargabas desde hace tiempo está perdiendo fuerza porque dejaste de alimentarlo, y se nota en esa respiración más profunda cuando sueltas algo. Perdonar — a otros y a ti — abre todo lo demás. Caminas más ligera de lo que recuerdas: lo que sigues llevando es nostalgia de un peso que ya no existe.",
+          "Hay una cadena que tú sigues poniendo y que ya no tiene razón de ser: una culpa vieja, un rencor que repasaste mil veces o un miedo que ya venció. No se trata de que el otro cambie: se trata de que tú sueltes lo que te toca cargar desde la memoria. Hoy puedes dejar la piedra. La paz no depende de lo que pasó, depende de lo que decidas soltar.",
+          "Algo que te ataba está perdiendo fuerza, y lo notas en un desapego nuevo que sientes. Perdonar no es olvidar: es dejar de cargar lo que ya cumplió su tiempo. Recoge tu energía del pasado y ponla en tu presente, donde sí produce fruto. El cielo ya desató lo que tocaba desatar: ahora solo falta caminar sin mirar atrás."
         ],
         sombra: [
-          "Zadkiel te señala la cadena que arrastras de hace tiempo: un rencor, un miedo ya vencido o una culpa que no es tuya. Cada día sin perdonar pesa más. Suelta la piedra, perdónate y perdona: tu corazón no fue hecho para cargar tanto.",
-          "Zadkiel te señala el peso que cargas: un agravio que repasaste mil veces o un perdón que te niegas. Cada vez que lo recuerdas, lo vuelves a cargar. El otro quizá ni lo sabe; tú sí: es hora de dejarlo.",
-          "Zadkiel toma tus manos y te pide soltar la piedra: te aferras a tu dolor como si fuera tu nombre. \"Soy quien fue herido\" se volvió tu escudo y tu jaula. Suelta esa historia: frente a ti hay más vida que recuerdo, y es tuya."
+          "Llevas una cadena que tú mismo eliges no soltar: un agravio que repasaste cien veces, una culpa que no es tuya, un perdón que te niegas a darte. Cada vez que lo recuerdas, la vuelves a cargar: el otro quizá ni lo sabe. Perdonar no es para quien te hizo daño: es para que tú dejes de pagar ese recuerdo con tu paz. Suelta la piedra hoy.",
+          "Te aferras a tu dolor como si fuera tu nombre, y esa historia de «soy quien fue herido» se volvió tu escudo y tu jaula a la vez. Ya cumplió: el recuerdo no te salva, te retiene. Frente a ti hay más vida que memoria, y es tuya. Deja de presentarte por lo que te pasó y empieza a caminar por lo que vas a hacer.",
+          "Hay un peso que traes por lealtad: no quieres soltar la tristeza porque soltarla te parece traicionar lo que amaste o lo que te marcó. Pero la cadena no honra a nadie: te ata a ti. Puedes honrar lo bueno sin cargar lo que te destruye. Hoy agradece lo que fue, deja lo pendiente atrás y vuelve a tu propia vida: te está esperando."
         ]
       },
       {
         icono: "🌟", area: "futuro", clave: "jofiel", titulo: "Futuro e inspiración",
         luz: [
-          "Arcángel Jofiel te dice: lo que viene está bien alineado contigo y tu luz ya florece. Confía en el proceso, suelta lo que cumplió su tiempo y camina hacia lo nuevo: el cielo está acomodando todo a tu favor.",
-          "Arcángel Jofiel te muestra el camino iluminado: lo que viene está hecho con lo mejor de ti. Suelta el proyecto viejo, confía en el ciclo nuevo y camina tranquila: la inspiración se cultiva y ya está floreciendo.",
-          "Arcángel Jofiel enciende tu cielo: el futuro se ordena a tu favor, con más belleza de la que imaginas. No necesitas verlo todo: necesitas dar el primer paso con fe. Tu luz ya ilumina el camino."
+          "Lo que viene está alineado contigo más de lo que imaginas, y tu luz ya está floreciendo aunque tu mente todavía la mida con dudas. Suelta lo que cumplió su tiempo: dejarlo no pierde nada, libera espacio para lo nuevo. El futuro no se recibe, se camina, y tu próximo paso con fe es el que abre lo que sigue. Confía en el proceso: el cielo está acomodando todo a tu favor.",
+          "Se acerca una etapa más luminosa, con una belleza que aún no puedes ver completa. No necesitas verlo todo: necesitas dar el primer paso con fe, porque tu luz ya alumbra el camino. El proyecto, la idea o el cambio que llevas en el corazón tiene más futuro del que te atreves a creer. Cultívalo en silencio: al florecer va a sorprenderte.",
+          "El futuro se está ordenando a tu favor, y lo que sembraste en épocas difíciles empieza a tener forma. Hay inspiración volviendo a ti: una idea, un deseo, una dirección que se repite. Ese es tu norte. No lo mires como un premio lejano: míralo como el fruto de cada cosa que ya estás haciendo bien. Da el paso de hoy y lo demás se acomoda."
         ],
         sombra: [
-          "Jofiel apaga su lámpara un momento para que lo veas: lo que sueñas no llegará mientras sigas mirando atrás o comparándote con los demás. Tu futuro no se recibe: se construye, y empieza en la decisión de hoy. Enciende tu luz y camina.",
-          "Jofiel apaga la lámpara y te muestra la verdad: estás pintando tu futuro con los colores del miedo y del pasado. El porvenir llega a quien lo camina, no a quien lo teme. Deja de esperar pérdidas y empieza a construir.",
-          "Jofiel te habla con cariño firme: comparas tu camino con los atajos de otros y por eso crees que vas tarde. No vas tarde: solo falta corregir un desvío. La inspiración vuelve cuando dejas de medirte con los demás y te mides con tu propia luz."
+          "Estás pintando tu futuro con los colores del pasado y del miedo, y por eso ves amenazas donde solo hay cambios. El porvenir llega a quien lo camina, no a quien lo teme: mientras sigas mirando atrás o comparándote, se te pasa adelante. Suelta la idea de que todo saldrá como la vez pasada. Enciende tu luz de nuevo: tu futuro empieza en la decisión de hoy.",
+          "Comparas tu camino con los atajos de otros y por eso crees que vas tarde. No vas tarde: solo estás midiéndote con la regla equivocada. Tu camino es el único que te toca y tiene un ritmo que nadie más tiene que entender. Deja de mirar hacia los lados y vuelve a ti: la inspiración regresa cuando te mides con tu propia luz, no con la del vecino.",
+          "Estás posponiendo tu alegría y lo que te ilumina «para cuando todo esté bien», y ese momento no llega solo. La inspiración no espera a que la merezcas: se cultiva en el ahora. Retoma hoy una sola cosa que amas — una afición, un sueño, una conversación — y deja que tu luz recuerde el camino. Tu futuro no se te escapa: se construye con lo que haces hoy."
         ]
       }
     ];
@@ -764,10 +764,10 @@ const TIRADAS = {
       mixto: "Arcángel Miguel te dice: tienes protección, sí, pero hay una grieta que no puedes seguir ignorando. Hay gente cerca que gasta tu energía y tú no dices nada. Refuerza tu escudo, elige bien tus peleas y no dejes tu cuidado en manos de quien no te cuida.",
       sombra: "Arcángel Miguel te regaña: bajaste tu escudo demasiado pronto. Estás expuesta donde no hay protección y entregas tu fuerza donde no te valoran. Es hora de ponerte firme, reclamar tu lugar y dejar de dar tu poder a quien no lo merece. Levántate y defiéndete.",
       fuerte: [
-        "¡Basta de hacerte la fuerte afuera y la frágil adentro! Arcángel Miguel te habla claro: estás dejando entrar a tu vida a quien no debería, y tú misma les abres la puerta. Deja de pedir permiso para cuidarte y deja de explicar por qué te cuidas. Tu paz no se negocia: se defiende. Hoy mismo pon los límites que has estado posponiendo.",
-        "¡Levántate y defiéndete! Arcángel Miguel no te suelta la mano, pero hoy no vino a consolarte: vino a armarte. Llevas tanto tiempo cediendo tu lugar, agachando la cabeza y dejando que otros decidan por ti, que confundiste humildad con rendirte. Vuelve a tu lugar: reclama lo tuyo, corta en seco lo que te desgasta y camina con la dignidad de quien sabe que la luz que lo protege también lo obliga. Ya es hora.",
-        "¡Tu tiempo no se regala! Arcángel Miguel pone su espada entre tú y esa gente que solo aparece cuando necesita algo. Sí, te he visto: dices que no puedes decir que no, que te da pena, que 'mejor no hacer ruido'. Y mientras tanto ellos se llenan de tu energía y tú llenas sus vacíos. Deja de ser el que siempre da y nunca recibe: hoy di un alto.",
-        "¡Deja de defenderlos! Arcángel Miguel te mira serio: pones tu escudo delante de quien jamás lo pondría por ti. Pregúntate por qué eres tan cuidadosa con tu paciencia y tan dura contigo. Defiende a quien también te defienda, espera a quien también te espere. Tu protección no es un regalo: es un derecho que repartiste mal y hoy recuperas."
+        "Estás en tu punto más vulnerable y todavía no quieres verlo: abres tu puerta a quienes llegan solo a sacar, y confundes tolerancia con generosidad. Este no es momento de explicarte, es momento de blindarte. Corta hoy lo que te desangra, aunque duela, y deja de pedir permiso para cuidarte. Tu paz no se negocia: se defiende.",
+        "Llevas tanto tiempo cediendo tu lugar, agachando la cabeza y dejando que otros decidan por ti, que confundiste humildad con rendirte. Vuelve a sentarte en tu propia silla: reclama lo tuyo, corta en seco lo que te desgasta y camina con la dignidad de quien sabe que quien lo protege también lo obliga. Hoy empieza tu defensa.",
+        "Hay gente cerca que solo aparece cuando necesita algo, y tú lo sabes: te conviertes en su plan B, en su préstamo, en su pañuelo, y ellos en tu costumbre. Dices que no puedes decir que no, que te da pena, que mejor no armar ruido, y mientras tanto ellos se llenan de tu energía. Ese patrón termina el día que entiendas que tu tiempo no se regala.",
+        "Has puesto tu escudo delante de quien jamás lo pondría por ti: defiendes, justificas y soportas por otros lo que no tolerarías para ti misma. Pregúntate por qué eres tan cuidadosa con su paciencia y tan dura contigo. Defiende a quien también te defienda y espera a quien también te espere: tu protección no es un regalo, es un derecho."
       ]
     },
     chamuel: {
@@ -775,10 +775,10 @@ const TIRADAS = {
       mixto: "Arcángel Chamuel te dice: hay amor, sí, pero también hay un nudo que duele en silencio. No confundas silencio con paz ni distancia con indiferencia. Habla lo que sientes con honestidad: decirlo no rompe nada, callarlo sí puede romperlo todo.",
       sombra: "Arcángel Chamuel te regaña: estás poniendo tu corazón donde no lo cuidan, o cerrando la puerta a quien sí te quiere bien. Deja de rogar cariño donde solo hay ego. Quiérete con dignidad: el amor que mereces empieza por el que tú misma te das.",
       fuerte: [
-        "¡Abre los ojos! Arcángel Chamuel te habla sin dulzura esta vez: sigues entregando tu corazón a quien te lo devuelve roto, y encima te sientes culpable. Deja de confundir amor con sacrificio y de perdonar lo que ni siquiera te han pedido perdón. Quiérete con dignidad o el amor pasará de largo. Basta de rogar cariño: el amor que mereces nace de ti.",
-        "¡No ames desde la falta! Arcángel Chamuel pone su rosa al revés para que la veas: buscas en otros lo que te niegas a darte, y por eso cada vínculo termina doliendo igual. El patrón no son ellos: eres tú eligiendo quedarte donde no te valoran. Hoy corta el círculo: pon tu nombre primero en tu propia lista, y el amor que pide entrar encontrará una casa que ya sabe cuánto vale.",
-        "¡No es el mismo amor con otras caras! Arcángel Chamuel te muestra el guion que se repite: empiezas ilusionada, luego cedes de todo, y terminas vacía diciéndote 'es que esta vez es distinto'. No lo es, y lo sabes. La única carta que cambia el juego eres tú. Cambia tu parte y el libreto entero se rompe.",
-        "¡Deja de pedir permiso para quererte! Arcángel Chamuel te lo grita con su luz rosa firme: no hace falta que otro te escoja para que tú te quieras. El amor que esperas por la puerta de enfrente ya está en tu casa: es el que no te has dado. Quiérete primero, sin condiciones, y mira cómo cambia la fila en tu puerta."
+        "Sigues entregando tu corazón a quien te lo devuelve roto y encima te sientes culpable, como si querer más fuera la prueba de amar mejor. Confundes amor con sacrificio y perdonas lo que ni siquiera te han pedido perdón. Quiérete con dignidad o el amor pasará de largo: el cariño que mereces nace de ti, no de la obediencia de otro.",
+        "Buscas en otros lo que te niegas a darte, y por eso cada vínculo termina doliendo igual: el patrón no son ellos, eres tú eligiendo quedarte donde no te valoran. Corta el círculo hoy: pon tu nombre primero en tu propia lista, y el amor que pide entrar encontrará una casa que ya sabe cuánto vale.",
+        "El guion se repite y ya lo conoces: empiezas ilusionada, luego cedes de todo y terminas vacía diciéndote que esta vez es distinto. No lo es, y lo sabes. La única carta que cambia el juego eres tú: cambia tu parte hoy y el libreto entero se rompe.",
+        "Esperas que otro te escoja para poder quererte, como si tu valor estuviera en ser elegida, y por eso das todo de ti a quien llega tarde y se va temprano. El amor que esperas por la puerta de enfrente ya está en tu casa: es el que no te has dado. Quiérete primero, sin condiciones, y mira cómo cambia la fila en tu puerta."
       ]
     },
     rafael: {
@@ -786,10 +786,10 @@ const TIRADAS = {
       mixto: "Arcángel Rafael te dice: la sanación viene en camino, pero hay algo que te niegas a atender. Ese cansancio, ese dolor o esa calma que pospones tiene voz. Escúchala hoy: cuidarte no es egoísmo, es el único camino para seguir brillando.",
       sombra: "Arcángel Rafael te regaña: deja de descuidarte. Te das a todos y no te queda nada para ti, y tu cuerpo te lo está avisando. No dejes para mañana tu salud ni tu paz: el descanso y el cuidado no se ganan, se toman. Empieza hoy.",
       fuerte: [
-        "¡Detente! Arcángel Rafael habla en serio: estás apagando la única vela que ilumina tu vida, y esa vela eres tú. Siempre dejas tu salud y tu descanso para el final, siempre eres el último en tu lista, y tu cuerpo ya te está cobrando. Deja de sacrificarte por quienes ni se dan cuenta. Cuidarte no es egoísmo: es tu obligación contigo. Hoy mismo, una cosa: descansa.",
-        "¡No desaparezcas dando! Arcángel Rafael alza la voz: cuidas a todos menos a ti. Sostienes, escuchas, cargas, y cuando te miras al espejo no reconoces tu cara. Tu energía no es infinita. Di no hoy a lo que te vacía, di sí al descanso que evitas, y deja que la sanación empiece por la única persona que puede hacerlo por ti.",
-        "¡El vaso ya rebosa! Arcángel Rafael te toma la mano y te enseña la cuenta que tu cuerpo lleva: cansancio que niegas, dolores que haces normales, ansiedad que escondes. No necesito más cartas para saber qué te pasa: lo estás contando con tus hombros, tu respiración y tu sueño. Hoy no te pido gran cosa, te pido algo pequeño: elige una cosa que te cuide y hazla como si fuera sagrada.",
-        "¡Tu cuerpo te está hablando y no lo escuchas! Arcángel Rafael te lo dice como médico y amigo: cada señal que ignoras hoy se convierte en un problema mañana. Deja de tratar tu salud como un trámite que harás 'cuando puedas'. Tu energía es el suelo donde crece todo lo demás: si no te cuidas, nada de lo que quieres puede florecer."
+        "Estás apagando la única vela que ilumina tu vida, y esa vela eres tú: siempre dejas tu salud y tu descanso para el final, siempre eres la última de tu lista, y tu cuerpo ya te está cobrando la cuenta. Deja de sacrificarte por quienes ni se dan cuenta. Cuidarte no es egoísmo: es tu obligación más sagrada. Hoy, una sola cosa: descansa.",
+        "Cuidas a todos menos a ti: sostienes, escuchas, cargas, y cuando te miras al espejo ya no te reconoces. Tu energía no es infinita, y tu cuerpo lo está anotando en cansancio, en dolores que ya volviste normales, en ese sueño que no descansa. Di no hoy a lo que te vacía y di sí al descanso que evitas: la sanación empieza por la única persona que puede hacerlo por ti.",
+        "Tu cuerpo lleva una contabilidad que no quieres abrir: el cansancio que niegas, el dolor al que le quitas importancia, la ansiedad que escondes detrás de la rutina. No hace falta que te digan nada: lo cuentan tus hombros, tu respiración y tu sueño. Hoy no te pido la gran transformación: elige una sola cosa que te cuide y hazla como si fuera sagrada.",
+        "Tratas tu salud como un trámite que harás cuando puedas, y cada señal que ignoras hoy se convierte en un problema mañana. Tu energía es el suelo donde crece todo lo demás: si no te cuidas, nada de lo que quieres puede florecer. No esperes a caer para detenerte: detente antes, que es donde se gana."
       ]
     },
     gabriel: {
@@ -797,10 +797,10 @@ const TIRADAS = {
       mixto: "Arcángel Gabriel te dice: la verdad está cerca, pero llega envuelta en ruido. No te apresures: revisa lo que escuchas, compara lo que crees, y el mensaje puro llegará a tu corazón sin que tengas que forzarlo.",
       sombra: "Arcángel Gabriel te regaña: dejaste de escuchar. Repites lo que quieres oír en vez de lo que necesitas, y por eso sigues en el mismo lugar. Cállate un momento, vuelve a preguntar y abre los oídos: la respuesta no llega hasta que haces silencio.",
       fuerte: [
-        "¡Deja de hacerte el sordo! Arcángel Gabriel te habla fuerte para que lo escuches: llevas años oyendo lo que quieres y tapando lo que necesitas. Te escondes detrás del ruido, del miedo y de las excusas. Hoy calla todo, siéntate y escucha la verdad que ya sabes: la respuesta siempre estuvo ahí. No pidas más señales si no piensas obedecerlas.",
-        "¡La respuesta ya llegó, no pidas otra! Arcángel Gabriel te mira a los ojos: andas juntando señales como si el cielo no te hubiera hablado mil veces. La respuesta no cambia porque no te gusta. Lo que falta no es una señal nueva: falta que obedezcas la que ya tienes. Deja de negociar con el cielo y haz lo que ya sabes que debes hacer.",
-        "¡Deja de hacerte el despistado! Arcángel Gabriel aparta el ruido: no necesitas más información, necesitas silencio para entender la que ya tienes. Te dices 'no sé qué hacer', pero sí lo sabes; solo te asusta hacerlo. Cállate las excusas un día y escucha tu propia voz: esa también soy yo hablándote por dentro.",
-        "¡La señal te llegó más de una vez! Arcángel Gabriel te cuenta las veces que pasó frente a tus ojos: esa conversación, esa coincidencia, ese aviso repetido. Llevas tiempo diciendo 'qué casualidad' cuando era una llamada de frente. Deja de preguntarle al tarot lo mismo y empieza a obedecer lo que ya te respondió."
+        "Llevas años oyendo lo que quieres oír y tapando lo que necesitas: te escondes detrás del ruido, del miedo y de las excusas para no escuchar la verdad que ya sabes. Hoy calla todo, siéntate y escucha de frente: la respuesta siempre estuvo ahí. No pidas más señales si no piensas obedecerlas.",
+        "Andas juntando señales como si el cielo no te hubiera hablado mil veces: esa coincidencia que se repitió, esa conversación que no quieres retomar, ese aviso que pasaste de largo. La respuesta no cambia porque no te guste. Lo que falta no es una señal nueva: falta que obedezcas la que ya tienes.",
+        "No necesitas más información: necesitas silencio para entender la que ya tienes. Te dices que no sabes qué hacer, pero sí lo sabes; solo te asusta hacerlo. Cállate las excusas un día y escucha tu propia voz, que también es la del cielo hablándote por dentro. La claridad y la acción llegan juntas si le obedeces.",
+        "Llevas tiempo diciendo qué casualidad cada vez que la señal pasa frente a tus ojos, para no tener que contestarla. Esa conversación, ese mensaje, esa idea que se repite: era una llamada de frente. Deja de preguntar lo mismo a las cartas y empieza a obedecer lo que ya te respondieron."
       ]
     },
     uriel: {
@@ -808,10 +808,10 @@ const TIRADAS = {
       mixto: "Arcángel Uriel te dice: tienes la verdad cerca, pero el impulso te empuja a decidir antes de tiempo. Detente, mira y compara. La sabiduría no está en actuar más rápido, sino en mirar más profundo.",
       sombra: "Arcángel Uriel te regaña: estás actuando por impulso y dejando que la emoción nuble tu juicio, y eso te está costando caro. Pide tiempo, toma distancia y decide con la luz, no con el miedo. No corras: primero mira.",
       fuerte: [
-        "¡Decide de una vez! Arcángel Uriel te habla sin vueltas: llevas tanto tiempo dudando que ya no es prudencia, es miedo con disfraz. No actúes por impulso, sí, pero tampoco te quedes parada esperando el momento perfecto: la vida se te pasa esperando. Mira con claridad, decide con firmeza y camina. El que no elige, elige perder.",
-        "¡Enciende la luz o elige la oscuridad! Arcángel Uriel no te da más tiempo: pusiste tu vida en pausa esperando garantías que nunca llegarán, y mientras tanto el tiempo pasa y las oportunidades se alejan. No necesitas ver todo el camino: necesitas prender la antorcha y caminar. Decidir es vivir. Estás a una sola decisión firme de cambiar tu rumbo: tómala hoy.",
-        "¡Tu parálisis tiene nombre: miedo! Arcángel Uriel te lo traduce sin pena: esa 'prudencia' que usas es excusa para no equivocarte, y no equivocarte se volvió tu forma de no vivir. Mira bien, sí, pero con plazo. La sabiduría no es esperar a tener certeza: es decidir con la luz que ya tienes y ajustar en el camino. Prende la antorcha y anda.",
-        "¡Una decisión a tiempo vale más que diez perfectas tarde! Arcángel Uriel alza la luz sobre el tiempo que pierdes revisando lo mismo: el análisis ya cumplió. Lo que estudias un millón de veces no gana verdad, gana retraso. Elige hoy una dirección con lo que sabes y comprométete: el camino se ilumina mientras caminas, no mientras ensayas."
+        "Llevas tanto tiempo dudando que ya no es prudencia: es miedo con disfraz, y mientras tanto la vida se te pasa esperando el momento perfecto. No actúes por impulso, sí, pero tampoco te quedes parada: mira con claridad, decide con firmeza y camina. El que no elige, elige perder.",
+        "Pusiste tu vida en pausa esperando garantías que nunca van a llegar, y mientras tanto las oportunidades se acercan y se van sin encontrar a nadie en la puerta. No necesitas ver todo el camino: necesitas encender la antorcha y caminar. Estás a una sola decisión firme de cambiar tu rumbo: tómala hoy.",
+        "Tu parálisis tiene nombre y es miedo: esa prudencia que repites es la excusa perfecta para no equivocarte, y no equivocarte se volvió tu forma de no vivir. Mira, sí, pero con plazo. La sabiduría no es esperar a tener certeza: es decidir con la luz que ya tienes y ajustar en el camino.",
+        "El análisis ya cumplió: lo que estudias por millonésima vez no gana verdad, gana retraso, y cada vuelta que le das a lo mismo es un paso que tu vida no da. Elige hoy una dirección con lo que sabes y comprométete. El camino se ilumina mientras caminas, no mientras ensayas el paso."
       ]
     },
     zadkiel: {
@@ -819,21 +819,21 @@ const TIRADAS = {
       mixto: "Arcángel Zadkiel te dice: la llave está en tu mano, pero hay una cadena que tú mismo sigues poniendo. No se trata solo de que otros te suelten: hay algo que debes soltar tú. Date permiso hoy y el cielo te sostiene.",
       sombra: "Arcángel Zadkiel te regaña: llevas demasiado tiempo atada a la culpa, al rencor o a un pasado que ya no existe. Cada día que no perdonas, la cadena pesa más. Suelta la piedra, perdónate y perdona: tu alma no fue hecha para cargar tanto.",
       fuerte: [
-        "¡Suelta esa piedra! Arcángel Zadkiel te habla sin medias palabras: el pasado que arrastras es tuyo porque tú lo cargas, no porque te lo hayan puesto. Perdonar no es para el otro: es para ti. Y si el otro no se arrepiente, perdonas igual, para soltarte tú. El rencor te está comiendo viva, y lo sabes. Basta de justificarlo.",
-        "¡No eres tu cicatriz! Arcángel Zadkiel rompe la cadena de un golpe: llevas años presentándote como alguien que fue herido, como si ese recuerdo fuera tu nombre. Lo que te pasó ya no te define, salvo que tú lo mantengas en el trono. Mira adelante: hay vida esperándote lejos de ese capítulo. Suelta la historia que te cuentas sobre tu pasado y deja que hoy sea otro principio.",
-        "¡El pasado no tiene llaves de tu casa! Arcángel Zadkiel te lo grita con su luz violeta: ese agravio, esa culpa y esa persona se fueron, pero tú sigues pagando su alquiler con paz, sueño y presente. Cada vez que vuelves a contarlo, la cadena vuelve a cerrarse. Hoy corta el ciclo: perdona no porque lo merezcan, sino porque tú necesitas soltar el peso.",
-        "¡Deja de llevar cuentas de quién te falló! Arcángel Zadkiel te mira con franqueza: mientras mides y repasas cada traición, el otro vive su vida y tú vives la de él, en círculo. Perdonar no borra lo que pasó: deja de cobrárselo a tu presente. Suelta la factura, agradece la lección y vuelve a tu propia vida, que te está esperando."
+        "El pasado que arrastras es tuyo porque tú lo cargas, no porque te lo hayan puesto: cada vez que vuelves a contarlo, la cadena se cierra de nuevo. Perdonar no es para el otro, es para ti, y si el otro no se arrepiente, perdonas igual para soltarte. El rencor te está comiendo viva y lo sabes: basta de justificarlo.",
+        "Llevas años presentándote como alguien que fue herido, como si ese recuerdo fuera tu nombre, y ya te cansó ver la vida desde esa ventana pero no te atreves a bajarte. Lo que te pasó ya no te define, salvo que tú lo mantengas en el trono. Suelta la historia que te cuentas sobre tu pasado y deja que hoy sea otro principio.",
+        "Ese agravio, esa culpa y esa persona se fueron, pero tú sigues pagando su alquiler con paz, sueño y presente. Cada vez que la memoria repasa la herida, la herida se actualiza. Corta el ciclo hoy: perdona no porque lo merezcan, sino porque tú necesitas soltar el peso.",
+        "Mientras mides y repasas cada traición, el otro vive su vida y tú vives la de él, en círculos. Perdonar no borra lo que pasó: deja de cobrárselo a tu presente. Suelta la factura, agradece la lección y vuelve a tu propia vida, que te está esperando."
       ]
     },
     jofiel: {
       luz: "Arcángel Jofiel te dice: la belleza y la luz que buscas ya están floreciendo a tu alrededor. Rodéate de lo que te hace bien, confía en tu creatividad y verás tu mundo brillar con tus propios colores. Lo bueno que esperas ya viene.",
       mixto: "Arcángel Jofiel te dice: hay luz, pero todavía tienes los ojos puestos en lo que no fue. Deja de mirar atrás y déjate inspirar por lo nuevo. La belleza no entra donde la mirada anda nublada: limpia tu ventana y verás.",
       sombra: "Arcángel Jofiel te regaña: dejaste de ver la luz que sí tienes. Te comparas con otros y apagas tu propio camino, y así la inspiración huye de ti. Deja de mirar a un lado y enciende tu propia lámpara: tu belleza no necesita permiso.",
-      fuerte: [
-        "¡Enciende tu luz! Arcángel Jofiel te habla con energía: tienes un sol dentro y pasas la vida mirando la lámpara del vecino. Te comparas, te quitas valor y apagas tu chispa. Tu camino no es el de nadie más y tu belleza no pide permiso. Deja de mirar a los lados, mira hacia ti, y verás que todo lo que buscas ya estaba en ti.",
-        "¡Deja de apagarte para que otros brillen! Arcángel Jofiel te levanta la barbilla: cedes tu luz, tu tiempo y tu creatividad, y te quedas con lo que sobra. Tu inspiración no es un favor que prestas: es un derecho que usas. Vuelve a ti, retoma lo que amas y acéptalo en voz alta. Cuando tu luz se prende por fin, nada ni nadie podrá apagarla.",
-        "¡Comparar apaga tu propia estrella! Arcángel Jofiel te toma la cara y te mira: cuando miras el camino de otros, dejas de ver el tuyo, que es el único que te toca. Detrás de esa vida que envidias hay un precio que no pagaste. Vuelve a tus propios sueños, retómalos desde donde los dejaste, y verás que tu luz siempre estuvo encendida.",
-        "¡Tu alegría también tiene fecha! Arcángel Jofiel te señala el calendario: llevas tanto tiempo dejando lo que te ilumina 'para cuando todo esté bien' que olvidaste lo que se siente. La alegría no espera a que la merezcas: se cultiva en el ahora. Retoma hoy una sola cosa que amas, solo una, y deja que tu sonrisa recuerde el camino."
+fuerte: [
+        "Tienes un sol dentro y pasas la vida mirando la lámpara del vecino: te comparas, te quitas valor y apagas tu chispa mientras admiras las de otros. Tu camino no es el de nadie más y tu belleza no pide permiso. Deja de mirar a los lados, mira hacia ti, y verás que lo que buscas ya estaba en ti.",
+        "Cedes tu luz, tu tiempo y tu creatividad para que otros brillen, y te quedas con lo que sobra, convencida de que tu momento todavía no llega. Tu inspiración no es un favor que prestas: es un derecho que usas. Vuelve a ti, retoma lo que amas y dilo en voz alta. Cuando tu luz se encienda por fin, nada podrá apagarla.",
+        "Cuando miras el camino de otros, dejas de ver el tuyo, que es el único que te toca: detrás de la vida que envidias hay un precio que no pagaste ni querrías pagar. Vuelve a tus propios sueños, retómalos desde donde los dejaste, y verás que tu luz siempre estuvo encendida, solo tapada por tu propio miedo.",
+        "Llevas tanto tiempo dejando lo que te ilumina para cuando todo esté bien que olvidaste cómo se siente: la alegría no espera a que la merezcas, se cultiva en el ahora. Retoma hoy una sola cosa que amas, una nada más, y deja que tu sonrisa recuerde el camino. Tu futuro no se te escapa: se construye con lo que haces hoy."
       ]
     }
   },
