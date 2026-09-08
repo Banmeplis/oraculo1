@@ -1095,9 +1095,6 @@ h3 { font-size: 1.25rem; }
   display: flex; align-items: center; justify-content: center;
   gap: 12px; flex-wrap: wrap; margin: 16px 0 6px;
 }
-.combo-lado {
-  display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;
-}
 .combo-mas {
   font-family: var(--fuente-deco);
   font-size: 1.7rem; font-weight: 700; color: var(--dorado);
@@ -1105,6 +1102,22 @@ h3 { font-size: 1.25rem; }
   line-height: 1;
 }
 .combo-igual { margin-left: 2px; }
+.combo-carta {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 64px; height: 104px;
+}
+.combo-carta img {
+  width: 100%; height: 100%; object-fit: contain; border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+.combo-carta.inv img { filter: brightness(0.7) saturate(0.85); }
+.combo-carta.inv .c-nm { opacity: 0.6; transform: rotate(180deg); }
+.combo-significado {
+  flex: 1 1 100%; text-align: center;
+  margin-top: 8px; font-size: 0.92rem; line-height: 1.45;
+  font-family: var(--fuente-serif); color: var(--blanco-humo);
+}
+.combo-significado b { color: var(--dorado); font-size: 0.95rem; }
 .combo-mini {
   display: flex; flex-direction: column; align-items: center; gap: 4px;
   max-width: 96px; padding: 7px 6px 5px; border-radius: 12px;

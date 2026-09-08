@@ -233,6 +233,28 @@ const TIRADAS = {
     </div>`;
   },
 
+  /* carta solo con su imagen, para la combinación visual: carta imagen + carta imagen = contexto */
+  comboCartaHtml(c) {
+    const rot = c.invertido ? ' style="transform:rotate(180deg)"' : "";
+    return `<span class="combo-carta${c.invertido ? " inv" : ""}">${c.img ? `<img src="${c.img}" alt="${c.nombre}" loading="lazy"${rot}>` : `<span class="c-nm">${c.emoji}</span>`}</span>`;
+  },
+
+  /* nombre del terreno en que se unen las cartas protagonistas de la combinación */
+  contextoDeCombinacion(cartas) {
+    const nombres = {
+      afectos: "el amor y los afectos", persona: "las personas y el poder", decision: "las decisiones",
+      espiritual: "lo espiritual", trabajo: "el trabajo y la meta", animo: "el ánimo", otro: "tu momento"
+    };
+    const contados = {};
+    cartas.forEach(c => {
+      const g = (this.esencia[c.nombre] && this.esencia[c.nombre].grupo) || "otro";
+      contados[g] = (contados[g] || 0) + 1;
+    });
+    const orden = Object.entries(contados).sort((a, b) => b[1] - a[1]);
+    const [g, n] = orden[0] || ["otro", 0];
+    return (n >= 2 || orden.length === 1) ? (nombres[g] || "tu momento") : "tu momento";
+  },
+
   /* carta + carta = significado en conjunto. Compone el mensaje unificado de un
      grupo de cartas (mismo contexto o mezcla), en la voz del arcángel que
      custodia ese rincón de la lectura */
@@ -551,7 +573,10 @@ const TIRADAS = {
       });
     }
 
-    finalBloques.push(this.bloqueCombinacionGlobal(resultado), { cierre: true, texto: cierrePoderoso, cita });
+    /* la combinación de cartas solo aparece a partir de 3 cartas: con una sola
+       no hay nada que combinar */
+    if (resultado.cartas.length >= 3) finalBloques.push(this.bloqueCombinacionGlobal(resultado));
+    finalBloques.push({ cierre: true, texto: cierrePoderoso, cita });
     return finalBloques;
   },
   /* ----------------------- GRAN TIRADA · 14 cartas ------------------------ */
@@ -937,7 +962,11 @@ const TIRADAS = {
           ${b.presencia ? `<p class="presencia-arc">${b.presencia}</p>` : ""}
           ${b.texto ? `<p>${b.texto}</p>` : ""}
           ${b.cartasHtml ? `<div class="regano-cartas">${b.cartasHtml}</div>` : ""}
-          ${b.combinacion ? `${b.combinacion.cartas && b.combinacion.cartas.length ? `<div class="combo-visual"><div class="combo-lado">${b.combinacion.cartas.map(c => this.miniCarta(c)).join('<span class="combo-mas">+</span>')}</div><span class="combo-mas combo-igual">=</span></div>` : ""}<p class="combinacion-texto">${b.combinacion.texto}</p>` : ""}
+          ${b.combinacion ? (b.combinacion.cartas && b.combinacion.cartas.length ? `<div class="combo-visual">
+            ${b.combinacion.cartas.map(c => this.comboCartaHtml(c)).join('<span class="combo-mas">+</span>')}
+            ${b.combinacion.cartas.length > 1 ? '<span class="combo-mas combo-igual">=</span>' : ""}
+            <span class="combo-significado"><b>Se unen en ${this.contextoDeCombinacion(b.combinacion.cartas)}:</b> ${b.combinacion.texto}</span>
+          </div>` : "") : ""}
         </div>`;
       }
     });
