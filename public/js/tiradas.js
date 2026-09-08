@@ -997,7 +997,7 @@ const TIRADAS = {
     const A = this.nombreCorto(arc.nombre);
     const regania = this.reganoDePregunta(resultado);
     const tipo = resultado.__tipoPregunta;
-    const refNombre = tipo === "persona" ? (this.personaDePregunta(resultado.pregunta) || "esa persona") : null;
+    const refNombre = tipo === "persona" ? (() => { const n = this.personaDePregunta(resultado.pregunta) || "esa persona"; return n === "esa persona" ? n : n.charAt(0).toUpperCase() + n.slice(1); })() : null;
 
     bloques.push({
       icono: arc.emoji,
@@ -1055,14 +1055,17 @@ const TIRADAS = {
   },
 
   personaDePregunta(pregunta) {
-    const prohibidas = new Set(["el","la","los","las","un","una","si","no","que","cuanto","donde","como","cuando","sera","seria","es","son","soy","sea","fue","puede","puedo","puedes","podria","estoy","esta","estas","voy","quiere","quiero","necesito","tengo","debo","deberia","mi","me","te","se","por","para","con","sin","lo","le","su","al","del","oraculo","tarot","amor","dinero","trabajo","salud","suerte","futuro","familia","persona","pregunta","respuesta","vuelve","vuelva","vuelvo","volvera","regresa","regresara","regrese","pasa","pasara","hara","hare","haran","habra","sigue","funciona","funcionara","termino","terminamos","lograre","conseguire","aceptara","pensara","dejare","puedo","debia","debamos","empezar","comenzar","significa","significado","nombre","opinion","otra","mejor","nuevo","papa","mama","mama","mama","mamita","madre","padre","abuela","abuelo","tia","tio","hija","hijo","esposa","esposo","marido","novia","novio","amiga","amigo","hermana","hermano","relacion","relaciones","vida","energia","espiritu","espiritu","casa","alma","economia","asunto","tema","situacion","empresa","negocio","proyecto","verdad","secreto","intencion","intenciones"]);
+    const prohibidas = new Set(["el","la","los","las","un","una","si","no","que","cuanto","donde","como","cuando","sera","seria","es","son","soy","sea","fue","puede","puedo","puedes","podria","estoy","esta","estas","voy","quiere","quiero","necesito","tengo","debo","deberia","mi","me","te","se","por","para","con","sin","lo","le","su","al","del","oraculo","tarot","amor","dinero","trabajo","salud","suerte","futuro","familia","persona","pregunta","respuesta","vuelve","vuelva","vuelvo","volvera","volveria","volvia","regresa","regresara","regresaria","regrese","pasa","pasara","hara","hare","haran","habra","habria","serian","seran","podra","podria","podre","podran","querra","querria","pensara","pensaria","sentira","estara","estaria","tendra","tendria","acabara","terminara","empezara","comenzara","llegara","seguiran","sigue","funciona","funcionara","termino","terminamos","lograre","conseguire","aceptara","pensara","dejare","puedo","debia","debamos","empezar","comenzar","significa","significado","nombre","opinion","otra","mejor","nuevo","papa","mama","mama","mama","mamita","madre","padre","abuela","abuelo","tia","tio","hija","hijo","esposa","esposo","marido","novia","novio","amiga","amigo","hermana","hermano","relacion","relaciones","vida","energia","espiritu","espiritu","casa","alma","economia","asunto","tema","situacion","empresa","negocio","proyecto","verdad","secreto","intencion","intenciones"]);
     const t = String(pregunta || "");
-    let nombres = (t.match(/\b([A-ZÁÉÍÓÚÑ][a-záéíóúñ]{2,})\b/g) || []).filter(n => !prohibidas.has(this.normalizarTexto(n)));
-    if (!nombres.length) {
-      const m = t.match(/\bsobre\s+([a-záéíóúñ]{3,})\b/i);
-      if (m && !prohibidas.has(this.normalizarTexto(m[1]))) nombres = [m[1]];
-    }
-    return nombres[0] || null;
+    const capitalizadas = t.match(/[A-ZÁÉÍÓÚÑ][a-záéíóúñ]*/g) || [];
+    const nombres = capitalizadas
+      .map(w => ({ w, n: this.normalizarTexto(w) }))
+      .filter(x => x.n.length >= 3 && !prohibidas.has(x.n))
+      .map(x => x.w);
+    if (nombres.length) return nombres[0];
+    const m = this.normalizarTexto(t).match(/\bsobre\s+([a-z]{3,})\b/);
+    if (m && !prohibidas.has(m[1])) return m[1];
+    return null;
   },
 
   parentescoDePregunta(pregunta) {
@@ -1341,6 +1344,105 @@ const TIRADAS = {
     };
   },
 
+  /* combinación de cartas ENFOCADA en la pregunta exacta (solo "Pregunta al
+     Oráculo"): cita la consulta y las cartas se unen para responderle a ella */
+  combinacionDePregunta(resultado) {
+    const arc = this.arcangelDeMensaje(resultado);
+    const A = this.nombreCorto(arc.nombre);
+    const R = arc.regencia.toLowerCase();
+    const q = this.escapar(String(resultado.pregunta || "").trim());
+    const grupo = this.elegirGrupoCombinacion(resultado.cartas);
+    const cartas = grupo.map(c => ({ nombre: c.nombre, img: c.img, emoji: c.emoji, invertido: c.invertido, palabras: c.palabras }));
+    const inv = grupo.filter(c => c.invertido).length;
+    const total = grupo.length;
+    const tipo = inv === 0 ? "normal" : (inv === total ? "sombra" : "espejada");
+    const derechas = grupo.filter(c => !c.invertido);
+    const invertidas = grupo.filter(c => c.invertido);
+    const facetaDe = c => {
+      const e = this.esencia[c.nombre];
+      return c.invertido ? (e ? e.sombra : "un aviso en sombra") : (e ? e.luz : "un mensaje de luz");
+    };
+    const encadenar = arr => arr
+      .map((c, i) => (i === 0 ? facetaDe(c).charAt(0).toUpperCase() + facetaDe(c).slice(1) : facetaDe(c)))
+      .join(", se enlaza con ");
+
+    const tipoPre = resultado.__tipoPregunta || this.tipoDePregunta(resultado.pregunta);
+    const esSiNo = tipoPre === "si-no";
+    let ref = null;
+    if (tipoPre === "persona") {
+      const nombre = this.personaDePregunta(resultado.pregunta);
+      if (nombre) ref = nombre.charAt(0).toUpperCase() + nombre.slice(1);
+      else {
+        const n = this.normalizarTexto(resultado.pregunta);
+        const rol = n.match(/\b(?:mi )?(ex|pareja|novio[^s]?|novia|esposo|esposa|marido|amigo|amiga|hermano|hermana|papa|mama|socio|socia|suegra|suegro|jefe|jefa|companero|companera|cuñado|cuñada)\b/);
+        ref = rol ? "tu " + rol[1] : "esa persona";
+      }
+    }
+    const sobre = ref ? `Preguntas por ${ref}: «${q}». ` : (esSiNo ? "" : `Sobre «${q}», `);
+
+    let texto;
+    if (tipo === "normal") {
+      texto = this.elegirDe([
+        `${sobre}${A} une estas cartas para responderte: ${encadenar(derechas)}. Cuando dos luces se tocan, tu consulta no se queda en palabras: lo que preguntas ya viene en movimiento y a tu favor. ${A} lo confirma desde su ${R}: camina con fe.`,
+        `${sobre}la combinación te responde: ${encadenar(derechas)}. ${A} ve estas luces juntas y te dice que no es azar: el cielo te está afirmando el camino.`
+      ]);
+    } else if (tipo === "sombra") {
+      texto = this.elegirDe([
+        `${sobre}las cartas se pliegan juntas y dicen una sola cosa: hay un patrón que se repite en lo que preguntas. ${A} te habla desde su ${R}: antes de que esto se resuelva, hay algo tuyo que corregir. La sombra no es castigo: es el mapa que faltaba.`,
+        `${sobre}la consulta se responde con todas las cartas en sombra: ${encadenar(invertidas)}. ${A} ve que insistes donde la energía todavía no está lista. No es un no del cielo: es un alto para que cambies de método, no de meta.`
+      ]);
+    } else {
+      texto = this.elegirDe([
+        `${sobre}${A} combina dos voces: ${encadenar(derechas)}; y en paralelo, ${encadenar(invertidas)}. Juntas forman tu respuesta: lo que ya avanza en lo que preguntas y lo que debes soltar para que se destrabe. ${A} sostiene esa balanza desde su ${R}.`,
+        `${sobre}la combinación mezcla señal y aviso: ${encadenar(derechas)}; mientras tanto, ${encadenar(invertidas)}. ${A} te dice: la respuesta que buscas llega cuando afirmas lo bueno y corriges lo pendiente.`
+      ]);
+    }
+
+    if (sobre.endsWith(". ")) texto = texto.charAt(0).toUpperCase() + texto.slice(1);
+
+    if (esSiNo) {
+      const sombrasTot = resultado.cartas.filter(c => c.invertido).length;
+      const veredicto = sombrasTot === 0
+        ? "un SÍ claro"
+        : (resultado.cartas.length - sombrasTot > sombrasTot
+          ? "un SÍ con condición"
+          : (sombrasTot === resultado.cartas.length ? "un NO por ahora" : "un NO provisional"));
+      texto = `La combinación de tus cartas responde a «${q}» con ${veredicto}: ${texto}`;
+    }
+
+    let consejo = tipo === "normal"
+      ? this.elegirDe([
+          `Mi consejo sobre tu pregunta: da el paso que ya sientes correcto y no pidas más señales. ${A} dice que tu consulta ya está respondida: ahora falta el acto.`,
+          `Sobre lo que preguntas, actúa hoy una cosa pequeña y real: la luz de esta combinación se confirma en el movimiento, no en la espera.`
+        ])
+      : (tipo === "sombra"
+          ? this.elegirDe([
+              `Ante tu pregunta, mi consejo es frenar antes de insistir: suelta la forma que venías usando, descansa y vuelve a preguntar con el corazón liviano. ${A} te acompaña en ese descanso.`,
+              `No dejes que el miedo decida por ti: la sombra te pide un cambio concreto, no una retirada. Corrige el rumbo y vuelve a intentar con calma.`
+            ])
+          : this.elegirDe([
+              `Mi consejo para tu pregunta: quédate con lo que ya funciona y corrige UNA sola cosa de las que la sombra señala. Un paso, hoy.`,
+              `Responde tu consulta en dos actos: confirma lo que avanza y suelta lo que pesa. El orden de los pasos también es parte de la señal.`
+            ]));
+
+    let regano = tipo === "normal"
+      ? this.elegirDe([
+          `Y el regaño de ${A} sobre tu pregunta: no conviertas la respuesta clara que te acabo de dar en otra excusa para esperar. Hoy, con calma, actúala.`,
+          `Lo único que ${A} te reclama: que pidas otra vez lo que la combinación ya te respondió. Escucha, decide y deja de repetir la consulta.`
+        ])
+      : (tipo === "sombra"
+          ? this.elegirDe([
+              `${A} te regaña sin crueldad: llevas la respuesta delante y no la quieres ver. Estas cartas te señalan tu tarea; hazla antes de volver a preguntar.`,
+              `Y te hablo fuerte, ${A}, porque la pregunta que repites no se cansa: la sombra sigue ahí esperando tu cambio, no tu miedo.`
+            ])
+          : this.elegirDe([
+              `${A} te reclama una sola cosa: no te quedes solo con la mitad que te gusta de la respuesta. La sombra también contesta tu pregunta, y esa parte también es tuya.`,
+              `El regaño de hoy: no busques una combinación «perfecta» para seguir preguntando. Esta mezcla ES la respuesta: afírmala y corrige.`
+            ]));
+
+    return { tipo, texto, cartas, consejo, regano, enfocada: true };
+  },
+
   /* bloque de combinación global de las lecturas cortas (1, 3, 5, 10 cartas):
      el arcángel regente resume cómo se combina toda la lectura mostrando las
      cartas protagonistas (2 o más del mismo contexto si las hay) con su
@@ -1364,13 +1466,15 @@ const TIRADAS = {
       arcangel: arc,
       regano: tipo === "sombra",
       presencia: "",
-      combinacion: {
-        tipo,
-        texto: this.significadoConjunto(grupo, arc),
-        cartas,
-        consejo: this.consejoDeCombinacion(grupo, arc),
-        regano: this.reganoDeCombinacion(grupo, arc)
-      },
+      combinacion: resultado.pregunta
+        ? this.combinacionDePregunta(resultado)
+        : {
+            tipo,
+            texto: this.significadoConjunto(grupo, arc),
+            cartas,
+            consejo: this.consejoDeCombinacion(grupo, arc),
+            regano: this.reganoDeCombinacion(grupo, arc)
+          },
       texto: ""
     };
   },
@@ -1591,7 +1695,7 @@ const TIRADAS = {
           ${b.combinacion ? (b.combinacion.cartas && b.combinacion.cartas.length ? `<div class="combo-visual">
             ${b.combinacion.cartas.map(c => this.comboCartaHtml(c)).join('<span class="combo-mas">+</span>')}
             ${b.combinacion.cartas.length > 1 ? '<span class="combo-mas combo-igual">=</span>' : ""}
-            <span class="combo-significado"><b>Se unen en ${this.contextoDeCombinacion(b.combinacion.cartas)}:</b> ${b.combinacion.texto}</span>
+            <span class="combo-significado">${b.combinacion.enfocada ? "" : `<b>Se unen en ${this.contextoDeCombinacion(b.combinacion.cartas)}:</b> `}${b.combinacion.texto}</span>
             ${b.combinacion.consejo ? `<span class="combo-consejo"><b>Mi consejo:</b> ${b.combinacion.consejo}</span>` : ""}
             ${b.combinacion.regano ? `<span class="combo-regano"><b>Mi regaño:</b> ${b.combinacion.regano}</span>` : ""}
           </div>` : "") : ""}
