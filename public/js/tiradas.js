@@ -1369,18 +1369,18 @@ const TIRADAS = {
     let texto;
     if (tipo === "normal") {
       texto = this.elegirDe([
-        `${sobre}${A} une estas cartas para responderte: ${encadenar(derechas)}.`,
-        `${sobre}la combinación te responde: ${encadenar(derechas)}.`
+        `${sobre}${A} une estas cartas para responderte: ${encadenar(derechas)}. Cuando todas las luces se tocan, tu consulta no se queda en consejo: ya viene en movimiento y a tu favor. ${A} ve el terreno listo y te pide una sola cosa: no frenarlo con la duda de «será que sí». Lo que llega, llega porque algo tuyo ya venía haciendo fuerza.`,
+        `${sobre}la combinación te responde: ${encadenar(derechas)}. No es azar que estas luces se dieran cita frente a tu pregunta: el cielo te está afirmando el camino que ya elegiste. ${A} te confirma que la señal no pide más pruebas, pide tu constancia: la suerte le sonríe a quien sigue caminando.`
       ]);
     } else if (tipo === "sombra") {
       texto = this.elegirDe([
-        `${sobre}las cartas se pliegan juntas y dicen una sola cosa: ${encadenar(invertidas)}.`,
-        `${sobre}la consulta se responde con todas las cartas en sombra: ${encadenar(invertidas)}.`
+        `${sobre}las cartas se pliegan juntas y dicen una sola cosa: ${encadenar(invertidas)}. No es castigo, ${A} te lo aclara: es el mapa que faltaba. Antes de que esto se resuelva, hay algo tuyo que corregir, y estas sombras te lo nombran con exactitud para que no tengas que adivinar. La pregunta se destraba cuando cambias algo adentro, no afuera.`,
+        `${sobre}la consulta se responde con todas las cartas en sombra: ${encadenar(invertidas)}. ${A} ve que insistes donde la energía todavía no está lista: no es un no del cielo, es un alto para que cambies de método, no de meta. Frenar a tiempo también es avanzar: esta pausa decide el resto del camino.`
       ]);
     } else {
       texto = this.elegirDe([
-        `${sobre}${A} combina dos voces: ${encadenar(derechas)}; y en paralelo, ${encadenar(invertidas)}.`,
-        `${sobre}la combinación mezcla señal y aviso: ${encadenar(derechas)}; mientras tanto, ${encadenar(invertidas)}.`
+        `${sobre}${A} combina dos voces: ${encadenar(derechas)}; y en paralelo, ${encadenar(invertidas)}. Tu respuesta no vive en una sola de esas voces, vive en el silencio entre las dos: una te muestra el rumbo y la otra el nudo que hasta hoy lo frena. ${A} te pide sostener las dos sin taparte los ojos: solo así la señal se vuelve decisión.`,
+        `${sobre}la combinación mezcla señal y aviso: ${encadenar(derechas)}; mientras tanto, ${encadenar(invertidas)}. Una lectura así no te regala una respuesta fácil: te entrega el mapa real, con su camino y sus baches. ${A} te dice que el aviso no viene a asustarte, viene a evitar que tropieces dos veces en lo mismo.`
       ]);
     }
 
@@ -1398,32 +1398,32 @@ const TIRADAS = {
 
     let consejo = tipo === "normal"
       ? this.elegirDe([
-          `Da el paso que ya sientes correcto y no pidas más señales. Tu consulta ya está respondida: ahora falta el acto.`,
-          `Actúa hoy una cosa pequeña y real: la luz de esta combinación se confirma en el movimiento, no en la espera.`
+          `Da el paso que ya sientes correcto y no pidas más señales: esta lectura acaba de darte la que buscabas, y volver a preguntar sería desconfiar de lo que ya tienes. Hoy, con calma, actúala: un gesto pequeño y real vale más que mil confirmaciones.`,
+          `Actúa hoy una cosa pequeña y concreta en la dirección que estas cartas señalan. La luz no espera a que estés seguro: se confirma mientras caminas. Elige una sola acción, hazla, y deja que el resto se alinee solo detrás de ella.`
         ])
       : (tipo === "sombra"
           ? this.elegirDe([
-              `Frena antes de insistir: suelta la forma que venías usando, descansa y vuelve a preguntar con el corazón liviano.`,
-              `No dejes que el miedo decida por ti: la sombra te pide un cambio concreto, no una retirada. Corrige el rumbo y vuelve a intentar con calma.`
+              `Frena antes de insistir: suelta la forma que venías usando, descansa y vuelve a preguntar con el corazón liviano. La sombra no te pide rendirte, te pide rendir la manera: si repites el mismo intento, la misma conversación, el mismo río, el resultado no puede cambiar. Cambia una sola conducta y todo lo demás empieza a moverse.`,
+              `No dejes que el miedo decida por ti: la sombra te pide un cambio concreto, no una retirada. Encuentra la única cosa que repites sin darte cuenta y córtala hoy mismo: con un solo cambio real, todo lo que estaba frenado se destraba solo.`
             ])
           : this.elegirDe([
-              `Quédate con lo que ya funciona y corrige UNA sola cosa de las que la sombra señala. Un paso, hoy.`,
-              `Confirma lo que avanza y suelta lo que pesa. El orden de los pasos también es parte de la señal.`
+              `Quédate con lo que ya funciona y corrige UNA sola cosa de las que la sombra señala. No hace falta rehacer el rumbo: las grandes vueltas nacen de un solo paso bien dado. Ese paso es hoy: cada día que le regalas a la duda, la duda gana un partido.`,
+              `Confirma lo que avanza y suelta lo que pesa, en ese orden: primero afianza lo que te sostiene y después deja ir lo que te detiene, para que la soltura no te desarme. Hazlo como un acto y no como una idea: una cosa soltada hoy vale más que mil pensadas.`
             ]));
 
     let regano = tipo === "normal"
       ? this.elegirDe([
-          `No conviertas la respuesta clara que acabo de darte en otra excusa para esperar. Hoy, con calma, actúala.`,
-          `Deja de pedir otra vez lo que la combinación ya te respondió. Escucha, decide y no repitas la consulta.`
+          `No conviertas la claridad de estas cartas en una excusa más para esperar. ${A} te conoce: cuando todo brilla, dudas de que sea real y pospones. La respuesta es clara y favorable; lo único que falta es que tú la cumplas hoy, no mañana.`,
+          `Deja de pedir otra vez lo que ya te respondieron. Esta lectura está limpia, y repetir la consulta solo disfraza la duda que aún no quieres nombrar. Escucha, decide y camina: el cielo ya cumplió su parte, ahora es la tuya.`
         ])
       : (tipo === "sombra"
           ? this.elegirDe([
-              `Llevas la respuesta delante y no la quieres ver. Estas cartas te señalan tu tarea; hazla antes de volver a preguntar.`,
-              `La pregunta que repites no se cansa: la sombra sigue ahí esperando tu cambio, no tu miedo.`
+              `Llevas la respuesta delante y no la quieres ver, y por eso preguntas otra vez. ${A} te regaña sin crueldad: estas cartas te señalan la tarea con claridad; hazla antes de volver. Preguntar sin actuar no es consultar, es escaparte.`,
+              `La pregunta que repites no se cansa: la sombra sigue ahí, esperando tu cambio, no tu miedo. ${A} te avisa que este patrón no se rompe con otra lectura, se rompe con otra conducta. Hoy, una distinta.`
             ])
           : this.elegirDe([
-              `No te quedes solo con la mitad que te gusta de la respuesta. La sombra también contesta tu pregunta, y esa parte también es tuya.`,
-              `No busques una combinación «perfecta» para seguir preguntando. Esta mezcla ES la respuesta: afírmala y corrige.`
+              `No te quedes con la mitad que te gusta de la respuesta: la sombra de estas cartas también te habla, y esa parte también es tuya. Ignorarla no la borra, la agranda. Mírala hoy con honestidad y deja de escaparte de tu propia lectura.`,
+              `¿Cuántas veces más vas a preguntar lo mismo esperando que el cielo te responda distinto? ${A} te habla sin rodeos: esta mezcla ya respondió. No te faltan señales, te falta la única decisión que la sombra te viene pidiendo. Hazla y vuelve.`
             ]));
 
     return { tipo, texto, cartas, consejo, regano, enfocada: true };
