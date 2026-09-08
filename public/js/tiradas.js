@@ -450,82 +450,6 @@ const TIRADAS = {
     ]);
   },
 
-  /* regaño moldeado por las cartas reales: usa los nombres, la posición y el
-     propio mensaje de cada carta en sombra, agrupados por contexto, en la voz
-     del arcángel que regenta la lectura */
-  regañoDeCartas(resultado, arc) {
-    const cartas = resultado.cartas || [];
-    const posiciones = (resultado.tirada.posiciones || []).map(p => p[0]);
-    const sombras = cartas.filter(c => c.invertido);
-    const luces = cartas.filter(c => !c.invertido);
-    const A = this.nombreCorto(arc.nombre);
-    const R = arc.regencia.toLowerCase();
-
-    /* apertura según el peso de la sombra */
-    const apertura = this.elegirDe([
-      `Te he puesto tu lectura sobre la mesa y hoy no vengo a consolarte: vengo a abrirte los ojos. Yo, ${A}, te hablo desde mi ${R}.`,
-      `He escuchado en silencio lo que tus cartas te cuentan, y soy yo, ${A}, quien te lo dice sin rebajas, desde mi ${R}.`,
-      `No me gusta hablarte así, pero tu lectura lo pide. Soy ${A} y te agarro fuerte la mano antes de decirte la verdad.`,
-      `He bajado del cielo a propósito para esto: tus cartas llevan tiempo intentando hablarte y no las escuchas. ${A} te lo señala, desde mi ${R}.`,
-      `Tu lectura no tiene filtro esta vez, y yo, ${A}, vengo a decírtelo cara a cara, con mi ${R} como respaldo.`
-    ]);
-
-    if (!sombras.length) {
-      const frag = luces.slice(0, 3).map(c => {
-        const e = this.esencia[c.nombre];
-        return `${c.emoji} ${c.nombre}: ${e ? e.sombra : "el filo de su mensaje"}`;
-      }).join(" ");
-      return this.elegirDe([
-        `${apertura} Estás caminando por la cornisa y casi no lo ves: ${frag}. No esperes a que una carta se ponga de espaldas: hoy que todo parece "bien", es el mejor día para corregir. Desde mi ${R}, detente, revisa y ajusta antes de que el golpe llegue gratis.`,
-        `${apertura} Tus cartas no se han volteado, y sin embargo yo levanto la voz: ${frag}. La vida no siempre avisa con cartas invertidas. Desde mi ${R} te pido que atiendas esto hoy, no cuando se vuelva urgente.`,
-        `${apertura} Tus cartas salieron derechas, pero yo sé leer entre líneas: ${frag}. El peligro no está en lo que cayó, sino en lo que llevas tiempo ignorando. Desde mi ${R}, corrígelo antes de que la vida te obligue.`
-      ]);
-    }
-
-    const grupos = this.agruparContexto(sombras).filter(g => g.cartas.length);
-
-    const piezas = grupos.map(g => {
-      if (g.cartas.length === 1) {
-        const c = g.cartas[0];
-        const e = this.esencia[c.nombre];
-        const pos = posiciones[cartas.indexOf(c)] ? ` en ${posiciones[cartas.indexOf(c)].toLowerCase()}` : "";
-        return `${c.emoji} ${c.nombre}${c.invertido ? " invertida" : ""}${pos} toca tu punto más delicado: ${e ? e.sombra : "lo que no quieres ver"}. Y te dice: «${c.texto}»`;
-      }
-      const cs = g.cartas;
-      const eSombra = cs.map(c => (this.esencia[c.nombre] ? this.esencia[c.nombre].sombra : "")).filter(Boolean);
-      const repetidas = cs.length === 2
-        ? `${cs.map(c => c.nombre).join(" y ")} repiten la misma lección en sombra`
-        : `${cs.map(c => c.nombre).join(", ")} repiten el mismo patrón en sombra`;
-      return `${cs.map(c => c.emoji).join("")} ${repetidas}: ${eSombra.join(" y ")}. Juntas te dicen: «${cs[0].texto}»${cs.length > 1 ? " y «" + cs[1].texto + "»" : ""}`;
-    });
-
-    const cuerpo = piezas.slice(0, 4).join(" ");
-    const resto = sombras.length > 4 ? ` Y no te engañes: hay más cartas en sombra detrás de estas, todas apuntando al mismo centro. ` : "";
-    const puente = (sombras.length === 1 ? [
-      `No lo mires como un castigo: te está señalando exactamente lo que estás listo para soltar.`,
-      `Pon atención a esa carta: no vino por casualidad, repite un tema que ya te está llamando.`,
-      `No te pido que la adivines: te pido que la obedezcas como la única señal que hoy hace falta.`
-    ] : [
-      `No lo mires como un castigo: estas cartas te señalan exactamente lo que estás listo para soltar.`,
-      `Pon atención al hilo que las une: no hay casualidad en que se repita el mismo tema.`,
-      `Cada una te habla de algo distinto, pero juntas cuentan una sola historia.`,
-      `No son varias lecturas: es una sola lección dicha de cuatro maneras.`,
-      `Fíjate cómo se señalan entre ellas: la sombra de una confirma la de la otra.`
-    ]);
-    const cierre = (sombras.length === 1 ? [
-      `Yo, ${A}, desde mi ${R}, te pido una sola cosa hoy: convierte lo que te dolió leer en acción. No necesitas más señales, necesitas obediencia.`,
-      `Mira de nuevo la carta que te señalé: no pidas otra señal, ya tienes la tuya. ${A} te lo dice con amor duro: actúa hoy y demuestra que esta lectura no cayó al vacío.`,
-      `Esta carta te deja una sola tarea: elige hoy una decisión pequeña y real, y hazla. Yo, ${A}, desde mi ${R}, empujo contigo mientras la cumples.`
-    ] : [
-      `Yo, ${A}, desde mi ${R}, te pido una sola cosa hoy: elige la que más te dolió leer y conviértela en acción. Cambia una cosa y las demás girarán solas.`,
-      `Mira de nuevo las cartas que te señalé: no necesitas más señales, necesitas obediencia. ${A} te lo dice con amor duro: levántate hoy y demuestra que esta lectura no cayó al vacío.`,
-      `No te pido que cambies de golpe: te pido una decisión pequeña y real antes de que termine el día. Yo, ${A}, desde mi ${R}, estaré ahí para sostenerte mientras obedeces.`,
-      `Cuando quieras comprobar que estas cartas no vinieron al azar, mira que todas señalan lo mismo: tu corazón ya sabe por dónde empezar. ${A} te acompaña desde mi ${R}.`
-    ]);
-
-    return `${apertura} ${cuerpo}${resto} ${this.elegirDe(puente)} ${this.elegirDe(cierre)}`;
-  },
-
   /* tarjetas de carta con su propio mensaje, para el regaño por bloque */
   reganoCartaHtml(cartas) {
     return (cartas || []).map(c => `
@@ -551,119 +475,506 @@ const TIRADAS = {
       "linear-gradient(160deg, var(--nocturno) 0%, var(--nocturno2) 55%, #241650 100%)";
   },
 
-/* interpretación final por áreas: cada arcángel habla de su área en primera
-     persona; el tono (luz o sombra) se decide según las cartas de la lectura,
-     pero el arcángel no nombra las cartas: solo entrega el mensaje */
+/* ===================== MOTOR NARRATIVO ANCLADO A LAS CARTAS ==============
+     cada lectura corta y la gran tirada se cuentan como una historia propia:
+     cada capítulo usa la carta real que cayó y su posición real (via {Pos}).
+     La luz y la sombra del relato se eligen según el sentido de cada carta. */
+
+  /* frase natural para cada posición de la baraja, sustituye a {Pos} */
+  posFrase: {
+    "Tu mensaje": "tu mensaje de hoy",
+    "La energía central de tu momento": "la energía central de tu momento",
+    "Pasado": "tu pasado",
+    "Presente": "tu presente",
+    "Futuro": "tu futuro",
+    "Situación": "tu situación",
+    "Camino": "el camino que eliges",
+    "Obstáculo": "tu obstáculo",
+    "Ayuda": "la ayuda que te sostiene",
+    "Resultado": "el resultado de esta etapa",
+    "Tu respuesta": "tu respuesta",
+    "Tu verdad": "la verdad que necesitas escuchar",
+    "Lo que evitas": "lo que evitas",
+    "Tu fuerza": "la fuerza de tu siguiente paso",
+    "Corazón del asunto": "el corazón de tu asunto",
+    "Lo que cruza": "lo que cruza tu camino",
+    "Lo que está por encima": "lo que tu mente persigue",
+    "Lo que está por debajo": "lo que habita tu interior",
+    "Lo que pasó": "tu pasado reciente",
+    "Lo que viene": "tu futuro cercano",
+    "Tu actitud": "tu actitud",
+    "El entorno": "tu entorno",
+    "Esperanzas y miedos": "tus esperanzas y tus miedos",
+    "Tu pregunta": "tu pregunta",
+    "La lección": "la lección de tu consulta",
+    "La respuesta": "la respuesta",
+    "Situación general": "tu situación general",
+    "Amor y relaciones": "tus amores y relaciones",
+    "Economía y abundancia": "tu economía y tu abundancia",
+    "Trabajo y proyecto": "tu trabajo y tus proyectos",
+    "Familia y hogar": "tu familia y tu hogar",
+    "Salud y energía": "tu salud y tu energía",
+    "Espiritualidad y fe": "tu espiritualidad y tu fe",
+    "Bloqueo a liberar": "el bloqueo que tienes que liberar",
+    "Pasado que te marcó": "tu pasado, el que te marcó",
+    "Presente que te sostiene": "tu presente, el que te sostiene",
+    "Futuro que se acerca": "el futuro que se acerca",
+    "Consejo del cielo": "el consejo que el cielo te da",
+    "Lección del alma": "la lección que tu alma aprende",
+    "Resultado final": "el resultado final de todo esto"
+  },
+
+  fraseDePos(pos) {
+    return (this.posFrase && this.posFrase[pos]) || String(pos || "tu historia").toLowerCase();
+  },
+
+  /* puentes breves que unen dos capítulos de la lectura narrada */
+  puentes: [
+    "Y no es casualidad lo que sigue en tu historia:",
+    "El hilo continúa, y se confirma:",
+    "Y justo ahí la vida añade otra pieza:"
+  ],
+
+  /* cierres del regaño, siempre en acción concreta */
+  empujes: [
+    "Esto no se corrige con buenas intenciones: elige una sola acción hoy y hazla de verdad, sin explicarla.",
+    "No necesitas otra señal: necesitas obedecer esta. Cambia una sola cosa hoy y las demás girarán solas.",
+    "Esta carta no vino a hacerte sentir mal: vino a darte la lista de lo que estás lista para soltar. Empieza por una."
+  ],
+
+  /* relatos: para cada arcano, dos versiones de luz y dos de sombra que se
+     integran a la lectura en la posición real de la carta */
+  relatos: {
+    "El Loco": {
+      luz: [
+        "En {Pos} algo nuevo llama a tu puerta con un impulso que no puedes explicar: un proyecto, un lugar, una persona distinta que abre un terreno que nunca habías pisado. Da el paso aunque no tengas el mapa completo, porque el rumbo se aclara caminando. Lo que hoy parece una apuesta es tu libertad llamándote a casa.",
+        "En {Pos} se abre un camino que no estaba en tus planes, y esa es justamente su mejor señal: soltar el recetario y atreverte a lo nuevo. No lo sobrepienses: la vida premia a quien salta con el corazón, y tus alas están más listas de lo que crees. Empieza ligero, y lo demás se acomoda."
+      ],
+      sombra: [
+        "En {Pos} hay una prisa que no te deja ver: corres hacia adelante sin mirar lo que dejas, y confundes vértigo con libertad. Te estás lanzando a una decisión importante sin el mínimo plan, y el suelo firme no está donde crees. Esta carta no te pide quedarte quieta: te pide mirar bien antes de saltar.",
+        "En {Pos} sigues apostando a la escapatoria, a empezar de nuevo en otro lado para no terminar lo que toca terminar. Esa libertad que persigues es en realidad un adiós repetido: a los compromisos, a las personas, a ti misma. El salto sin red esta vez no es aventura: es huida con los ojos cerrados."
+      ]
+    },
+    "El Mago": {
+      luz: [
+        "En {Pos} tienes en la mano exactamente lo que necesitas para crear lo que imaginas: talento, palabra y un momento que se abre. Todo lo que aprendiste en silencio empieza a pedir salir, y alguien está dispuesto a apoyar tu idea si la presentas bien. Cree en tu capacidad y empieza con una acción pequeña: lo demás se encadena solo.",
+        "En {Pos} se enciende tu capacidad de hacer real lo que hasta ahora era deseo, y las puertas no se abren solas: se abren cuando muestras lo que sabes hacer. Llega el minuto de dejar de ensayar en tu mente y mostrar al mundo tu talento. Nadie va a hacerlo por ti, y hoy lo sabes con claridad."
+      ],
+      sombra: [
+        "En {Pos} nadie te engaña excepto tú: promesas que dices y no cumples, talentos que guardas sin usar, ideas que fabricas y no pones en marcha. Tu poder no se perdió, se quedó dormido en la primera puerta que cerraste por miedo. Esta carta no te pide más discursos: te pide el primer hecho.",
+        "En {Pos} hay una palabra dada que quedó pendiente, y esa pendiente te pesa más de lo que admites. Acomodas tu agenda para no enfrentar lo que prometiste, y la energía que podría construir se te va en evadir. Solo recuperas tu poder devolviendo lo que quedó a medias: hoy toca cumplir."
+      ]
+    },
+    "La Sacerdotisa": {
+      luz: [
+        "En {Pos} la respuesta ya existe y vive en ti, aunque tu cabeza todavía la descarte: hay una certeza en el pecho que la lógica no puede explicar, y hacerle caso hoy te ahorra un error grande. Busca un momento de silencio, baja el ruido y pregúntate una sola vez. La señal te va a salir al paso.",
+        "En {Pos} lo importante casi no se ve: una intuición, una corazonada, un no que ya sabes antes de que lleguen las razones. Algo se te está revelando en cuentagotas y pide que confíes en tu propio radar. No necesitas más datos: necesitas hacer caso de la data que llevas dentro."
+      ],
+      sombra: [
+        "En {Pos} guardas una verdad que no te atreves a mirar ni a decir, y ese silencio ya se volvió costumbre: sabes lo que está pasando y esperas que alguien lo confirme para no creértelo tú. La intuición no te está fallando, la estás tapando con ocupaciones. Escucha tu propia voz o ella se cansará de hablar.",
+        "En {Pos} te escondes detrás de la ambigüedad: no preguntas, no confirmas, no miras, porque temes lo que vas a encontrar. Ese misterio que cultivas no es prudencia, es miedo con velo. La verdad ya está en tu interior, nítida: deja de esperar el permiso de otros para aceptarla."
+      ]
+    },
+    "La Emperatriz": {
+      luz: [
+        "En {Pos} algo que cuidaste en silencio empieza a florecer: una relación, un proyecto, tu propio cuerpo, tu casa. La abundancia no llega por golpe de suerte, llega porque regaste, protegiste y esperaste con paciencia. Disfruta lo que brota y compártelo sin miedo: lo que se da también se multiplica.",
+        "En {Pos} la vida te devuelve con generosidad lo que sembraste: hay terreno fértil para que nazca lo que pides, y una persona cercana, protectora y cariñosa juega a tu favor sin buscar publicidad. Crea, embellece y nutre: lo que tocas hoy da frutos y te sonríe."
+      ],
+      sombra: [
+        "En {Pos} llevas tiempo viviendo en el borrador de tu vida: pospones tu cuidado, tu creatividad y tus deseos para cuando haya tiempo, y tu tierra se está quedando sin riego. Se nota en el cansancio y en el abandono de lo que amabas. Vuelve a ser la persona que siembra y cuida: nadie puede nutrirte mejor que tú.",
+        "En {Pos} hay un descuido que ya tiene nombre: dejaste de darte lo que siempre les das a otros, tu generosidad se volvió la única moneda y tu propia cuenta quedó en ceros. Esta carta no te pide más sacrificio: te pide ponerte primera en tu propia lista y volver a florecer."
+      ]
+    },
+    "El Emperador": {
+      luz: [
+        "En {Pos} se consolidan las bases: tu palabra, tu casa, tu trabajo y tus límites ganan peso. Hay una figura de autoridad, un jefe, un padre, alguien mayor, que puede abrirte una puerta si te presentas con orden. Este es el momento de mandar en tu vida con firmeza tranquila: estructura hoy lo que quieres sostener mañana.",
+        "En {Pos} la firmeza que muestras empieza a dar frutos: lo que estaba disperso se ordena bajo tu mando y el entorno te reconoce más autoridad de la que tú misma te das. Ejerce tu lugar sin demostrar de más: el poder bien usado construye, protege y se respeta solo."
+      ],
+      sombra: [
+        "En {Pos} el control se te está yendo de las manos por querer abarcarlo todo: rigidez, orden impuesto, una autoridad que ahoga hasta a la que manda. Entre más aprietas, más se escapa; entre más decides por todos, más solo te quedas. Suelta un poco el mando, delega y respeta los tiempos del mundo: mandar bien también es saber ceder.",
+        "En {Pos} alguien con poder, un jefe, un familiar, una figura mayor, está ejerciendo una autoridad que te asfixia; o tú estás ejerciendo igual de dura contigo. La estructura en la que confiaste tambalea y lo sabes. No se trata de derribarlo todo: se trata de negociar desde tu dignidad, no desde el miedo."
+      ]
+    },
+    "El Hierofante": {
+      luz: [
+        "En {Pos} se acerca una guía que no tiene la forma que imaginas: no viene a darte la respuesta, viene a ponerte delante de situaciones para que descubras que puedes. Así es una persona mayor, sabia y exigente: te quiere demasiado para regalarte el camino. Acepta el reto, porque detrás del esfuerzo está la capacidad que no sabías que tenías.",
+        "En {Pos} alguien con experiencia, un maestro, un familiar grande, un mentor, está dispuesto a ayudarte aunque a su manera y en sus tiempos. Las enseñanzas que te da hoy no siempre suenan dulces, pero son las que de verdad fortalecen. Escucha, aplica y crece: esta guía es un regalo disfrazado de exigencia."
+      ],
+      sombra: [
+        "En {Pos} estás obedeciendo reglas que no son tuyas: un siempre se hizo así que te mantiene donde no quieres estar. Alguien, una enseñanza, una tradición, una figura de autoridad, te tiene plantada en un carril que no elegiste. Esta carta te da permiso de revisar qué te sirve y qué ya cumplió: escuchar tu propia verdad no es desobediencia.",
+        "En {Pos} hay un consejo repetido que seguiste sin pensar y hoy se volvió jaula: la opinión de otros, el deber heredado, la costumbre que ya no te hace bien. Pregúntate de quién es el guion que estás escribiendo. Liberarte de lo aprendido no te deja vacía: te devuelve a ti misma."
+      ]
+    },
+    "Los Enamorados": {
+      luz: [
+        "En {Pos} llega una elección importante y esta vez tu corazón y tu mente se ponen de acuerdo: un sentimiento que iba en silencio pide ser dicho, una unión, una reconciliación, un sí que temías pronunciar. Elige desde la verdad y no desde el miedo a perder: quien te quiere de verdad también te elige, y lo que es para ti no se marcha.",
+        "En {Pos} el amor se decide a tomar forma, en un vínculo que se confirma o en un cariño que se renueva. Hay una química que ya no se puede seguir negando y alguien espera tu señal para dar el siguiente paso. Abre la boca con honestidad: decir lo que sientes no rompe nada, cierra brechas."
+      ],
+      sombra: [
+        "En {Pos} la duda te tiene partida en dos: quieres y no te atreves, recibes y no decides, te acercas y huyes. Esa indecisión no protege tu corazón, lo deja en vilo y deja en vilo a quien te quiere. Esta carta no va a elegir por ti: te pide soltar el miedo a quedarte sola y decidir de una vez.",
+        "En {Pos} hay una relación que se sostiene por costumbre y no por amor: quedarse por miedo, ceder por culpa, callar por paz. Esta carta no te pregunta si amas: te pregunta cuánto te estás traicionando para no tener que decidir. La verdad duele menos que la espera, y hoy lo sabes."
+      ]
+    },
+    "El Carro": {
+      luz: [
+        "En {Pos} tu voluntad se pone en marcha y nada va a poder frenarte si eliges un solo rumbo: la meta que parecía lejana se acerca con cada paso firme, y hay una victoria que ya está en camino. Sujeta las riendas, mira adelante y cruza: la disciplina de hoy es tu triunfo de mañana.",
+        "En {Pos} sales ganando no por suerte sino por enfoque: entre tantas direcciones elegiste una y le pusiste cuerpo. Una meta concreta está a tu alcance y el impulso corre a favor. Mantén el paso constante, celebra cada avance pequeño y no desvíes la vista: la línea de llegada está más cerca de lo que crees."
+      ],
+      sombra: [
+        "En {Pos} vas para todos lados y no llegas a ninguno: cambias de rumbo con cada opinión, empiezas proyectos y los abandonas, llena de velocidad y vacía de dirección. Esa energía dispersa agota y no construye. Esta carta te detiene el paso para decirte: elige una sola cosa hoy y cambia el destino de tu semana.",
+        "En {Pos} corres para no pensar, empujas situaciones solo por avanzar y confundes movimiento con progreso. Vas deprisa hacia nadie y el cansancio te alcanza. Te pido frenar en seco: la victoria no está en la prisa, está en la dirección, y recuperarla es tu tarea."
+      ]
+    },
+    "La Fuerza": {
+      luz: [
+        "En {Pos} tu calma vale más que cualquier grito: tienes frente a ti un miedo, una presión o una persona difícil, y la salida no es pelear sino dominar desde la serenidad. Tu mejor armadura es tu paciencia: cuando el león de tu interior te obedece, nada de afuera puede contigo. Confía en esa fortaleza que no hace ruido.",
+        "En {Pos} la valentía que necesitas no es ruidosa: es la de quedarte firme, respirar y no rendirte ante la primera contrariedad. Hay una capacidad de resistir que desconocías y se está probando justo ahora. Amate en el proceso, cuida tu energía y sigue: el coraje sereno siempre llega más lejos que el impulso."
+      ],
+      sombra: [
+        "En {Pos} hay una voz interna que te repetía que no puedes y la creíste de tanto repetirla: te tratas con más dureza que cualquier enemigo, te exiges, te castigas y eso te deja al pie de cada batalla. Esta carta no te pide ser más dura: te pide dejar de serlo contigo. Trátate como tratarías a quien más amas.",
+        "En {Pos} la presión te está volviendo contra ti misma: aguantas, callas, te esfuerzas de más y un día explotas donde menos conviene. Esa fuerza que gastas dominando todo termina derrumbándote. Baja la exigencia, pide ayuda y deja que alguien cargue contigo: la valentía también es saber cuándo ya."
+      ]
+    },
+    "El Ermitaño": {
+      luz: [
+        "En {Pos} necesitas un retiro breve y voluntario: bajar el ruido, alejarte un rato y escuchar a tu guía interior. La respuesta que buscas afuera está adentro, esperando que vayas a buscarla en silencio. Apaga el exceso, camina despacio y descansa: la claridad vuelve sola, y vuelve más fuerte.",
+        "En {Pos} una luz se enciende desde adentro: algo que sabías y habías olvidado regresa a ti en la soledad elegida. Un tiempo de recogimiento te está preparando un regalo de entendimiento. No lo pierdas por distraerte en lo urgente: lo importante de esta etapa se ve mejor con los ojos cerrados."
+      ],
+      sombra: [
+        "En {Pos} te estás aislando por miedo, no por paz: dejas de contestar, de salir, de pedir, y se te nota en la mirada. Ese silencio que eliges no te está sanando: te está desertando de tu propia vida. El cariño te espera ahí afuera, y abrir la puerta también es cuidado propio.",
+        "En {Pos} te encerraste en tu propio faro y ya no alumbras a nadie, empezando por ti: la soledad dejó de ser elección y se volvió costumbre. Te acostumbraste a no contar tus penas y a no recibir. Vuelve al mundo con pasos chicos, deja que te ayuden y suelta un poco el mando: no estás tan solo como te lo creíste."
+      ]
+    },
+    "La Rueda de la Fortuna": {
+      luz: [
+        "En {Pos} el destino gira a tu favor: lo que esperabas, pedías o necesitabas llega por una vía que no viste venir, y algo cambia de rumbo y te levanta: una oportunidad, una respuesta, un encuentro. No te aferres a lo viejo: suelta lo que la rueda deja atrás y deja entrar lo nuevo.",
+        "En {Pos} la marea cambia de signo y te lleva hacia aguas que te favorecen: lo que estaba frenado empieza a moverse y lo que se daba por perdido regresa, quizá transformado. Es momento de subirte al golpe en vez de esperar a pie: tu suerte se actúa, y la actúas hoy moviéndote."
+      ],
+      sombra: [
+        "En {Pos} te aferras a un pasado que la rueda ya giró: esperas que vuelva lo que se fue, que se repita lo que terminó, y así frenas lo que viene. El mundo no va a regresar por ti: va hacia adelante, contigo o sin ti. Suelta el andén, mira el giro que se acerca y camina al paso de tu propia historia.",
+        "En {Pos} sientes que la suerte te esquiva y que los golpes se repiten en la misma esquina de tu vida. Pero mira bien: los patrones que le echas al destino los fabrica la repetición que tú eliges. La rueda no está parada contra ti: está esperando que cambies de punto de partida."
+      ]
+    },
+    "La Justicia": {
+      luz: [
+        "En {Pos} la verdad regresa a su lugar: una cuenta que se cuadra, una decisión que se define justa, una palabra que era tuya y vuelve. Lo que sembraste se está cosechando con balanza equilibrada, y el resultado te favorece si tus manos están limpias. Asume con honradez y la justicia sonríe contigo.",
+        "En {Pos} llega el momento de ajustar cuentas contigo y con otros: firmas, acuerdos, compromisos, tu palabra dada. La claridad que pide esta carta te protege: escribe, anota, confirma y no dejes cabos sueltos. La justicia hecha con calma hoy te ahorra el juicio mañana."
+      ],
+      sombra: [
+        "En {Pos} hay una evasión que te cobra factura: dejaste algo a medias, una promesa, una verdad, una responsabilidad, y el peso se nota en tu espalda aunque no lo dejes ver. Esta carta solo pide una cosa: asume y repara la parte tuya. La paz regresa por la puerta de la honestidad.",
+        "En {Pos} sientes la vara caer encima de una injusticia que quizá tú misma ayudaste a sostener: medias verdades, acuerdos que firmas sin leer, culpas mal repartidas. Esta carta no te condena, te equilibra: reparte de nuevo las responsabilidades, corrige a tiempo y vuelve a tu centro."
+      ]
+    },
+    "El Colgado": {
+      luz: [
+        "En {Pos} una pausa que parece pérdida se está volviendo tu mayor escuela: lo que hoy sientes que pierdes, en realidad está preparando algo que todavía no alcanzas a ver completo. Esta demora, esta espera, este punto muerto está acomodando tu camino. Cambia el ángulo de la mirada, confía en la quietud y verás la revelación.",
+        "En {Pos} la solución no es empujar más: es soltar el control un momento y mirar tu vida desde otra posición. Lo que has hecho hasta aquí no alcanza, no porque esté mal, sino porque esta etapa pide entrega. Deja que el tiempo trabaje a favor y encuentra la salida que aparece cuando dejas de forzar."
+      ],
+      sombra: [
+        "En {Pos} te quedas colgado por miedo y le pones nombre de paciencia: una espera que ya es costumbre y un sacrificio que nadie te pidió. Te quedas quieta para no equivocarte y la vida pasa delante de ti. Esta carta te baja del gancho: muévete, decide y devuelve tu energía a tu propio camino.",
+        "En {Pos} el peso que soportas por otros se volvió tu identidad: te sacrificas, cedes y aguantas, convencida de que sufrir te hace buena, y nadie te lo agradece como imaginabas. Esta carta te devuelve el permiso de soltar lo que no es tuyo: dejar de cargar no es traicionar a nadie, es volver a ti."
+      ]
+    },
+    "La Muerte": {
+      luz: [
+        "En {Pos} algo termina para que algo mayor nazca: un ciclo, un vínculo, una etapa o una versión tuya que ya cumplió. Duele el adiós y lo sé, pero cada final que abrazas te despeja el terreno. No busques revivir lo que murió: agradece lo que te dio y camina hacia lo que empieza, más aliviada y más libre.",
+        "En {Pos} la vida te pide cerrar para abrir: hay un cambio profundo en marcha que no tiene vuelta atrás, y esa es la mejor noticia. Lo que se está transformando era demasiado pequeño para lo que viene. Suelta sin culpa, mira todo lo que dejas de cargar y deja que la nueva etapa te llame: naces de nuevo."
+      ],
+      sombra: [
+        "En {Pos} te niegas a dejar morir lo que ya murió: lo repasas, lo revives, le alargas la agonía y, mientras tanto, lo nuevo no encuentra sitio. El pasado que no sueltas te ocupa el presente entero. Esta carta es clara: soltar no es dejar de amar, es dejar de sangrar. Entierra de verdad para poder renacer.",
+        "En {Pos} hay un final que llevas años posponiendo por miedo: una relación, un trabajo, una costumbre, una casa que ya cumplieron su tiempo. Cada mes que lo sostienes artificial te cobra algo de vida. Esta carta no te anuncia desgracia: te anuncia la deuda que pagas por no soltar. Juégatela y cierra."
+      ]
+    },
+    "La Templanza": {
+      luz: [
+        "En {Pos} las piezas vuelven a encontrar su punto medio: cuerpo y mente, dar y recibir, trabajo y descanso se equilibran otra vez. La sanación que esperas llega con calma, como el agua al valle, sin necesidad de forzarla. Respira hondo y confía: la armonía que se restaura hoy sostiene todo lo que viene.",
+        "En {Pos} un equilibrio se está reconstruyendo después de un exceso o de un vacío: una mezcla justa de esfuerzo y descanso, de compañía y soledad. Este es el tiempo de la combinación serena, de pasos pequeños hacia el centro, sin grandes sacrificios. Ve despacio y verás cómo lo que estaba roto se va soldando solo."
+      ],
+      sombra: [
+        "En {Pos} los excesos te pasaron factura: mucho trabajo sin descanso, mucho dar sin recibir, mucho apuro sin pausa, y tu cuerpo y tu ánimo están pidiendo basta. Creíste que el desequilibrio era entrega y es cansancio. Vuelve al punto medio, a los horarios, a la moderación: ahí están tu paz y tu fuerza de regreso.",
+        "En {Pos} andas mezclando emociones a destiempo: lo que sientes y lo que haces caminan desincronizados, y esa turbulencia se nota en cada relación y en cada decisión. Un lado de ti se apresura y el otro se retira. Esta carta te pide bajar la intensidad y buscar la mezcla justa: nada de extremos hoy, solo centro."
+      ]
+    },
+    "El Diablo": {
+      luz: [
+        "En {Pos} por fin ves la cadena que te tenía atado: un miedo, una culpa, una costumbre o una persona que te encadenaba en silencio, y mirarla de frente ya es desatarla, porque la cadena existe mientras no la nombres. La llave nunca la tuvo otro: la tienes tú, y el momento de usarla es hoy.",
+        "En {Pos} te das cuenta de lo que te estaban vendiendo, la ilusión, el vínculo o el rol que te tenía enfocada en lo que no era tuyo. Verlo no te hace débil, te hace dueña de tu salida. Este es el instante de soltar la tentación que te costaba cara y recuperar tu propio aire."
+      ],
+      sombra: [
+        "En {Pos} hay una atadura que eliges porque la conoces más que a tu libertad: una persona que te desgasta, un vicio, una culpa, un miedo que se volvió tu sombra fiel. Y lo peor es que lo sabes y aún lo alimentas. Esta carta no te juzga: te muestra la puerta y la llave. Deja de pagar con tu paz el derecho a dejar una cadena.",
+        "En {Pos} algo o alguien te tiene atrapada por la promesa de lo que fue: te quedas por culpa, por miedo, por migajas. Esta relación, costumbre o compromiso se alimenta de tu energía y te devuelve casi nada. Corta el cable, agradece la lección y sal: la cadena solo tiene el poder que tú le dejas."
+      ]
+    },
+    "La Torre": {
+      luz: [
+        "En {Pos} una verdad sacude tus cimientos y duele, te acompaño en eso, pero lo que se cae hoy es preciso que caiga. Hay algo que construiste sobre arena, una confianza, un plan, una ilusión, y la vida te está devolviendo a tierra firme. Deja caer lo que se cae y reconstruye sobre lo que sí es verdad: esta luz que entra es liberación.",
+        "En {Pos} se rompe algo que parecía eterno y en la sacudida ganas una claridad que no tenías: por fin ves las grietas que todos veían menos tú. El golpe no viene a destruirte, viene a enseñarte dónde estaba lo falso. Suelta los restos, recoge lo bueno que hay en ti y vuelve a construir con los pies en la tierra."
+      ],
+      sombra: [
+        "En {Pos} sostienes con miedo una estructura que ya está cayendo: un trabajo que se acabó y no admites, una relación que hace ruido y sigues remendando, una falsa seguridad que te cuesta una fortuna emocional. Cada día que la sostienes artificial te resta fuerza para el después. Déjala caer ya: tu nueva construcción espera el terreno limpio.",
+        "En {Pos} el golpe que temes ya viene anunciado y las señales se fueron acumulando: quizá no es la casa que se cae, sino la versión de ti que se quedó pequeña. Nada sólido se construye sobre la mentira que eliges sostener. Esta carta te pide el valor de derribar tu propia fachada antes de que la derribe el golpe."
+      ]
+    },
+    "La Estrella": {
+      luz: [
+        "En {Pos} la tormenta amainó y tu fe regresa con más fuerza que antes: una herida antigua está cicatrizando y un deseo que creías perdido vuelve a pronunciarse. Tu estrella sigue arriba, encendida, y por fin la miras. Espera, cree y deja que la luz te bañe: lo sanado hoy es la base de lo que sueñas mañana.",
+        "En {Pos} se enciende una señal de esperanza que no se explica con lógica: un encuentro, un mensaje, una quietud que te devuelve la calma. Tu fe viene a rescatar lo que la rutina había apagado. Siembra ahora lo que quieres cosechar, agradece temprano y camina hacia la luz: el cielo te la está tendiendo."
+      ],
+      sombra: [
+        "En {Pos} tienes la luz encendida y la pasas mirando el gris: un mal día, una crítica, un miedo te están tapando lo que sí está bien. Tu estrella no se apagó, se te nubló la vista a fuerza de mirar los bordes. Vuelve la mirada a lo que existe, agradece lo que tienes y deja que la fe regrese.",
+        "En {Pos} perdiste la costumbre de creer: después de tanta promesa rota, dejas de pedir y de soñar para no sufrir. Pero tu historia no termina ahí: hay un regalo esperando tu mirada y solo te pide un resquicio. Deja entrar una esperanza pequeña: de ahí crece todo."
+      ]
+    },
+    "La Luna": {
+      luz: [
+        "En {Pos} hay algo que se mueve bajo la superficie y todavía no tiene nombre: una intuición, un cambio emocional, una marea que sube despacio. No todo es lo que parece y tu alma lo sabe. Camina con calma, escucha lo que sientas por las noches y no decidas aún: la verdad saldrá a la luz en su momento.",
+        "En {Pos} las emociones vienen y van como la luna sobre el agua: días claros, días inquietos, dudas que crecen en la oscuridad. Este tiempo pide más escucha que respuesta: observa, anota, descansa y espera. Hay secretos que se revelan solos y un presentimiento que tu ser te está guardando para acertar."
+      ],
+      sombra: [
+        "En {Pos} tu imaginación está agrandando sombras: un miedo que repites, un qué pasará que te quita el sueño, una sospecha sin pruebas que ya vive en tu cabeza. La noche le pone volumen a lo que en el día no tiene forma. Baja el miedo, sube la razón, pide información y descansa: la realidad es más amable que tu peor boceto.",
+        "En {Pos} hay una incertidumbre que no quieres mirar y te escondes de ella en distracciones: esperas señales, revisas conversaciones, relees mensajes. Y la luna está llena de pistas que tú misma niegas. Lo que desconoces duele menos que lo que adivinas a oscuras: enciende la pregunta, ponla en el centro y respóndela con datos, no con fantasmas."
+      ]
+    },
+    "El Sol": {
+      luz: [
+        "En {Pos} el sol sale para ti a pleno: alegría, éxito y vitalidad se alinean en tu camino. Lo que sembraste se ve, se celebra y se descansa: un logro llega, un cariño se confirma, una buena noticia te pinta el día. Vive este momento a lo grande, agradece en voz alta y comparte la luz: se multiplica cuando se da.",
+        "En {Pos} una claridad te baña: lo que era confuso se vuelve simple y lo que dudabas se confirma. Hay una energía de victoria cerca, un reconocimiento, una reconciliación, una buena nueva, y tú eres parte de ella. Sonríe, congela este momento y guárdalo para los días grises: este es tu presente prometido."
+      ],
+      sombra: [
+        "En {Pos} tienes el sol brillando y andas mirando nubes: te acostumbraste a lo bueno y solo reparas en lo que falta. La alegría no se está escapando, la estás subestimando. Esta carta te recuerda que tu luz sigue intacta dentro de ti: deja de esconderla por culpa o por miedo y permite que vean lo que eres.",
+        "En {Pos} pospones la celebración para cuando todo esté perfecto y ese día no llega nunca: el logro está, la risa falta. Te vuelves severo con tu propia felicidad, como si no la hubieras merecido. Esta carta no te pide más méritos: te pide permitirte estar bien. Alégrate hoy, aunque sea de una pausa: la felicidad también se entrena."
+      ]
+    },
+    "El Juicio": {
+      luz: [
+        "En {Pos} escuchas un llamado que no puedes ignorar: una parte tuya que quedó dormida vuelve a despertar y te llama a una segunda oportunidad. Es el instante de renacer, de responder, de levantarte de los arrepentimientos. El cielo te está convocando por tu nombre: levántate, que tu momento llegó.",
+        "En {Pos} se abre un juicio a tu favor: algo que estuvo pendiente, cuestionado o retrasado se resuelve y te absuelve. Una decisión madura que ya no esquivas te devuelve el control y la paz. Habla, actúa y presenta tu verdad con la conciencia tranquila: esta llamada te encuentra lista."
+      ],
+      sombra: [
+        "En {Pos} estás ignorando una llamada que dejó de sonar de tanto repetirte: una voz interior, un aviso, una opción que te pide decidir y nunca te defines. Dudas de tu valor y eso te deja atrás de tu propia vida. Esta carta te pide un sí: deja de escuchar a los demás sobre lo que puedes y escucha lo que tu corazón sabe.",
+        "En {Pos} te quedaste anclada en una versión vieja de ti por miedo al qué dirán: no subes, no cambias, no te permites renacer porque alguien te conoció de otra manera. Pero tu historia recién está en su mejor capítulo. Esta carta te absuelve de la culpa vieja: levántate y demuestra el tamaño nuevo de tu vida."
+      ]
+    },
+    "El Mundo": {
+      luz: [
+        "En {Pos} un ciclo llega a su cierre y el resultado te corona: lo que empezaste con dudas termina con honores, una etapa se completa y el horizonte se abre. Ya no falta nada importante: solo festeja, agradece y descansa antes del próximo giro. Cerraste bien, y ese cierre te abre la puerta grande.",
+        "En {Pos} reconoces la medida de tu propio camino: has avanzado más de lo que admites y el mundo se acomoda a tu alrededor para confirmarlo. Un logro grande redondea un período de esfuerzo y te devuelve la certeza. Da el último paso con los brazos abiertos: lo que sigue ya te está esperando."
+      ],
+      sombra: [
+        "En {Pos} quedaste a un paso de la meta y te detuviste: lo complicado ya pasó, pero el final te da vértigo y te quedas mirando. Culminar te asusta porque después qué. Esta carta te empuja con dulzura: cierra la etapa, recibe el premio que ya es tuyo y respira para el siguiente baile.",
+        "En {Pos} vives con la meta tan encima que ya no la ves: cerca del final te distraes, pospones el último esfuerzo y el ciclo queda inconcluso por un detalle que no ordenas. No es cansancio, es miedo a terminar y redefinirte. Culmina hoy esa última tarea, recoge los frutos y deja que tu nueva vida tenga pista."
+      ]
+    }
+  },
+
+  /* consejos: para cada arcano, el mensaje accionable que deja la lectura */
+  consejos: {
+    "El Loco": [
+      "Ábrete al comienzo que te tiembla: elige una dirección, comprométete con ella un tiempo y corrige sobre la marcha. La libertad no está en no decidir, está en atreverte a tu propia decisión. Da el primer paso hoy, sin esperar el mapa completo.",
+      "Empieza en pequeño la aventura que te asusta: un día concreto, un primer gesto, una puerta que llamas. Lo nuevo no pide que saltes de un golpe, pide que camines hacia él. Tu coraje crece en el camino, no en la orilla."
+    ],
+    "El Mago": [
+      "Muéstrate en acción: presenta la idea, di la palabra guardada, muestra lo que sabes hacer. El apoyo que necesitas llega cuando el otro puede verte en movimiento, no cuando imaginas el momento perfecto. Tu talento necesita pantalla y tú decides dársela.",
+      "Usa hoy una de tus herramientas en serio: el que sabe y actúa se vuelve indispensable. Deja de guardar tus dones para una ocasión que no llega: la ocasión eres tú cada mañana."
+    ],
+    "La Sacerdotisa": [
+      "Baja el volumen del mundo y hazle caso a esa certeza que llevas en el pecho: anota la primera impresión antes de racionalizarla. Tu radar ya leyó lo que las palabras todavía no confiesan. Una pausa de silencio hoy te regala la señal que andabas pidiendo.",
+      "Confía en lo que sientes aunque no tengas pruebas: si una situación te incomoda sin explicación, es dato. Escríbelo, respétalo y actúa despacio. La intuición no sustituye la razón, la precede."
+    ],
+    "La Emperatriz": [
+      "Vuelve a darte lo que siempre le das a otros: agenda tu cuidado, retoma la afición abandonada, nutre tu cuerpo y tu casa. Lo que cuides hoy es lo que florece mañana. Siembra una cosa con cariño y deja el resto en manos del tiempo.",
+      "Da a luz esa idea o ese proyecto que llevas gestando: no necesita ser perfecto, necesita nacer. Nutre tu creatividad como quien riega un jardín y verás que lo que deseas empieza a crecer a tu medida."
+    ],
+    "El Emperador": [
+      "Ordena un solo rincón desordenado: tus cuentas, tu agenda, tu palabra. El orden se recupera con estructura chica, no con ímpetu: define límites claros y sostenlos sin gritar. Tu autoridad se nota más en la constancia que en la fuerza.",
+      "Toma el mando de tu vida con calma firme: decide tus reglas, arma tu plan y defiéndelos ante quien quiera moverlos. El verdadero poder sobre tu camino no se pide, se ejerce, en silencio y cada día."
+    ],
+    "El Hierofante": [
+      "Busca la guía de quien ya caminó ese camino y acéptala aunque exija práctica: el maestro que te reta te ofrece un atajo de verdad. Pregunta, anota y aplica antes de discutir. Aprender de la experiencia de otro te ahorra años de prueba.",
+      "Vuelve a los fundamentos de lo que llevas tiempo haciendo: la base cierta, la rutina que construye, el compromiso sin brillo. A veces el avance no está en lo nuevo, está en honrar lo aprendido."
+    ],
+    "Los Enamorados": [
+      "Decide desde tu verdad y no desde el miedo a perder: imagina cada opción sin la presión de nadie y escucha cuál te deja más en paz. Luego habla claro: nombrar lo que sientes desata el resto. El amor se adelanta a quien se atreve.",
+      "Elige con el corazón entero y sin medias tintas: esta decisión define el rumbo de tus vínculos. Cuando dudes, pregúntate cuál de las dos opciones honra más a la persona que quieres ser. Esa es tu respuesta."
+    ],
+    "El Carro": [
+      "Elige una sola meta para la próxima temporada y quítale distracciones: define la única cosa que, lograda, cambia tu semestre. Actúa un paso cada día sin abandonar la dirección. La victoria no es del más rápido: es de quien no suelta el rumbo.",
+      "Frena la dispersión y dale un solo camino a tu energía: menos planes abiertos y uno en marcha. La fuerza que pierdes repartiéndote es la misma que te llevaría lejos si la concentras en una sola cosa."
+    ],
+    "La Fuerza": [
+      "Trátate hoy como tratarías a tu mejor amiga: suaviza el juicio, baja la exigencia y felicítate por algo concreto. La fortaleza que necesitas crece cuando dejas de guerrear contigo y empiezas a apoyarte. Respira ante la presión: ya has sobrevivido a mucho.",
+      "Mantén la calma ante lo que provoca: la respuesta serena es tu mayor poder y la gente lo nota. Controla lo que sientes en vez de reprimirlo: acógelo, respíralo y decide desde ahí, sin dejarte arrastrar."
+    ],
+    "El Ermitaño": [
+      "Regálate una pausa real antes de decidir: una caminata sola, un rato sin pantallas, un cuaderno abierto. La respuesta no está en más datos, está en el silencio que sigue al ruido. Vuelve a la conversación contigo que dejaste pendiente.",
+      "Aparta la semana para ti, sin rendir cuentas: ordena tu interior antes de volver a lo exterior. Lo que descubras en ese retiro corto vale más que meses de consejos ajenos."
+    ],
+    "La Rueda de la Fortuna": [
+      "Sube al golpe del cambio que sopla a tu favor: muévete con él en vez de esperar la señal perfecta, y suelta lo que la rueda deja atrás aunque haya sido bueno. Atrévete a girar: lo que viene está más a tu medida.",
+      "Prepara el terreno para la buena racha que llega: ordena, decide y comprométete hoy, porque el destino ayuda a quien lo espera en movimiento. Cuando el viento cambie, tú ya estarás con las velas listas."
+    ],
+    "La Justicia": [
+      "Ordena la parte que te toca de esta historia: una conversación, un acuerdo, una promesa que dejaste a medias. Escribe lo que de verdad piensas y actúa sin esconder cartas. La paz se edifica con hechos honestos y pequeños: da el primero hoy.",
+      "Reparte las cargas con justicia: lo que es tuyo, asúmelo; lo que no es tuyo, devuélvelo. Una decisión ecuánime hoy te ahorra una cadena de malentendidos mañana. La balanza se inclina a tu favor cuando actúas derecho."
+    ],
+    "El Colgado": [
+      "Detente antes de empujar: esta situación pide una pausa activa, no un golpe más de fuerza. Cambia tu punto de vista, hazte otra lectura del problema y deja que el tiempo decante. La salida que no aparece forzando, aparece mirando desde otro lado.",
+      "Suelta el control sobre lo que no depende de ti y gana perspectiva: lo que hoy parece callejón sin salida es un ángulo falso. Descansa la batalla, cambia el plan y vuelve cuando el panorama se haya aclarado."
+    ],
+    "La Muerte": [
+      "Deja partir lo que ya cumplió su tiempo: una despedida, un cierre, una etapa que solo sostienes por costumbre. Haz el duelo con ritos pequeños, agradece lo recibido y no lo revivas. La energía que recuperas del pasado es el combustible de lo nuevo.",
+      "Cierra ese capítulo con gratitud y decisión: lo que termina libera el espacio de lo que nace. No necesitas entender todo para soltar: necesitas soltar para poder avanzar. Hoy es un buen día para decir adiós a tiempo."
+    ],
+    "La Templanza": [
+      "Vuelve al punto medio en la zona que esté desbocada: horarios, esfuerzo, comida, compañía y silencio en equilibrio. La sanación no pide héroes, pide rutinas: pasos pequeños y constantes hacia el centro. Lo que hoy se equilibra sostiene lo que viene.",
+      "Mezcla con calma los opuestos de tu vida: trabajo y descanso, darlo y recibirlo, aventura y raíces. Tu mejor versión no vive en los extremos: vive en la mezcla serena que decides cuidar cada día."
+    ],
+    "El Diablo": [
+      "Nombra la cadena para desactivarla: la persona, el hábito, la culpa o el miedo que te tiene con llave. Escribe cuánto te cuesta cada mes y cuánto te devuelve. Luego corta una conexión real con un gesto concreto y celebra: la libertad se hace de cortes limpios.",
+      "Suelta una atadura concreta hoy: quita el permiso, borra el contacto, cambia el plan. Lo que te ata no se rompe con debates internos, se corta con un acto físico. Hazlo y respira: la cadena era más ruidosa que pesada."
+    ],
+    "La Torre": [
+      "Deja caer lo que ya avisa su caída: no remiendes la pared agrietada ni aplaques la verdad que pide ser dicha. El cambio dolerá menos hoy que mañana. Recoge de los escombros lo tuyo, tu valor y tu historia, y reconstruye sobre esa base firme.",
+      "Confiesa la verdad incómoda y haz espacio a la tormenta: lo que se limpia con transparencia no se pudre. Derriba hoy lo que está falso en tu vida y observa cuánta luz entra cuando los muros caen."
+    ],
+    "La Estrella": [
+      "Siembra una esperanza pequeña y concreta: un plan a seis meses, un deseo escrito, el primer paso hacia el sueño olvidado. La fe no se fabrica de golpe, se alimenta de gestos. Agradece algo real cada noche y verás crecer la luz.",
+      "Recupera el hábito de pedir y de desear sin miedo: anota tu sueño, decóralo y dale fecha. La esperanza no es pasiva, es práctica: cada paso hacia lo que quieres le da la razón a la estrella."
+    ],
+    "La Luna": [
+      "No decidas todavía por la inquietud nocturna: deja pasar un día antes de contestar, firmar o concluir. Escribe lo que te ronda, contrasta con datos y habla con alguien de confianza. La claridad llega cuando baja la marea, y la marea siempre baja.",
+      "Convierte el presentimiento en pregunta concreta: en lugar de adivinar, averigua. Busca la información que te falta, pide la conversación que evade y deja que el día aclare lo que la noche engrandece."
+    ],
+    "El Sol": [
+      "Permítete una dosis real de alegría hoy y no la conviertas en pendiente: celebra tu avance, regálate el plan o la compra que pospones, ríe con quien te suma. Tu luz no molesta, pide permiso. Guarda la prueba de lo bueno para los días grises.",
+      "Brilla sin esperar a que todos te aplaudan: haz visible lo que aprendiste, estrena tu talento y celebra tu esfuerzo. El mundo recibe con gusto tu energía cuando tú la dejas salir."
+    ],
+    "El Juicio": [
+      "Responde a la llamada que llevas aplazando: elige, confirma, preséntate, cambia. La segunda oportunidad no espera una confianza que ya tengas: se construye con el primer acto. Levántate y da el paso que la versión nueva de ti ya conoce.",
+      "Suelta el juicio sobre tu pasado y responde al presente: hoy es tu día de presentarte como quien eres ahora. Deja que te conozcan de nuevo y verás cuántas puertas se abren al otro lado de la antigua versión."
+    ],
+    "El Mundo": [
+      "Cierra el ciclo con los honores que le tocan: la última tarea, el agradecimiento, la celebración. No te quedes a medio paso de la meta por vértigo del después. Termina hoy y deja preparado el rincón donde entrará tu siguiente historia.",
+      "Recoge los frutos y festéjate: lo que lograste merece reconocimiento y descanso. Concluye lo pendiente con pulcritud, agradece a quien te ayudó y date permiso de habitar tu victoria antes de arrancar la siguiente."
+    ]
+  },
+
+  /* convierte la lectura en capítulos: con hasta 5 cartas, cada una es un
+     episodio; con más, se agrupan de a dos para que el relato no se alargue */
+  narrarGrupos(cartas, posiciones, fuerte) {
+    const pares = [];
+    if (cartas.length <= 5) {
+      cartas.forEach((c, i) => pares.push([{ c, pos: posiciones[i] || "" }]));
+    } else {
+      for (let i = 0; i < cartas.length; i += 2) {
+        pares.push(cartas.slice(i, i + 2).map((c, j) => ({ c, pos: posiciones[i + j] || "" })));
+      }
+    }
+    return pares.map(g => {
+      const partes = g.map(x => this.relatoDe(x.c, x.pos, fuerte || x.c.invertido ? "sombra" : "luz"));
+      return {
+        icono: g.map(x => x.c.emoji).join(""),
+        area: g.length === 1 ? "historia" : "colaboracion",
+        titulo: g.length === 1 ? `${g[0].c.nombre} · ${g[0].pos}` : this.nombrarCapitulo(g),
+        cartas: g,
+        regano: g.some(x => x.c.invertido),
+        texto: partes.length > 1 ? partes.join(" " + this.elegirDe(this.puentes) + " ") : partes[0]
+      };
+    });
+  },
+
+  nombrarCapitulo(g) {
+    const nombres = g.map(x => x.c.nombre).join(" y ");
+    const frases = g.map(x => this.fraseDePos(x.pos));
+    const unica = new Set(frases).size === 1;
+    return unica ? `${nombres} · ${frases[0]}` : `${nombres} · ${frases.join(" + ")}`;
+  },
+
+  /* elige la carta protagonista del consejo: prefiere las posiciones de guía o,
+     si no, la primera carta derecha de la lectura */
+  cartaDeConsejo(resultado) {
+    const cartas = resultado.cartas;
+    const posiciones = (resultado.tirada.posiciones || []).map(p => p[0]);
+    const prefer = ["Ayuda", "Resultado", "Consejo", "Tu fuerza", "Consejo del cielo", "Resultado final", "La lección", "Presente", "Presente que te sostiene"];
+    const conPos = cartas.map((c, i) => ({ c, pos: posiciones[i] || "" }));
+    const deGuia = conPos.filter(x => prefer.includes(x.pos));
+    const derecha = conPos.find(x => !x.c.invertido);
+    return (deGuia.find(x => !x.c.invertido) || deGuia[0] || derecha || conPos[0] || { c: cartas[0], pos: "" });
+  },
+
+  /* elige la carta protagonista del regaño: la primera que sale en sombra; si
+     no hay sombras, la lectura fuerte usa la primera carta */
+  cartaDeRegano(resultado) {
+    const cartas = resultado.cartas;
+    const posiciones = (resultado.tirada.posiciones || []).map(p => p[0]);
+    const sombra = cartas.findIndex(c => c.invertido);
+    const idx = sombra === -1 ? 0 : sombra;
+    return { c: cartas[idx], pos: posiciones[idx] || "" };
+  },
+
+  /* relato de una carta en su posición real: sustituye {Pos} por la frase */
+  relatoDe(c, posLabel, tono) {
+    const def = this.relatos[c.nombre];
+    const frags = def ? def[tono] : null;
+    const base = frags && frags.length
+      ? this.elegirDe(frags)
+      : ((this.esencia[c.nombre] || {})[tono] || "una carta que pide ser leída");
+    return base.split("{Pos}").join(this.fraseDePos(posLabel) || "tu historia");
+  },
+
+/* interpretación final: la lectura se cuenta como una historia propia, un
+     capítulo por cada carta (o pareja) en su posición real; el tono nace del
+     sentido de cada carta y la lectura cierra con un consejo accionable y,
+     cuando hay sombra real en la mesa, con un regaño dicho por quien regenta */
   interpretacionFinal(resultado) {
     const cartas = resultado.cartas;
     const total = cartas.length;
     const bien = cartas.filter(c => !c.invertido).length;
     const propor = bien / total;
     const cita = this.citas[Math.floor(Math.random() * this.citas.length)];
+    const posiciones = (resultado.tirada.posiciones || []).map(p => p[0]);
+    const fuerte = !!resultado.fuerte;
 
-const allAreas = [
-      {
-        icono: "🛡️", area: "situacion", clave: "miguel", titulo: "Situación y protección",
-        luz: [
-          "Estás entrando en una etapa en la que las cosas empiezan a resolverse solas, como si alguien hubiera movido las piezas por ti. Los problemas que te quitaron el sueño están perdiendo fuerza y el terreno que pisas se vuelve más seguro. No hace falta pelear de más: sostén tu rumbo y deja que lo trabado se destrabe. Tu momento es de construcción, no de guerra.",
-          "Hay una protección que no ves actuando a tu favor, y por eso lo que intentas hoy tiene más posibilidades de las que crees. Alguien o algo te está cuidando en la sombra, y se nota en las oportunidades que llegan en el momento justo. Camina con la cabeza en alto: lo que empiezas ahora tiene base firme. Confía en tu fuerza, que el cielo está de tu lado.",
-          "Las preocupaciones que te rodeaban están cediendo de a poco, como quien baja la marea. Lo que antes te dejaba en vela hoy tiene menos peso, aunque todavía no lo creas del todo. Es el momento de apostar por ti sin mirar atrás: tu camino se arregla solo cuando caminas con confianza. La puerta que se abre hoy no se cierra tan pronto."
-        ],
-        sombra: [
-          "Hay una puerta que dejaste abierta y por ella están entrando personas y situaciones que te agotan. No es mala suerte: es falta de límites, y tu energía se está yendo por donde no debe. Hoy tienes que elegir de quién te rodeas y a qué le das tu tiempo. Decir que no no ofende: te protege.",
-          "Has estado defendiendo a los demás más de lo que te defiendes a ti, y tu escudo está del lado equivocado. Peleas las batallas de otros mientras las tuyas se quedan sin dueño, y eso te tiene agotada y un paso atrás. Vuelve tu energía hacia ti: quien te valora no necesita que te sacrifiques, y quien no te valora no merece tu esfuerzo.",
-          "Hay gente cerca tuya que se alimenta de tu tiempo sin devolverte nada, y tú lo permites por costumbre o por pena. Ese patrón no se rompe con paciencia: se rompe con una decisión. Hoy pon un límite claro y sostenlo sin explicarlo tanto. Cuidarte no es egoísmo: es el único camino para que lo demás no te desborde."
-        ]
-      },
-      {
-        icono: "💞", area: "amor", clave: "chamuel", titulo: "Amor y relaciones",
-        luz: [
-          "El amor que esperas está más cerca de lo que piensas, y no se anuncia con fuegos artificiales: llega quieto, en una conversación, en una persona que ya conoces o en la forma en que un vínculo actual se profundiza. Lo que sembraste con paciencia está dando fruto, y alguien te quiere más de lo que admite. Abre las manos y recibe sin miedo: recibir también es parte del amor.",
-          "Hay un encuentro que viene a sanarte, y no tiene que ser romántico para sentirse así: puede ser una reconciliación, una amistad que vuelve o un amor que se confirma. Lo importante es que tu corazón está listo para abrirse otra vez. Deja espacio para lo bueno y no desprecies las señales por pequeñas. El cariño verdadero está cerca y espera tu permiso.",
-          "Estás rodeada de cariño y a veces no lo ves porque buscas el amor donde no está. Quien te quiere de verdad está más cerca de lo que crees, mostrándotelo a su manera, quizá no con la intensidad que tu mente pide. Abre los ojos a las señales que ya tienes: el amor que mereces ya está tocando tu vida. Recíbelo sin condiciones."
-        ],
-        sombra: [
-          "Hay un cariño que está dando todo y otro que solo recibe, y tú sabes exactamente cuál es el tuyo. Te quedas donde no te valoran por miedo a la soledad y confundes aguantar con querer. El amor no se gana sufriendo, y nadie te va a querer mejor porque tú sufras más. Quiérete tú primero: del amor que te des nace el que te dan los demás.",
-          "Estás esperando que alguien te dé la seguridad que tú no te das, y por eso cualquier distancia te desarma. Nadie puede llenar desde afuera el vacío que llevas dentro: eso solo lo haces tú. Deja de buscar en otros lo que te niegas a ti y empieza hoy a darte eso que les pides. El amor justo encuentra su lugar cuando dejas de pedir prestado el tuyo.",
-          "Hay algo que callas en tu relación o en tu deseo, y ese silencio está pesando más que cualquier palabra. Dejas de decir lo que sientes para no romper la paz, pero la paz que nace del silencio no es paz: es espera. Habla con honestidad, sin drama y a tiempo. Lo que se nombra se arregla; lo que se calla se desgasta."
-        ]
-      },
-      {
-        icono: "💚", area: "salud", clave: "rafael", titulo: "Salud y energía",
-        luz: [
-          "Tu cuerpo y tu mente están volviendo a alinearse, y la mejoría que notas no es casualidad: es el fruto de lo que has ido corrigiendo sin darle importancia. Sanar lleva su tiempo y tú estás justo en ese tramo de mejoría. No apures las cosas ni exijas señales grandes: cada descanso, cada comida y cada respiro cuenta. Estás sanando de verdad, aunque no lo sientas todos los días.",
-          "La energía que te faltaba está regresando de a poco, y con ella vuelven las ganas. Tu cuerpo te está pidiendo algo concreto y simple — dormir un poco más, moverte, bajar el ritmo — y si lo escuchas hoy, la recuperación se acelera. Celebra las pequeñas mejoras: son la prueba de que el equilibrio se está reconstruyendo. Vas bien, más de lo que crees.",
-          "Hay una calma que vuelve a instalarse en tu cuerpo después de un tiempo de tensión. Lo que te agotaba está soltando peso, y se nota en tu descanso y en tu respiración. Sostén ese cuidado en lo pequeño: agua, sueño, pausas. Tu salud se construye en el día a día, y a favor tuyo ya está trabajando el cielo en ese frente."
-        ],
-        sombra: [
-          "Hay una parte tuya que llevas descuidando con la excusa de que no hay tiempo: el descanso, el chequeo que pospones, el dolor que volviste normal. Tu cuerpo te está avisando, y cada señal que ignoras hoy se convierte en un problema mañana. Cuidarte no es egoísmo: es la base de todo lo demás. Empieza hoy con una sola cosa que pospones.",
-          "Te das a todos y al final no te queda nada, y tu cuerpo ya está cobrando esa cuenta con cansancio, irritabilidad o dolores que callas. Nadie va a venir a cuidarte si tú no empiezas: tú eres la primera en tu lista, no la última. Pon tu descanso y tus citas primero, aunque te sientas egoísta. La sanación empieza por ti.",
-          "Has normalizado un malestar que no deberías estar viviendo, y ya no recuerdas cómo se sentía estar bien. Sanar también es dejar de tratar lo anormal como normal y de poner tu salud en fila detrás de todo lo demás. No esperes a caer para cuidarte: detente antes. Un cuerpo cuidado hoy es una vida distinta mañana."
-        ]
-      },
-      {
-        icono: "📯", area: "mensajes", clave: "gabriel", titulo: "Mensajes y propósito",
-        luz: [
-          "La respuesta que esperas viene en camino, y llegará por donde menos la esperas: una conversación, un mensaje, una coincidencia que se repite. Presta atención a lo que se repite, porque ahí está el cielo hablándote de frente. Tu propósito se está aclarando y ya no necesitas el gran anuncio: las señales pequeñas marcan el paso. Escucha, y esta vez no fallarás.",
-          "Se acerca un mensaje que va a aclarar tus dudas, y quizá ya lo tengas delante sin reconocerlo: hay palabras que alguien te dijo, un texto que pasaste rápido o una idea que se te apareció dos veces. Ese es el hilo que debes tirar. No busques la gran revelación: cuenta las señales repetidas, y ahí está tu respuesta.",
-          "Tu mente se está ordenando y ya puedes ver con claridad por qué haces lo que haces. El mensaje que buscabas afuera lo tienes adentro, y los próximos días lo van a confirmar con señales externas. Escucha tu propia voz con más atención: esa también es la voz del cielo. Cuando alinees lo que sientes con lo que haces, la respuesta se vuelve evidente."
-        ],
-        sombra: [
-          "Llevas tiempo escuchando solo lo que quieres oír y descartando lo que te incomoda, y por eso te sorprenden verdades que ya te estaban avisando. El mensaje que evitas es justo el que necesitas: te obligaría a cambiar algo. Deja de taparte los oídos y vuelve a escuchar lo que se repite. La respuesta no llega hasta que haces silencio y la aceptas.",
-          "Hay palabras que no estás diciendo y mensajes que no envías, y ese silencio te tiene dando vueltas. No es que el cielo no te hable: es que te desconectaste de tu propia voz y de tu propia verdad. Di lo que sientes, aunque quede expuesto, y verás cómo aparece la señal. La claridad llega cuando avanzas con lo que ya sabes.",
-          "Te distraes con ruido para no oír la verdad que ya conoces, y cada pregunta nueva es una manera de no obedecer la que ya te respondieron. La respuesta no cambia porque no te guste: lo que falta es ponerla en práctica. Deja de pedir señales nuevas y camina con la que ya tienes en la mano."
-        ]
-      },
-      {
-        icono: "💰", area: "economia", clave: "uriel", titulo: "Economía y abundancia",
-        luz: [
-          "El dinero está volviendo a fluir, y no por casualidad: lo que ordenaste y cuidaste en silencio empieza a devolverte. Hay oportunidades cerca que otros no ven todavía, y tú sí: una puerta está por abrirse en lo laboral o en un ingreso nuevo. Adminístrate con calma y decide con claridad. No mires cuánto hay a un lado del camino: mira hacia dónde va.",
-          "Se está abriendo una puerta económica que no habías previsto, y te va a pedir una decisión rápida pero clara. Lo que hoy administras bien se vuelve lo que mañana te sostiene, así que cuida los detalles: ahí está tu oportunidad. No se trata de esperar un golpe de suerte: se trata de estar lista cuando tu puerta llame. Ordena una cosa hoy y el flujo responde.",
-          "El caos económico que temías se está calmando y tu dinero vuelve a tener rumbo. Hay una claridad en el frente material que no tenías hace un tiempo, y esa claridad se va a notar en oportunidades concretas. Aunque la cifra no sea grande todavía, la dirección cuenta más que la cantidad. Da un paso con orden hoy: la abundancia responde a quien administra."
-        ],
-        sombra: [
-          "Tus números piden orden, y lo sabes: hay gastos que se repiten, promesas que suenan fuerte y no llegan, y una sensación de que el dinero se te escapa. No es castigo, es aviso. Cierra las fugas, pon límites a tu generosidad y mira tus cuentas de frente, hoy. El dinero también necesita reglas, y tú mereces tenerlas.",
-          "Tu dinero refleja tus decisiones repetidas, no tu suerte: hay gastos que tapan vacíos y apariencias que te cuestan caras. Ordena tu casa antes de pedirle al cielo: la abundancia no llega donde hay desorden o engaño. Escribe lo que entra y lo que sale, corta lo que no suma y deja espacio para lo bueno. Cambia una decisión hoy y el patrón empieza a romperse.",
-          "Hay algo que evitas mirar en tu economía: el miedo a ver los números, a pedir lo que vales o a soltar lo que ya no te conviene. Esa ceguera te cuesta más que el problema que evitas. Mira la hoja, la cifra, la conversación que pospones: nombrarlo es el primer paso para arreglarlo. No es tu valor, es un número: se ordena, se corrige y se mejora."
-        ]
-      },
-      {
-        icono: "🔓", area: "bloqueo", clave: "zadkiel", titulo: "Bloqueos a liberar",
-        luz: [
-          "La liberación ya empezó, aunque todavía no lo notes del todo. El peso que cargabas desde hace tiempo está perdiendo fuerza porque dejaste de alimentarlo, y se nota en esa respiración más profunda cuando sueltas algo. Perdonar — a otros y a ti — abre todo lo demás. Caminas más ligera de lo que recuerdas: lo que sigues llevando es nostalgia de un peso que ya no existe.",
-          "Hay una cadena que tú sigues poniendo y que ya no tiene razón de ser: una culpa vieja, un rencor que repasaste mil veces o un miedo que ya venció. No se trata de que el otro cambie: se trata de que tú sueltes lo que te toca cargar desde la memoria. Hoy puedes dejar la piedra. La paz no depende de lo que pasó, depende de lo que decidas soltar.",
-          "Algo que te ataba está perdiendo fuerza, y lo notas en un desapego nuevo que sientes. Perdonar no es olvidar: es dejar de cargar lo que ya cumplió su tiempo. Recoge tu energía del pasado y ponla en tu presente, donde sí produce fruto. El cielo ya desató lo que tocaba desatar: ahora solo falta caminar sin mirar atrás."
-        ],
-        sombra: [
-          "Llevas una cadena que tú mismo eliges no soltar: un agravio que repasaste cien veces, una culpa que no es tuya, un perdón que te niegas a darte. Cada vez que lo recuerdas, la vuelves a cargar: el otro quizá ni lo sabe. Perdonar no es para quien te hizo daño: es para que tú dejes de pagar ese recuerdo con tu paz. Suelta la piedra hoy.",
-          "Te aferras a tu dolor como si fuera tu nombre, y esa historia de «soy quien fue herido» se volvió tu escudo y tu jaula a la vez. Ya cumplió: el recuerdo no te salva, te retiene. Frente a ti hay más vida que memoria, y es tuya. Deja de presentarte por lo que te pasó y empieza a caminar por lo que vas a hacer.",
-          "Hay un peso que traes por lealtad: no quieres soltar la tristeza porque soltarla te parece traicionar lo que amaste o lo que te marcó. Pero la cadena no honra a nadie: te ata a ti. Puedes honrar lo bueno sin cargar lo que te destruye. Hoy agradece lo que fue, deja lo pendiente atrás y vuelve a tu propia vida: te está esperando."
-        ]
-      },
-      {
-        icono: "🌟", area: "futuro", clave: "jofiel", titulo: "Futuro e inspiración",
-        luz: [
-          "Lo que viene está alineado contigo más de lo que imaginas, y tu luz ya está floreciendo aunque tu mente todavía la mida con dudas. Suelta lo que cumplió su tiempo: dejarlo no pierde nada, libera espacio para lo nuevo. El futuro no se recibe, se camina, y tu próximo paso con fe es el que abre lo que sigue. Confía en el proceso: el cielo está acomodando todo a tu favor.",
-          "Se acerca una etapa más luminosa, con una belleza que aún no puedes ver completa. No necesitas verlo todo: necesitas dar el primer paso con fe, porque tu luz ya alumbra el camino. El proyecto, la idea o el cambio que llevas en el corazón tiene más futuro del que te atreves a creer. Cultívalo en silencio: al florecer va a sorprenderte.",
-          "El futuro se está ordenando a tu favor, y lo que sembraste en épocas difíciles empieza a tener forma. Hay inspiración volviendo a ti: una idea, un deseo, una dirección que se repite. Ese es tu norte. No lo mires como un premio lejano: míralo como el fruto de cada cosa que ya estás haciendo bien. Da el paso de hoy y lo demás se acomoda."
-        ],
-        sombra: [
-          "Estás pintando tu futuro con los colores del pasado y del miedo, y por eso ves amenazas donde solo hay cambios. El porvenir llega a quien lo camina, no a quien lo teme: mientras sigas mirando atrás o comparándote, se te pasa adelante. Suelta la idea de que todo saldrá como la vez pasada. Enciende tu luz de nuevo: tu futuro empieza en la decisión de hoy.",
-          "Comparas tu camino con los atajos de otros y por eso crees que vas tarde. No vas tarde: solo estás midiéndote con la regla equivocada. Tu camino es el único que te toca y tiene un ritmo que nadie más tiene que entender. Deja de mirar hacia los lados y vuelve a ti: la inspiración regresa cuando te mides con tu propia luz, no con la del vecino.",
-          "Estás posponiendo tu alegría y lo que te ilumina «para cuando todo esté bien», y ese momento no llega solo. La inspiración no espera a que la merezcas: se cultiva en el ahora. Retoma hoy una sola cosa que amas — una afición, un sueño, una conversación — y deja que tu luz recuerde el camino. Tu futuro no se te escapa: se construye con lo que haces hoy."
-        ]
-      }
-    ];
+    /* capítulos de la historia: cada carta (o pareja) narrada en su posición */
+    const finalBloques = this.narrarGrupos(cartas, posiciones, fuerte);
 
-    /* filtra solo las áreas de los arcángeles que participan en esta lectura */
-    const elegidos = (resultado.__arcangeles || this.arcangelesDeLectura(resultado)).map(a => a.clave);
-    let areas = allAreas.filter(a => elegidos.includes(a.clave));
+    /* el consejo lo deja la carta guía de la lectura */
+    const consejo = this.cartaDeConsejo(resultado);
+    const cc = consejo.c;
+    finalBloques.push({
+      icono: cc.emoji,
+      area: "consejo",
+      titulo: `El consejo de ${cc.nombre}${consejo.pos ? ` · ${consejo.pos}` : ""}`,
+      arcangel: this.arcangelDeMensaje(resultado),
+      regano: false,
+      texto: this.elegirDe(this.consejos[cc.nombre] || [
+        "Elige una acción concreta y hazla hoy: esa es la mejor respuesta que puede darte tu lectura."
+      ])
+    });
 
-    /* en la Lectura Fuerte corta, no siempre se repiten las mismas 7 áreas:
-       se muestra una mezcla de 5 para variar de lectura en lectura */
-    if (resultado.fuerte && areas.length > 5) {
-      const sobrantes = this.barajar([...areas]).slice(0, areas.length - 5);
-      areas = areas.filter(a => !sobrantes.includes(a));
+    /* el regaño aparece cuando hay sombra real en la mesa (3+ cartas) o la
+       lectura viene fuerte: lo dice la primera carta en sombra, en su lugar */
+    const sombras = cartas.filter(c => c.invertido);
+    if (total >= 3 && (fuerte || sombras.length)) {
+      const reg = this.cartaDeRegano(resultado);
+      const rc = reg.c;
+      const regente = this.arcangelDeMensaje(resultado);
+      const sombraRelato = this.relatos[rc.nombre] ? this.relatoDe(rc, reg.pos, "sombra") : "";
+      finalBloques.push({
+        icono: "🔥",
+        area: "regano",
+        titulo: `El regaño de ${rc.nombre}${reg.pos ? ` · ${reg.pos}` : ""}`,
+        arcangel: regente,
+        regano: true,
+        presencia: this.elegirDe([
+          `${regente.nombre} no te suelta la mano, pero hoy te aprieta fuerte:`,
+          `${regente.nombre} se planta frente a ti con su ${regente.regencia.toLowerCase()} en la mano:`,
+          `${regente.nombre} te mira fijo y no te deja apartar la vista:`,
+          `${regente.nombre} levanta la voz para que la escuches, y lo dice con amor de fuego:`
+        ]),
+        texto: `${sombraRelato} ${this.elegirDe(this.empujes)}`,
+        cartasHtml: this.reganoCartaHtml(sombras.slice(0, 5))
+      });
     }
 
     const cierrePoderoso = propor >= 0.5
@@ -678,61 +989,6 @@ const allAreas = [
           "No ignores esta lectura como las anteriores: por algo llega fuerte. El cambio que evitas es pequeño frente al peso que cargas. Decide hoy una cosa, solo una, y hazla: ese primer paso desata lo demás. Estás más cerca de la salida de lo que crees."
         ]);
 
-    const finalBloques = areas.map(a => {
-      const tono = resultado.fuerte ? "fuerte" : (propor >= 0.5 ? "luz" : "sombra");
-      const texto = tono === "fuerte"
-        ? this.elegirDe(this.voces[a.clave].fuerte)
-        : this.elegirDe(a[tono] || (propor >= 0.5 ? a.luz : a.sombra));
-      return {
-        icono: a.icono,
-        area: a.area,
-        titulo: a.titulo,
-        arcangel: this.arcangeles[a.clave],
-        regano: resultado.fuerte || propor < 0.5,
-        texto
-      };
-    });
-
-    // regaño moldeado por las cartas reales, dicho por el arcángel que
-    // corresponde al contexto de las cartas (no siempre el mismo).
-    const clavesAreas = areas.map(a => a.clave);
-    const regente = this.arcangelDeMensaje(resultado, clavesAreas);
-    const presenciaRegano = this.elegirDe([
-      `${regente.nombre} no te suelta la mano, pero hoy te aprieta fuerte:`,
-      `${regente.nombre} se planta frente a ti con su ${regente.regencia.toLowerCase()} en la mano:`,
-      `${regente.nombre} te mira fijo y no te deja apartar la vista:`,
-      `${regente.nombre} levanta la voz para que la escuches, y lo dice con amor de fuego:`
-    ]);
-    /* el regaño moldeado por las cartas solo tiene sentido con 3+ cartas:
-       con una sola carta no hay sombras que contrastar ni combinación que formar */
-    if (resultado.cartas.length >= 3) {
-      if (resultado.fuerte) {
-        finalBloques.push({
-          icono: "🔥",
-          area: "fuerte",
-          titulo: "El regaño final",
-          arcangel: regente,
-          regano: true,
-          presencia: presenciaRegano,
-          texto: this.regañoDeCartas(resultado, regente)
-        });
-      } else if (propor < 0.5) {
-        finalBloques.push({
-          icono: "🔥",
-          area: "regano",
-          titulo: "Lo que tus cartas te regañan",
-          arcangel: regente,
-          regano: true,
-          presencia: presenciaRegano,
-          texto: this.regañoDeCartas(resultado, regente),
-          cartasHtml: this.reganoCartaHtml(resultado.cartas.filter(c => c.invertido))
-        });
-      }
-    }
-
-    /* la combinación de cartas solo aparece a partir de 3 cartas: con una sola
-       no hay nada que combinar */
-    if (resultado.cartas.length >= 3) finalBloques.push(this.bloqueCombinacionGlobal(resultado));
     finalBloques.push({ cierre: true, texto: cierrePoderoso, cita });
     return finalBloques;
   },
@@ -753,89 +1009,6 @@ const allAreas = [
     "Pasado que te marcó": "zadkiel",
     "Futuro que se acerca": "jofiel",
     "Resultado final": "jofiel"
-  },
-
-  /* voces de cada arcángel en primera persona: opinión luminosa, aviso
-     matizado o regaño firme; el arcángel nunca nombra las cartas, solo
-     entrega el mensaje que su lectura le inspira */
-  voces: {
-    miguel: {
-      luz: "Arcángel Miguel te dice: hoy estás protegida y más fuerte de lo que crees. Nada puede tumbarte mientras camines con fe y pongas tus límites. Esta pelea no es tuya sola: la ganamos los dos.",
-      mixto: "Arcángel Miguel te dice: tienes protección, sí, pero hay una grieta que no puedes seguir ignorando. Hay gente cerca que gasta tu energía y tú no dices nada. Refuerza tu escudo, elige bien tus peleas y no dejes tu cuidado en manos de quien no te cuida.",
-      sombra: "Arcángel Miguel te regaña: bajaste tu escudo demasiado pronto. Estás expuesta donde no hay protección y entregas tu fuerza donde no te valoran. Es hora de ponerte firme, reclamar tu lugar y dejar de dar tu poder a quien no lo merece. Levántate y defiéndete.",
-      fuerte: [
-        "Estás en tu punto más vulnerable y todavía no quieres verlo: abres tu puerta a quienes llegan solo a sacar, y confundes tolerancia con generosidad. Este no es momento de explicarte, es momento de blindarte. Corta hoy lo que te desangra, aunque duela, y deja de pedir permiso para cuidarte. Tu paz no se negocia: se defiende.",
-        "Llevas tanto tiempo cediendo tu lugar, agachando la cabeza y dejando que otros decidan por ti, que confundiste humildad con rendirte. Vuelve a sentarte en tu propia silla: reclama lo tuyo, corta en seco lo que te desgasta y camina con la dignidad de quien sabe que quien lo protege también lo obliga. Hoy empieza tu defensa.",
-        "Hay gente cerca que solo aparece cuando necesita algo, y tú lo sabes: te conviertes en su plan B, en su préstamo, en su pañuelo, y ellos en tu costumbre. Dices que no puedes decir que no, que te da pena, que mejor no armar ruido, y mientras tanto ellos se llenan de tu energía. Ese patrón termina el día que entiendas que tu tiempo no se regala.",
-        "Has puesto tu escudo delante de quien jamás lo pondría por ti: defiendes, justificas y soportas por otros lo que no tolerarías para ti misma. Pregúntate por qué eres tan cuidadosa con su paciencia y tan dura contigo. Defiende a quien también te defienda y espera a quien también te espere: tu protección no es un regalo, es un derecho."
-      ]
-    },
-    chamuel: {
-      luz: "Arcángel Chamuel te dice: el amor real ya está tocando tu corazón. El amor va a llegar, a sanar o a liberarte justo lo que necesitas. Abre las manos y recibe, sin miedo a querer ni a que te quieran. El cielo confirma tu unión.",
-      mixto: "Arcángel Chamuel te dice: hay amor, sí, pero también hay un nudo que duele en silencio. No confundas silencio con paz ni distancia con indiferencia. Habla lo que sientes con honestidad: decirlo no rompe nada, callarlo sí puede romperlo todo.",
-      sombra: "Arcángel Chamuel te regaña: estás poniendo tu corazón donde no lo cuidan, o cerrando la puerta a quien sí te quiere bien. Deja de rogar cariño donde solo hay ego. Quiérete con dignidad: el amor que mereces empieza por el que tú misma te das.",
-      fuerte: [
-        "Sigues entregando tu corazón a quien te lo devuelve roto y encima te sientes culpable, como si querer más fuera la prueba de amar mejor. Confundes amor con sacrificio y perdonas lo que ni siquiera te han pedido perdón. Quiérete con dignidad o el amor pasará de largo: el cariño que mereces nace de ti, no de la obediencia de otro.",
-        "Buscas en otros lo que te niegas a darte, y por eso cada vínculo termina doliendo igual: el patrón no son ellos, eres tú eligiendo quedarte donde no te valoran. Corta el círculo hoy: pon tu nombre primero en tu propia lista, y el amor que pide entrar encontrará una casa que ya sabe cuánto vale.",
-        "El guion se repite y ya lo conoces: empiezas ilusionada, luego cedes de todo y terminas vacía diciéndote que esta vez es distinto. No lo es, y lo sabes. La única carta que cambia el juego eres tú: cambia tu parte hoy y el libreto entero se rompe.",
-        "Esperas que otro te escoja para poder quererte, como si tu valor estuviera en ser elegida, y por eso das todo de ti a quien llega tarde y se va temprano. El amor que esperas por la puerta de enfrente ya está en tu casa: es el que no te has dado. Quiérete primero, sin condiciones, y mira cómo cambia la fila en tu puerta."
-      ]
-    },
-    rafael: {
-      luz: "Arcángel Rafael te dice: estás sanando, de verdad. Tu cuerpo, tu mente y tu alma se están equilibrando otra vez. Respira hondo, descansa y confía: la medicina del cielo ya trabaja en ti.",
-      mixto: "Arcángel Rafael te dice: la sanación viene en camino, pero hay algo que te niegas a atender. Ese cansancio, ese dolor o esa calma que pospones tiene voz. Escúchala hoy: cuidarte no es egoísmo, es el único camino para seguir brillando.",
-      sombra: "Arcángel Rafael te regaña: deja de descuidarte. Te das a todos y no te queda nada para ti, y tu cuerpo te lo está avisando. No dejes para mañana tu salud ni tu paz: el descanso y el cuidado no se ganan, se toman. Empieza hoy.",
-      fuerte: [
-        "Estás apagando la única vela que ilumina tu vida, y esa vela eres tú: siempre dejas tu salud y tu descanso para el final, siempre eres la última de tu lista, y tu cuerpo ya te está cobrando la cuenta. Deja de sacrificarte por quienes ni se dan cuenta. Cuidarte no es egoísmo: es tu obligación más sagrada. Hoy, una sola cosa: descansa.",
-        "Cuidas a todos menos a ti: sostienes, escuchas, cargas, y cuando te miras al espejo ya no te reconoces. Tu energía no es infinita, y tu cuerpo lo está anotando en cansancio, en dolores que ya volviste normales, en ese sueño que no descansa. Di no hoy a lo que te vacía y di sí al descanso que evitas: la sanación empieza por la única persona que puede hacerlo por ti.",
-        "Tu cuerpo lleva una contabilidad que no quieres abrir: el cansancio que niegas, el dolor al que le quitas importancia, la ansiedad que escondes detrás de la rutina. No hace falta que te digan nada: lo cuentan tus hombros, tu respiración y tu sueño. Hoy no te pido la gran transformación: elige una sola cosa que te cuide y hazla como si fuera sagrada.",
-        "Tratas tu salud como un trámite que harás cuando puedas, y cada señal que ignoras hoy se convierte en un problema mañana. Tu energía es el suelo donde crece todo lo demás: si no te cuidas, nada de lo que quieres puede florecer. No esperes a caer para detenerte: detente antes, que es donde se gana."
-      ]
-    },
-    gabriel: {
-      luz: "Arcángel Gabriel te dice: la respuesta que esperas viene en camino y tu propósito se aclara. Presta atención a las señales, a las palabras y a las coincidencias: por ahí te está hablando el cielo, y esta vez no fallarás.",
-      mixto: "Arcángel Gabriel te dice: la verdad está cerca, pero llega envuelta en ruido. No te apresures: revisa lo que escuchas, compara lo que crees, y el mensaje puro llegará a tu corazón sin que tengas que forzarlo.",
-      sombra: "Arcángel Gabriel te regaña: dejaste de escuchar. Repites lo que quieres oír en vez de lo que necesitas, y por eso sigues en el mismo lugar. Cállate un momento, vuelve a preguntar y abre los oídos: la respuesta no llega hasta que haces silencio.",
-      fuerte: [
-        "Llevas años oyendo lo que quieres oír y tapando lo que necesitas: te escondes detrás del ruido, del miedo y de las excusas para no escuchar la verdad que ya sabes. Hoy calla todo, siéntate y escucha de frente: la respuesta siempre estuvo ahí. No pidas más señales si no piensas obedecerlas.",
-        "Andas juntando señales como si el cielo no te hubiera hablado mil veces: esa coincidencia que se repitió, esa conversación que no quieres retomar, ese aviso que pasaste de largo. La respuesta no cambia porque no te guste. Lo que falta no es una señal nueva: falta que obedezcas la que ya tienes.",
-        "No necesitas más información: necesitas silencio para entender la que ya tienes. Te dices que no sabes qué hacer, pero sí lo sabes; solo te asusta hacerlo. Cállate las excusas un día y escucha tu propia voz, que también es la del cielo hablándote por dentro. La claridad y la acción llegan juntas si le obedeces.",
-        "Llevas tiempo diciendo qué casualidad cada vez que la señal pasa frente a tus ojos, para no tener que contestarla. Esa conversación, ese mensaje, esa idea que se repite: era una llamada de frente. Deja de preguntar lo mismo a las cartas y empieza a obedecer lo que ya te respondieron."
-      ]
-    },
-    uriel: {
-      luz: "Arcángel Uriel te dice: tu luz interior se encendió y ahora ves con claridad lo que otros no ven. Confía en esa certeza que sientes en el pecho: tus decisiones tienen luz propia y te llevarán a buen puerto.",
-      mixto: "Arcángel Uriel te dice: tienes la verdad cerca, pero el impulso te empuja a decidir antes de tiempo. Detente, mira y compara. La sabiduría no está en actuar más rápido, sino en mirar más profundo.",
-      sombra: "Arcángel Uriel te regaña: estás actuando por impulso y dejando que la emoción nuble tu juicio, y eso te está costando caro. Pide tiempo, toma distancia y decide con la luz, no con el miedo. No corras: primero mira.",
-      fuerte: [
-        "Llevas tanto tiempo dudando que ya no es prudencia: es miedo con disfraz, y mientras tanto la vida se te pasa esperando el momento perfecto. No actúes por impulso, sí, pero tampoco te quedes parada: mira con claridad, decide con firmeza y camina. El que no elige, elige perder.",
-        "Pusiste tu vida en pausa esperando garantías que nunca van a llegar, y mientras tanto las oportunidades se acercan y se van sin encontrar a nadie en la puerta. No necesitas ver todo el camino: necesitas encender la antorcha y caminar. Estás a una sola decisión firme de cambiar tu rumbo: tómala hoy.",
-        "Tu parálisis tiene nombre y es miedo: esa prudencia que repites es la excusa perfecta para no equivocarte, y no equivocarte se volvió tu forma de no vivir. Mira, sí, pero con plazo. La sabiduría no es esperar a tener certeza: es decidir con la luz que ya tienes y ajustar en el camino.",
-        "El análisis ya cumplió: lo que estudias por millonésima vez no gana verdad, gana retraso, y cada vuelta que le das a lo mismo es un paso que tu vida no da. Elige hoy una dirección con lo que sabes y comprométete. El camino se ilumina mientras caminas, no mientras ensayas el paso."
-      ]
-    },
-    zadkiel: {
-      luz: "Arcángel Zadkiel te dice: la liberación llegó. Suelta la culpa, perdona lo que haya que perdonar y siente cuánta libertad entra cuando dejas de cargar el pasado. El pasado pesa menos hoy: esta es tu hora de soltar las cadenas y caminar ligero.",
-      mixto: "Arcángel Zadkiel te dice: la llave está en tu mano, pero hay una cadena que tú mismo sigues poniendo. No se trata solo de que otros te suelten: hay algo que debes soltar tú. Date permiso hoy y el cielo te sostiene.",
-      sombra: "Arcángel Zadkiel te regaña: llevas demasiado tiempo atada a la culpa, al rencor o a un pasado que ya no existe. Cada día que no perdonas, la cadena pesa más. Suelta la piedra, perdónate y perdona: tu alma no fue hecha para cargar tanto.",
-      fuerte: [
-        "El pasado que arrastras es tuyo porque tú lo cargas, no porque te lo hayan puesto: cada vez que vuelves a contarlo, la cadena se cierra de nuevo. Perdonar no es para el otro, es para ti, y si el otro no se arrepiente, perdonas igual para soltarte. El rencor te está comiendo viva y lo sabes: basta de justificarlo.",
-        "Llevas años presentándote como alguien que fue herido, como si ese recuerdo fuera tu nombre, y ya te cansó ver la vida desde esa ventana pero no te atreves a bajarte. Lo que te pasó ya no te define, salvo que tú lo mantengas en el trono. Suelta la historia que te cuentas sobre tu pasado y deja que hoy sea otro principio.",
-        "Ese agravio, esa culpa y esa persona se fueron, pero tú sigues pagando su alquiler con paz, sueño y presente. Cada vez que la memoria repasa la herida, la herida se actualiza. Corta el ciclo hoy: perdona no porque lo merezcan, sino porque tú necesitas soltar el peso.",
-        "Mientras mides y repasas cada traición, el otro vive su vida y tú vives la de él, en círculos. Perdonar no borra lo que pasó: deja de cobrárselo a tu presente. Suelta la factura, agradece la lección y vuelve a tu propia vida, que te está esperando."
-      ]
-    },
-    jofiel: {
-      luz: "Arcángel Jofiel te dice: la belleza y la luz que buscas ya están floreciendo a tu alrededor. Rodéate de lo que te hace bien, confía en tu creatividad y verás tu mundo brillar con tus propios colores. Lo bueno que esperas ya viene.",
-      mixto: "Arcángel Jofiel te dice: hay luz, pero todavía tienes los ojos puestos en lo que no fue. Deja de mirar atrás y déjate inspirar por lo nuevo. La belleza no entra donde la mirada anda nublada: limpia tu ventana y verás.",
-      sombra: "Arcángel Jofiel te regaña: dejaste de ver la luz que sí tienes. Te comparas con otros y apagas tu propio camino, y así la inspiración huye de ti. Deja de mirar a un lado y enciende tu propia lámpara: tu belleza no necesita permiso.",
-fuerte: [
-        "Tienes un sol dentro y pasas la vida mirando la lámpara del vecino: te comparas, te quitas valor y apagas tu chispa mientras admiras las de otros. Tu camino no es el de nadie más y tu belleza no pide permiso. Deja de mirar a los lados, mira hacia ti, y verás que lo que buscas ya estaba en ti.",
-        "Cedes tu luz, tu tiempo y tu creatividad para que otros brillen, y te quedas con lo que sobra, convencida de que tu momento todavía no llega. Tu inspiración no es un favor que prestas: es un derecho que usas. Vuelve a ti, retoma lo que amas y dilo en voz alta. Cuando tu luz se encienda por fin, nada podrá apagarla.",
-        "Cuando miras el camino de otros, dejas de ver el tuyo, que es el único que te toca: detrás de la vida que envidias hay un precio que no pagaste ni querrías pagar. Vuelve a tus propios sueños, retómalos desde donde los dejaste, y verás que tu luz siempre estuvo encendida, solo tapada por tu propio miedo.",
-        "Llevas tanto tiempo dejando lo que te ilumina para cuando todo esté bien que olvidaste cómo se siente: la alegría no espera a que la merezcas, se cultiva en el ahora. Retoma hoy una sola cosa que amas, una nada más, y deja que tu sonrisa recuerde el camino. Tu futuro no se te escapa: se construye con lo que haces hoy."
-      ]
-    }
   },
 
   /* interpretación de la gran tirada: cada arcángel habla de sus dos temas,
@@ -862,19 +1035,9 @@ fuerte: [
       const inv = b.temas.filter(t => t.carta.invertido).length;
       const tenor = inv === 0 ? "luz" : (inv === b.temas.length ? "sombra" : "mixto");
       const arc = b.arcangel;
-      const nombreTemas = b.temas.map(t => t.tema.toLowerCase()).join(" y ");
-      let texto;
-      if (resultado.fuerte) {
-        texto = this.elegirDe(this.voces[b.clave].fuerte);
-      } else if (tenor === "sombra") {
-        const cs = b.temas.map(t => t.carta);
-        texto = this.elegirDe([
-          `${arc.nombre} revisa ${nombreTemas} y encuentra tus cartas dadas vuelta: ${cs.map(c => `${c.nombre} invertida ${this.esencia[c.nombre] ? "muestra " + this.esencia[c.nombre].sombra : "no quiere ser mirada"}`).join("; ")}. Atiende ese lugar hoy: la sombra se va cuando la miras de frente.`,
-          `${arc.nombre} te habla firme en ${nombreTemas}: todas las cartas de este rincón te muestran su revés, y cada una señala la misma puerta. ${cs.length === 1 ? "Mira la carta que te avisa: no es un no, es un desvío que corregir." : "No es un no: es el patrón que repites en este terreno."} Devuélveles la luz desde su ${arc.regencia.toLowerCase()}.`
-        ]);
-      } else {
-        texto = this.elegirDe(this.voces[b.clave][tenor]);
-      }
+      const texto = b.temas.map(t =>
+        this.relatoDe(t.carta, t.tema, (resultado.fuerte || t.carta.invertido) ? "sombra" : "luz")
+      ).join(" " + this.elegirDe(this.puentes) + " ");
       return {
         icono: arc.emoji,
         area: b.clave,
