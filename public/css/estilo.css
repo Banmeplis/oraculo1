@@ -665,7 +665,7 @@ h3 { font-size: 1.25rem; }
 .titulo-arcangel { color: rgb(var(--arc-color)); }
 .titulo-arcangel-nombre { color: rgb(var(--arc-color)); text-shadow: 0 0 18px rgba(var(--arc-color),0.45); }
 .particulas-arcangel { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
-.particulas-arcangel i { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: rgb(var(--arc-color)); box-shadow: 0 0 10px 2px rgba(var(--arc-color),0.8); opacity: 0; animation: particulaArcangel 4.8s linear infinite; }
+.particulas-arcangel i { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: rgb(var(--arc-color)); box-shadow: 0 0 12px 3px rgba(var(--arc-color),0.9); opacity: 0; animation: particulaArcangel 4.8s linear infinite; }
 .particulas-arcangel i:nth-child(1) { left: 12%; bottom: 8%; animation-delay: -0.8s; }
 .particulas-arcangel i:nth-child(2) { left: 28%; bottom: -4%; animation-delay: -2.1s; }
 .particulas-arcangel i:nth-child(3) { left: 52%; bottom: 14%; animation-delay: -3.4s; }
@@ -768,28 +768,32 @@ h3 { font-size: 1.25rem; }
 .mazo.mazo-layout { margin-top: 14px; margin-bottom: 4px; }
 
 /* Avatar de arcángel con partículas (resultados y chips) */
-.arc-avatar { position: relative; display: inline-block; width: 26px; height: 26px; border-radius: 50%; flex: none; }
-.arc-avatar img { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; display: block; border: 2px solid rgb(var(--chip)); box-shadow: 0 0 12px rgba(var(--chip), 0.9); mix-blend-mode: screen; }
-.arc-avatar i { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: rgb(var(--chip)); box-shadow: 0 0 6px 1px rgba(var(--chip), 0.9); animation: arcP 2.6s ease-in-out infinite; }
-.arc-avatar i:nth-child(1) { top: -6px; left: 50%; animation-delay: -0.4s; }
-.arc-avatar i:nth-child(2) { top: 50%; right: -7px; animation-delay: -1.2s; }
-.arc-avatar i:nth-child(3) { bottom: -7px; left: 40%; animation-delay: -2s; }
-.arc-avatar i:nth-child(4) { top: 8%; left: -7px; animation-delay: -2.8s; }
+.arc-avatar { position: relative; display: inline-block; width: 46px; height: 46px; border-radius: 50%; flex: none; }
+.arc-avatar img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; display: block; border: 3px solid rgb(var(--chip)); box-shadow: 0 0 18px rgba(var(--chip), 0.95); mix-blend-mode: screen; }
+.arc-avatar i { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: rgb(var(--chip)); box-shadow: 0 0 8px 2px rgba(var(--chip), 0.95); animation: arcP 2.6s ease-in-out infinite; }
+.arc-avatar i:nth-child(1) { top: -8px; left: 50%; animation-delay: -0.4s; }
+.arc-avatar i:nth-child(2) { top: 50%; right: -10px; animation-delay: -1.2s; }
+.arc-avatar i:nth-child(3) { bottom: -10px; left: 38%; animation-delay: -2s; }
+.arc-avatar i:nth-child(4) { top: 6%; left: -10px; animation-delay: -2.8s; }
 @keyframes arcP {
   0%, 100% { opacity: 0; transform: translateY(2px) scale(0.6); }
   50% { opacity: 1; transform: translateY(-2px) scale(1.25); }
 }
-.ar-chip .arc-avatar { margin-right: 8px; }
+.ar-chip .arc-avatar { margin-right: 10px; }
 
 /* Partículas flotantes dentro del div del arcángel (bloques de resultado) */
 .bloque-categoria, .mensaje-poderoso { position: relative; }
 .arc-part { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; border-radius: inherit; }
 .bloque-categoria > :not(.arc-part), .mensaje-poderoso > :not(.arc-part) { position: relative; z-index: 1; }
-.arc-part i { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: rgb(var(--arc-color, 212, 175, 55)); box-shadow: 0 0 10px 2px rgba(var(--arc-color, 212, 175, 55), 0.85); opacity: 0; animation: particulaArcangel 4.5s linear infinite; }
-.arc-part i:nth-child(1) { left: 8%; top: 22%; animation-delay: -1s; }
-.arc-part i:nth-child(2) { right: 12%; top: 55%; animation-delay: -2.6s; }
-.arc-part i:nth-child(3) { left: 18%; bottom: 12%; animation-delay: -3.6s; }
-.arc-part i:nth-child(4) { right: 20%; bottom: 30%; animation-delay: -1.8s; }
+.arc-part i { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: rgb(var(--arc-color, 212, 175, 55)); box-shadow: 0 0 14px 4px rgba(var(--arc-color, 212, 175, 55), 0.9); opacity: 0; animation: particulaArcangel 4.5s linear infinite; }
+.arc-part i:nth-child(1) { left: 8%; top: 18%; animation-delay: -1s; }
+.arc-part i:nth-child(2) { right: 10%; top: 48%; animation-delay: -2.6s; }
+.arc-part i:nth-child(3) { left: 16%; bottom: 14%; animation-delay: -3.6s; }
+.arc-part i:nth-child(4) { right: 22%; bottom: 34%; animation-delay: -1.8s; }
+.arc-part i:nth-child(5) { left: 42%; top: 8%; animation-delay: -0.4s; }
+.arc-part i:nth-child(6) { right: 38%; top: 66%; animation-delay: -3.1s; }
+.arc-part i:nth-child(7) { left: 64%; bottom: 10%; animation-delay: -1.2s; }
+.arc-part i:nth-child(8) { right: 6%; top: 30%; animation-delay: -4.2s; }
 
 /* ------------------------------- blog ----------------------------------- */
 .post {
@@ -1029,9 +1033,9 @@ h3 { font-size: 1.25rem; }
 .arcangel-regente .ar-regencia { font-size: 0.85rem; color: var(--lavanda); letter-spacing: 0.5px; }
 .arcangel-regente .ar-fila { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .arcangel-regente .ar-chip {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 5px 12px; border-radius: 999px;
-  font-size: 0.82rem; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 14px; border-radius: 999px;
+  font-size: 0.85rem; font-weight: 600;
   color: var(--nocturno);
   background: linear-gradient(135deg, rgba(var(--chip), 0.95), rgba(var(--chip), 0.75));
   box-shadow: 0 4px 14px rgba(var(--chip), 0.5);
@@ -1112,12 +1116,16 @@ h3 { font-size: 1.25rem; }
 }
 .combo-carta.inv img { filter: brightness(0.7) saturate(0.85); }
 .combo-carta.inv .c-nm { opacity: 0.6; transform: rotate(180deg); }
-.combo-significado {
-  flex: 1 1 100%; text-align: center;
-  margin-top: 8px; font-size: 0.92rem; line-height: 1.45;
+.combo-significado { flex: 1 1 100%; text-align: center; margin-top: 10px; font-size: 1.5rem; line-height: 1.6; font-family: var(--fuente-serif); color: var(--blanco-humo); max-width: 760px; margin-left: auto; margin-right: auto; }
+.combo-significado b { color: var(--dorado); font-size: 1.5rem; }
+.combo-consejo, .combo-regano {
+  flex: 1 1 100%; text-align: center; font-size: 1.5rem; line-height: 1.6;
   font-family: var(--fuente-serif); color: var(--blanco-humo);
+  max-width: 760px; margin: 10px auto 0;
 }
-.combo-significado b { color: var(--dorado); font-size: 0.95rem; }
+.combo-consejo b { color: #7ee8c8; font-size: 1.5rem; }
+.combo-regano b { color: #ff9e6d; font-size: 1.5rem; }
+.combo-regano { border-top: 1px dashed rgba(255, 158, 109, 0.4); padding-top: 10px; }
 .combo-mini {
   display: flex; flex-direction: column; align-items: center; gap: 4px;
   max-width: 96px; padding: 7px 6px 5px; border-radius: 12px;
@@ -1227,9 +1235,9 @@ h3 { font-size: 1.25rem; }
 }
 .bloque-categoria .cat-icono { font-size: 1.3rem; }
 .bloque-categoria h4 .cat-arc {
-  display: inline-flex; align-items: center; gap: 5px;
-  margin-left: 8px; padding: 3px 11px; border-radius: 999px;
-  font-size: 0.74rem; font-weight: 700; color: var(--nocturno);
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-left: 8px; padding: 5px 14px; border-radius: 999px;
+  font-size: 0.85rem; font-weight: 700; color: var(--nocturno);
   background: linear-gradient(135deg, rgba(var(--chip), 0.95), rgba(var(--chip), 0.7));
   box-shadow: 0 3px 10px rgba(var(--chip), 0.45);
   vertical-align: middle;
@@ -1495,6 +1503,15 @@ footer.pie .enlace { color: var(--dorado); text-decoration: none; }
   background: linear-gradient(120deg, rgba(255,255,255,0.04), transparent 30%, rgba(255,255,255,0.02));
   pointer-events: none;
 }
+.rd-particulas { position: absolute; inset: 0; overflow: hidden; pointer-events: none; border-radius: inherit; z-index: 0; }
+.rd-particulas i { position: absolute; border-radius: 50%; background: rgb(var(--arc-dia, 212,175,55)); box-shadow: 0 0 14px 4px rgba(var(--arc-dia, 212,175,55), 0.95); opacity: 0; animation: rdParticulas linear infinite; }
+.regente-dia .rd-cabecera, .regente-dia .rd-cuerpo { position: relative; z-index: 1; }
+@keyframes rdParticulas {
+  0% { opacity: 0; transform: translateY(30px) translateX(0) scale(0.5); }
+  15% { opacity: 0.95; }
+  70% { opacity: 0.35; }
+  100% { opacity: 0; transform: translateY(-280px) translateX(24px) scale(1.25); }
+}
 .regente-dia .rd-cabecera {
   display: flex;
   align-items: center;
@@ -1603,6 +1620,58 @@ nav.menu a.btn-whatsapp:hover {
   box-shadow: 0 6px 16px rgba(37, 211, 102, 0.55);
 }
 .btn-whatsapp .wa-ico { width: 18px; height: 18px; flex: none; }
+
+/* aviso animado al pasar el cursor sobre el botón WhatsApp */
+.btn-whatsapp {
+  position: relative;
+}
+.btn-whatsapp::after {
+  content: "✨ Lectura personalizada";
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  background: linear-gradient(135deg, #25d366, #128c46);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  padding: 7px 13px;
+  border-radius: 999px;
+  box-shadow: 0 6px 18px rgba(37, 211, 102, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 60;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.btn-whatsapp::before {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #128c46;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 60;
+  transition: opacity 0.25s ease;
+}
+.btn-whatsapp:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+.btn-whatsapp:hover::before {
+  opacity: 1;
+}
+@keyframes waFlota {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-4px); }
+}
+.btn-whatsapp:hover::after {
+  animation: waFlota 1.6s ease-in-out infinite;
+}
 
 /* ==================== contador de visitantes (odómetro) ================= */
 .odometro {

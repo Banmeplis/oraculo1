@@ -283,6 +283,19 @@ window.INICIO = (function () {
     document.getElementById("rd-firma").textContent = "— " + arc.nombre.replace("Arcángel ", "") + ", tu guardián de hoy";
 
     caja.style.setProperty("--arc-dia", arc.color.join(","));
+
+    /* muchas partículas del color del arcángel, flotando por toda la tarjeta */
+    var existentes = caja.querySelector(".rd-particulas");
+    if (existentes) existentes.remove();
+    var particulas = "";
+    for (var n = 0; n < 24; n++) {
+      particulas += '<i style="left:' + (Math.random() * 100).toFixed(1) +
+        "%;bottom:" + (Math.random() * 45).toFixed(1) +
+        "%;width:" + (3 + Math.random() * 5).toFixed(1) + "px;height:" + (3 + Math.random() * 5).toFixed(1) + "px;" +
+        "animation-duration:" + (4 + Math.random() * 4).toFixed(2) + "s;" +
+        "animation-delay:-" + (Math.random() * 6).toFixed(2) + 's"></i>';
+    }
+    caja.insertAdjacentHTML("beforeend", '<div class="rd-particulas" aria-hidden="true">' + particulas + "</div>");
   }
 
   function init() {
