@@ -1349,7 +1349,6 @@ const TIRADAS = {
   combinacionDePregunta(resultado) {
     const arc = this.arcangelDeMensaje(resultado);
     const A = this.nombreCorto(arc.nombre);
-    const R = arc.regencia.toLowerCase();
     const q = this.escapar(String(resultado.pregunta || "").trim());
     const grupo = this.elegirGrupoCombinacion(resultado.cartas);
     const cartas = grupo.map(c => ({ nombre: c.nombre, img: c.img, emoji: c.emoji, invertido: c.invertido, palabras: c.palabras }));
@@ -1383,18 +1382,18 @@ const TIRADAS = {
     let texto;
     if (tipo === "normal") {
       texto = this.elegirDe([
-        `${sobre}${A} une estas cartas para responderte: ${encadenar(derechas)}. Cuando dos luces se tocan, tu consulta no se queda en palabras: lo que preguntas ya viene en movimiento y a tu favor. ${A} lo confirma desde su ${R}: camina con fe.`,
-        `${sobre}la combinación te responde: ${encadenar(derechas)}. ${A} ve estas luces juntas y te dice que no es azar: el cielo te está afirmando el camino.`
+        `${sobre}${A} une estas cartas para responderte: ${encadenar(derechas)}.`,
+        `${sobre}la combinación te responde: ${encadenar(derechas)}.`
       ]);
     } else if (tipo === "sombra") {
       texto = this.elegirDe([
-        `${sobre}las cartas se pliegan juntas y dicen una sola cosa: hay un patrón que se repite en lo que preguntas. ${A} te habla desde su ${R}: antes de que esto se resuelva, hay algo tuyo que corregir. La sombra no es castigo: es el mapa que faltaba.`,
-        `${sobre}la consulta se responde con todas las cartas en sombra: ${encadenar(invertidas)}. ${A} ve que insistes donde la energía todavía no está lista. No es un no del cielo: es un alto para que cambies de método, no de meta.`
+        `${sobre}las cartas se pliegan juntas y dicen una sola cosa: ${encadenar(invertidas)}.`,
+        `${sobre}la consulta se responde con todas las cartas en sombra: ${encadenar(invertidas)}.`
       ]);
     } else {
       texto = this.elegirDe([
-        `${sobre}${A} combina dos voces: ${encadenar(derechas)}; y en paralelo, ${encadenar(invertidas)}. Juntas forman tu respuesta: lo que ya avanza en lo que preguntas y lo que debes soltar para que se destrabe. ${A} sostiene esa balanza desde su ${R}.`,
-        `${sobre}la combinación mezcla señal y aviso: ${encadenar(derechas)}; mientras tanto, ${encadenar(invertidas)}. ${A} te dice: la respuesta que buscas llega cuando afirmas lo bueno y corriges lo pendiente.`
+        `${sobre}${A} combina dos voces: ${encadenar(derechas)}; y en paralelo, ${encadenar(invertidas)}.`,
+        `${sobre}la combinación mezcla señal y aviso: ${encadenar(derechas)}; mientras tanto, ${encadenar(invertidas)}.`
       ]);
     }
 
@@ -1412,32 +1411,32 @@ const TIRADAS = {
 
     let consejo = tipo === "normal"
       ? this.elegirDe([
-          `Mi consejo sobre tu pregunta: da el paso que ya sientes correcto y no pidas más señales. ${A} dice que tu consulta ya está respondida: ahora falta el acto.`,
-          `Sobre lo que preguntas, actúa hoy una cosa pequeña y real: la luz de esta combinación se confirma en el movimiento, no en la espera.`
+          `Da el paso que ya sientes correcto y no pidas más señales. Tu consulta ya está respondida: ahora falta el acto.`,
+          `Actúa hoy una cosa pequeña y real: la luz de esta combinación se confirma en el movimiento, no en la espera.`
         ])
       : (tipo === "sombra"
           ? this.elegirDe([
-              `Ante tu pregunta, mi consejo es frenar antes de insistir: suelta la forma que venías usando, descansa y vuelve a preguntar con el corazón liviano. ${A} te acompaña en ese descanso.`,
+              `Frena antes de insistir: suelta la forma que venías usando, descansa y vuelve a preguntar con el corazón liviano.`,
               `No dejes que el miedo decida por ti: la sombra te pide un cambio concreto, no una retirada. Corrige el rumbo y vuelve a intentar con calma.`
             ])
           : this.elegirDe([
-              `Mi consejo para tu pregunta: quédate con lo que ya funciona y corrige UNA sola cosa de las que la sombra señala. Un paso, hoy.`,
-              `Responde tu consulta en dos actos: confirma lo que avanza y suelta lo que pesa. El orden de los pasos también es parte de la señal.`
+              `Quédate con lo que ya funciona y corrige UNA sola cosa de las que la sombra señala. Un paso, hoy.`,
+              `Confirma lo que avanza y suelta lo que pesa. El orden de los pasos también es parte de la señal.`
             ]));
 
     let regano = tipo === "normal"
       ? this.elegirDe([
-          `Y el regaño de ${A} sobre tu pregunta: no conviertas la respuesta clara que te acabo de dar en otra excusa para esperar. Hoy, con calma, actúala.`,
-          `Lo único que ${A} te reclama: que pidas otra vez lo que la combinación ya te respondió. Escucha, decide y deja de repetir la consulta.`
+          `No conviertas la respuesta clara que acabo de darte en otra excusa para esperar. Hoy, con calma, actúala.`,
+          `Deja de pedir otra vez lo que la combinación ya te respondió. Escucha, decide y no repitas la consulta.`
         ])
       : (tipo === "sombra"
           ? this.elegirDe([
-              `${A} te regaña sin crueldad: llevas la respuesta delante y no la quieres ver. Estas cartas te señalan tu tarea; hazla antes de volver a preguntar.`,
-              `Y te hablo fuerte, ${A}, porque la pregunta que repites no se cansa: la sombra sigue ahí esperando tu cambio, no tu miedo.`
+              `Llevas la respuesta delante y no la quieres ver. Estas cartas te señalan tu tarea; hazla antes de volver a preguntar.`,
+              `La pregunta que repites no se cansa: la sombra sigue ahí esperando tu cambio, no tu miedo.`
             ])
           : this.elegirDe([
-              `${A} te reclama una sola cosa: no te quedes solo con la mitad que te gusta de la respuesta. La sombra también contesta tu pregunta, y esa parte también es tuya.`,
-              `El regaño de hoy: no busques una combinación «perfecta» para seguir preguntando. Esta mezcla ES la respuesta: afírmala y corrige.`
+              `No te quedes solo con la mitad que te gusta de la respuesta. La sombra también contesta tu pregunta, y esa parte también es tuya.`,
+              `No busques una combinación «perfecta» para seguir preguntando. Esta mezcla ES la respuesta: afírmala y corrige.`
             ]));
 
     return { tipo, texto, cartas, consejo, regano, enfocada: true };
