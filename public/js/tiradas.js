@@ -292,7 +292,46 @@ const TIRADAS = {
     "La Luna":        { grupo: "animo",       luz: "la marea emocional que navegas con calma",     sombra: "temor a sombras que tu imaginación agranda" },
     "El Sol":         { grupo: "animo",       luz: "la alegría plena, el éxito y la vitalidad",    sombra: "tener el sol y andar mirando nubes" },
     "El Juicio":      { grupo: "espiritual",  luz: "el llamado a despertar y renovarte",           sombra: "dudar de tu valor y quedarte atrás" },
-    "El Mundo":       { grupo: "trabajo",     luz: "el ciclo completo y la meta alcanzada",        sombra: "detenerte a un paso de la meta" }
+    "El Mundo":       { grupo: "trabajo",     luz: "el ciclo completo y la meta alcanzada",        sombra: "detenerte a un paso de la meta" },
+
+    /* ---------------- arcanos menores ---------------- */
+    "As de Copas":    { grupo: "afectos",     luz: "el nido, el bienestar en casa y la familia que crece", sombra: "cerrarte al cariño y al hogar que te sostiene" },
+    "Dos de Copas":   { grupo: "afectos",     luz: "la unión que se concreta y la vida que nace de ti",      sombra: "idealizar un vínculo sin que pise tierra firme" },
+    "Tres de Copas":  { grupo: "otro",        luz: "una noticia nueva e inesperada que llega a tu puerta",   sombra: "quedarte esperando mensajes ajenos para sentirte vivo" },
+    "Cinco de Copas": { grupo: "animo",       luz: "una temporada de celebraciones, alegría y reconocimiento", sombra: "enfrascarte en preparar la fiesta y perderte la fiesta" },
+    "Seis de Copas":  { grupo: "afectos",     luz: "la nostalgia que ablanda y la gente querida que vuelve",   sombra: "quedarte a vivir en el pasado y no ver el presente" },
+    "Siete de Copas": { grupo: "animo",       luz: "la plenitud: recoges los frutos de tu esfuerzo",          sombra: "no creerte la abundancia y guardarla sin disfrutar" },
+    "Ocho de Copas":  { grupo: "afectos",     luz: "las buenas influencias que te abren puertas",             sombra: "depender del favor ajeno más que de tu propio paso" },
+    "Nueve de Copas": { grupo: "espiritual",  luz: "la entrega y el desapego que devuelven lo sembrado",      sombra: "dar tanto que se te olvida pedir y recibir" },
+    "Sota de Copas":  { grupo: "persona",     luz: "una mujer sensible y soñadora que ama de verdad",         sombra: "enamorarte del cuento de alguien y no de su realidad" },
+    "Caballero de Copas": { grupo: "persona", luz: "el caballero andante que se entrega a su ideal",          sombra: "perseguir quimeras sin echar raíces en lo real" },
+    "Rey de Copas":   { grupo: "persona",     luz: "la sensibilidad madura que acompaña sin empujar",         sombra: "vivir en el país de los sueños y no aterrizar nunca" },
+
+    "Cuatro de Espadas":  { grupo: "animo",   luz: "la pausa reparadora que evita que el bache te tumbe",     sombra: "un tramo de dolores y aislamiento que conviene atender pronto" },
+    "Cinco de Espadas":   { grupo: "animo",   luz: "venirte de la trinchera con la cabeza alta",              sombra: "una disputa fuerte que amenaza con dejar heridas" },
+    "Seis de Espadas":    { grupo: "animo",   luz: "cruzar con paciencia el tramo de conflictos",             sombra: "un viaje con contratiempos y planes que se encallan" },
+    "Siete de Espadas":   { grupo: "animo",   luz: "un atisbo de esperanza que te devuelve la confianza",     sombra: "un subidón de esperanza que desordena tus razones" },
+    "Nueve de Espadas":   { grupo: "animo",   luz: "una angustia que, atravesada, te deja más fuerte",        sombra: "el sufrimiento y los miedos por lo que más amas" },
+    "Sota de Espadas":    { grupo: "persona", luz: "una mujer resuelta y perspicaz que ve lo oculto",         sombra: "una enemiga capaz de urdir las intrigas más absurdas" },
+    "Caballero de Espadas": { grupo: "persona", luz: "el caballero de la fortaleza que defiende causas justas", sombra: "una disputa o un mensaje duro que exige decisión" },
+    "Rey de Espadas":     { grupo: "persona", luz: "la mente clara y la autoridad serena que corta el ruido",  sombra: "enredos, engaños y acuerdos que no terminan de cumplirse" },
+
+    "As de Oros":         { grupo: "trabajo", luz: "el triunfo: éxito y prosperidad en lo que tocas",          sombra: "no creerte que la suerte también te toca a ti" },
+    "Dos de Oros":        { grupo: "animo",   luz: "una noticia o un ingreso que suaviza la tensión",          sombra: "una rivalidad que compite por tu tiempo y tu paz" },
+    "Tres de Oros":       { grupo: "espiritual", luz: "la fecundidad: una idea o un amor que nace y crece",    sombra: "improvisar sin madurar las decisiones" },
+    "Cuatro de Oros":     { grupo: "trabajo", luz: "la prosperidad y el obsequio que te da seguridad",         sombra: "el amor al dinero que te vuelve tacaño de corazón" },
+    "Cinco de Oros":      { grupo: "animo",   luz: "los vínculos afectivos que marcan un antes y un después",  sombra: "desavenencias y celos que enfrían lo que estaba por venir" },
+    "Seis de Oros":       { grupo: "trabajo", luz: "las dificultades que se resuelven solas y engordan la cosecha", sombra: "la codicia y las envidias que enturbian lo que viene" },
+    "Nueve de Oros":      { grupo: "otro",    luz: "los cambios que te invitan a cerrar asuntos viejos",       sombra: "engaños, promesas que no se cumplen y amistades perdidas" },
+
+    "Dos de Bastos":      { grupo: "otro",    luz: "la cercanía: viajes cortos y alegrías sencillas",         sombra: "buscar la felicidad lejos cuando la tienes al lado" },
+    "Tres de Bastos":     { grupo: "espiritual", luz: "el amor universal y la visión de que todos somos hermanos", sombra: "perder la espiritualidad por las prisas de lo diario" },
+    "Cuatro de Bastos":   { grupo: "animo",   luz: "los cimientos que se afianzan y la alegría compartida",   sombra: "la melancolía que no te deja celebrar lo logrado" },
+    "Seis de Bastos":     { grupo: "animo",   luz: "poner nombre al bajón y empezar a remontar",              sombra: "la depresión y el ánimo por los suelos que paralizan" },
+    "Siete de Bastos":    { grupo: "trabajo", luz: "el buen hacer y el reconocimiento por el trabajo bien hecho", sombra: "defender tu puesto en vez de caminar por él" },
+    "Ocho de Bastos":     { grupo: "animo",   luz: "cortar una atadura y recuperar tu libertad",              sombra: "dependencias que te controlan por costumbre" },
+    "Sota de Bastos":     { grupo: "persona", luz: "una mujer enérgica y apasionada que enciende proyectos",   sombra: "el carácter que se vuelve impulso y celos" },
+    "Rey de Bastos":      { grupo: "persona", luz: "la experiencia que manda con carisma y templanza",         sombra: "las ambiciones que pesan y el fuego que agota" }
   },
 
   /* agrupa cartas por su contexto (alegría, tristeza, personas, decisiones...) */
@@ -764,6 +803,351 @@ const TIRADAS = {
         "En {Pos} quedaste a un paso de la meta y te detuviste: lo complicado ya pasó, pero el final te da vértigo y te quedas mirando. Culminar te asusta porque después qué. Esta carta te empuja con dulzura: cierra la etapa, recibe el premio que ya es tuyo y respira para el siguiente baile.",
         "En {Pos} vives con la meta tan encima que ya no la ves: cerca del final te distraes, pospones el último esfuerzo y el ciclo queda inconcluso por un detalle que no ordenas. No es cansancio, es miedo a terminar y redefinirte. Culmina hoy esa última tarea, recoge los frutos y deja que tu nueva vida tenga pista."
       ]
+    },
+    /* ------------------------- arcanos menores ------------------------- */
+    /* --- bastos --- */
+    "Dos de Bastos": {
+      luz: [
+        "En {Pos} las alegrías se visten de cercanía: viajes cortos, escapadas de fin de semana y charlas con amigos, vecinos o hermanos que te devuelven la sonrisa. La carta te invita a buscar la felicidad en lo inmediato y no en lo lejano, porque está tan cerca que a veces no la ves. Lo pequeño, bien atendido, es pan de cada día.",
+        "En {Pos} se enciende un flirteo o la necesidad de renovar tu relación: un gesto, una salida, una complicidad que reaviva la llama. Y si andas algo decaído, esta carta te trae un mensaje de esperanza: no todo está tan triste como lo pintas. Date un regalo cercano, un paseo, una llamada, una casa con luz."
+      ],
+      sombra: [
+        "En {Pos} corres tras horizontes lejanos y desprecias el jardín de al lado: el viaje perfecto, la vida soñada lejos, mientras lo bueno te espera en la misma esquina. La carta no te pide dejar de soñar, te pide mirar aquí: la felicidad no está lejos, está ocupada esperando tu atención.",
+        "En {Pos} la cercanía justa te incomoda: te sientes invadido por las charlas, las visitas y los planes pequeños y cierras la puerta. Pero el aislamiento también es un viaje que cansa. Prueba un plan cercano, de los que no comprometen y sí acarician: la cercanía que cultivas hoy te abriga mañana."
+      ]
+    },
+    "Tres de Bastos": {
+      luz: [
+        "En {Pos} el amor pierde fronteras: esta carta preciosa habla del cariño universal y de la visión espiritual que reconoce que todos somos hermanos. Quien se reconoce en ella ama profundamente a todos los seres y camina ligero porque no envidia. Deja que hoy se asome lo mejor de ti: el amor sin etiquetas también se practica.",
+        "En {Pos} si la tirada es de amor, la conexión es hondísima: una relación donde incluso el cuerpo puede no tener importancia porque el vínculo va más profundo. Es de esas uniones que alimentan el alma antes que la conversación. Si estás en pareja, eleva el nivel del trato: a este se habla con la mirada."
+      ],
+      sombra: [
+        "En {Pos} amas en teoría y te cuesta en práctica: tu discurso habla de fraternidad, pero el trato diario se queda corto con los tuyos. La carta no premia las palabras, premia la constancia de un cariño que se sostiene aunque nadie aplauda. Practica hoy el amor universal en miniatura con la primera persona que cruce tu puerta.",
+        "En {Pos} el amor hondo te asusta y lo conviertes en distancia: cuando el vínculo se pone profundo, te retiras a la orilla. Tres de bastos te recuerda que la entrega no te pierde, te expande. Deja que te quieran hasta el fondo sin preparar la salida."
+      ]
+    },
+    "Cuatro de Bastos": {
+      luz: [
+        "En {Pos} la alegría se instala en tu casa y en tu gente: momentos de celebración, estabilidad que se afianza y una comunidad que se reúne en torno a lo que construiste. Es el convite después de la obra: los cimientos que pusiste con esfuerzo ahora se disfrutan. Celebra a quienes te ayudaron a levantarlos.",
+        "En {Pos} el refugio se convierte en festín: una reunión, un aniversario, un logro que se brinda en familia. La carta también anuncia unión y alegría compartida en el lugar que cada día te espera. Si la lectura habla de casa o de proyectos de hogar, respira: el viento sopla a favor y la puerta se abre de par en par."
+      ],
+      sombra: [
+        "En {Pos} la fiesta ajena te encuentra trabajando en la sombra: celebras los triunfos de todos y el tuyo sigue en agenda. Pero la carta no pide más sacrificio, pide una mesa para ti. Suelta el traje de organizador y siéntate entre invitados: tu lugar está puesto desde hace rato.",
+        "En {Pos} tu casa o tu círculo se siente vacío aunque haya gente: conversaciones de pendientes y mesas que no se comparten de verdad. El hogar se construye con presencia emocional, no con muebles. Enciende algo digno de festejo: ordena un rato de convivencia sincera con los tuyos."
+      ]
+    },
+    "Seis de Bastos": {
+      luz: [
+        "En {Pos} la carta más pesada del mazo también es la más resolutiva: al saber que el ánimo está por los suelos, sabes exactamente sobre qué trabajar. Depresión y tristeza con nombre propio: esa claridad ya es la mitad del camino. Como quien dibuja el pozo, esta carta te da el mapa para salir de él con ayuda, compañía y movimiento.",
+        "En {Pos} reconocer el bajón y nombrar su origen es el primer acto de valentía: el dinero, la pareja, la familia o la salud señalan el porqué y eso es oro. Las terapias que conectan alma y mente, la meditación y el tacto de un buen profesional son tu sendero. Remontar empieza hoy, con un paso pequeño."
+      ],
+      sombra: [
+        "En {Pos} el ánimo se desploma y todo parece cuesta arriba: tristeza, falta de ganas y pensamientos oscuros que paralizan y vuelven cualquier futuro un promontorio. No lo atravieses sola. Esta carta no es un juicio, es una alarma que suena a tiempo: busca ayuda, cambia la colmena y planta cara a lo que pesa.",
+        "En {Pos} el bajón tiene fecha marcada por las cartas que lo rodean: con oros, el dinero aprieta; con copas, la pareja o la familia duelen; con bastos, lo profesional frustra; con espadas, la salud avisa. Ninguno de esos frentes es eterno. Atiéndelo como se atiende una herida: limpiar, vendar y dar tiempo."
+      ]
+    },
+    "Siete de Bastos": {
+      luz: [
+        "En {Pos} tu vida profesional se sienta a la mesa y te enseña su balance: posibilidades de ascenso, gusto por lo que haces y la entrega con que lo sostienes. Si te representa, eres persona de palabra cumplida, de las que cumplen sin aspavientos. El reconocimiento llega por ese lado, aunque tarde en pronunciarse: no aflojes el buen nombre.",
+        "En {Pos} la vocación se enciende: haces lo que sabes y lo sabes hacer, y las cartas que te rodean afinan el resto, satisfacción, ganancias y la posición que mereces. Este siete premia al que trabaja con el corazón puesto. Hoy es buen día para hablar claro de tu futuro laboral o dar el siguiente paso hacia él."
+      ],
+      sombra: [
+        "En {Pos} el trabajo se vuelve una defensa constante en vez de un camino: sientes que debes justificarte, escalar a empujones o sostener un puesto que ya no te reconoce. La carta te pide replantear: ¿sigues en esta batalla por convicción o por inercia? Define tu siguiente movimiento con la misma entrega de siempre.",
+        "En {Pos} el deber te gana al placer: cumples de sobra con tus obligaciones y te das de menos en la alegría. Siete de bastos te recuerda que el trabajo también es territorio de deseo. Pide lo que vales, en tiempo, contrato o reconocimiento: tu responsabilidad no necesita castigarte."
+      ]
+    },
+    "Ocho de Bastos": {
+      luz: [
+        "En {Pos} la carta de las cadenas llega para soltarte: al ponerle nombre a la dependencia, sea la pareja, la familia, un empleo sin ascenso o un mal hábito, la cadena empieza a oxidarse. Esta semana es ideal para buscar ayuda: una terapia, un pacto, un límite claro. La libertad no es un grito, es una puerta que se abre con actos pequeños.",
+        "En {Pos} reconoces en ti la persona que otros controlan o las circunstancias que te mecen, y decides despertar la autoestima. El autocontrol y la confianza en ti no se piden, se entrenan. Hoy, un pequeño gesto de libertad: uno solo, pero real."
+      ],
+      sombra: [
+        "En {Pos} la dependencia silenciosa va de ronda: ataduras enfermizas a una persona, un empleo sin salida o una relación donde uno sostiene al otro. Y si las espadas asoman cerca, cuidado con el alcohol, las drogas o las malas compañías: esa es la ruta marcada. Esta carta no juzga: llama a una mano amiga que ayude a cortar.",
+        "En {Pos} le das a lo material un poder que no tiene: la aprobación, el comprar y el estatus se vuelven tu tabla. La carta pone el dedo en la llaga para que la toques: tu valor no se mide en lo que posees ni en lo que aguantas."
+      ]
+    },
+    "Sota de Bastos": {
+      luz: [
+        "En {Pos} una mujer de fuego se suma a la partida: enérgica, apasionada, carismática y muy segura de sí, de temperamento que no pasa desapercibido. Puede representarte a ti mismo. Su presencia trae energía de sobra para prosperar y coraje para tus proyectos. Deja que el temperamento se convierta en carácter: es tu motor.",
+        "En {Pos} se despierta en ti la emprendedora: seguridad para gastar con criterio y sabiduría para conseguir lo que quieres. En el trabajo, tu carisma abre puertas; en el amor, el fuego invita a relaciones vivas. La salud acompaña: solo vigila el exceso de temperamento, porque el fuego que te mueve también marca tu paso."
+      ],
+      sombra: [
+        "En {Pos} la pasión se vuelve exceso: gastas de forma impulsiva y los celos de esta dama encienden el ambiente, en el amor o en el trabajo. Tu temperamento dice mucho de ti y algo te cobra caro. Baja un grado la llama: el carácter no necesita incendiar para ser escuchado.",
+        "En {Pos} la seguridad ajena te eclipsa: sientes que la pasión, el carisma y la viveza están del lado del rival y tú te quedas en segunda fila. Pero la carta te representa a ti también: la misma chispa vive en ti, solo espera permiso para encenderse. No copies el brillo ajeno: enciende el tuyo."
+      ]
+    },
+    "Rey de Bastos": {
+      luz: [
+        "En {Pos} se sienta a la mesa alguien de fuego y experiencia: emprendedor, enérgico, carismático, con dotes de mando y la seguridad de quien ya alcanzó metas. Puede ser de signo de fuego o una persona mayor que sabe por dónde va el camino. Acércate, aprende y recibe su palabra: la experiencia ajena es oro que se hereda en minutos.",
+        "En {Pos} tu estado interior asume el trono: eres tú con tu experiencia acumulada, gobernando con energía y carisma lo que empieza. El fuego que se domina es liderazgo; el que arde solo, viento. Esta carta te invita a mandar sobre tu propio reino con la testa fría de quien ya pasó por el fuego."
+      ],
+      sombra: [
+        "En {Pos} el fuego del mandato te quema por dentro: ambiciones no cumplidas que pesan como corona sin reino, y una salud que avisa con dolores propios de la edad si no moderas el paso. La carta no te quita tu potencia: te pide dosificar. Aprende a dejar el control en manos confiables y a descansar el imperio.",
+        "En {Pos} la experiencia de otros te humilla en vez de guiarte: comparas tu avance con el de quien lleva más camino y el fuego se vuelve envidia. Pero tu trayecto es tuyo y no lleva prisa por rendir cuentas. Pregunta, absorbe y aplica sin despreciar tu propio paso: también tú inspiras."
+      ]
+    },
+    /* --- copas --- */
+    "As de Copas": {
+      luz: [
+        "En {Pos} el cariño encuentra su casa: la familia, el hogar o el proyecto que formas con los tuyos se llena de bienestar y aire fresco. Lo que siembras en tu nido crece con seguridad, y lo profesional acompaña con alianzas que funcionan. Déjate abrazar por lo tuyo: está todo listo para disfrutarlo.",
+        "En {Pos} una promesa de hogar toma cuerpo: buenas noticias de familia, paz en la casa o la decisión que convierte tu espacio en refugio. El amor que cultivas aquí se multiplica si lo compartes. Abre la puerta, pon la mesa y deja entrar a quien te quiere ver triunfar."
+      ],
+      sombra: [
+        "En {Pos} el calor de tu nido te queda lejano: cerca de los tuyos andas distraído o guardando el cariño para cuando creas que mereces. Pero tu hogar no exige méritos, solo presencia: vuelve a la mesa, llama a esa persona y deja que el bienestar que ya existe te sostenga.",
+        "En {Pos} tiendes a olvidar que lo más sólido que tienes no se compra: tu gente y tu casa te sostienen en silencio mientras persigues lo de afuera. Devuelve la atención a lo cercano, ordena un rincón de tu vida y sentirás que el refugio siempre estuvo abierto."
+      ]
+    },
+    "Dos de Copas": {
+      luz: [
+        "En {Pos} algo tuyo está a punto de nacer y lleva tu misma esencia: un hijo, una idea, una obra que sale de ti. La fecundidad de esta carta se riega con amor y se extiende a tu creatividad. Rodeada de las personas indicadas, te dice: lo que hoy concibes, crecerá hermoso.",
+        "En {Pos} dos voluntades se juntan y la vida se duplica: sea una relación, un proyecto o la llegada de una criatura, hay algo que pide nacer de tu interior. Cuida el germen, protégelo un tiempo y verás cómo echa raíces. El amor que inviertes hoy es la cosecha de mañana."
+      ],
+      sombra: [
+        "En {Pos} quieres que algo nazca pero la tierra se siente seca: quizá esperas el amor o el proyecto y lo único pendiente eres tú. No fuerces la cosecha: siembra una vez más con paciencia y deja espacio a que lo tuyo llegue. La fecundidad no se exige, se riega.",
+        "En {Pos} idealizas aquello que sueñas criar: pones toda tu ilusión en una imagen de amor, de hijo o de éxito que nubla el presente. Baja del cuento y acércate a lo real: decide por el vínculo concreto, no por la película que te montaste."
+      ]
+    },
+    "Tres de Copas": {
+      luz: [
+        "En {Pos} el aire se mueve: un mensaje, una llamada o una noticia nueva cruza tu camino con la fuerza de lo inesperado. No llegará de forma dramática, sino como quien abre una ventana: de repente todo se aclara un poco. Recibe con calma: las próximas horas traen novedades que cambian el tono del día.",
+        "En {Pos} el futuro llama a tu puerta en forma de palabra: pronto sabrás lo que estabas esperando y, según lo que haya cerca, tocará dinero, familia o trabajo. Las palabras que llegan son más que ruido, son señales de dirección. Escúchalas dos veces antes de responder una."
+      ],
+      sombra: [
+        "En {Pos} dejas tu ánimo en la bandeja de entrada: el día avanza torcido porque aún no llega el mensaje que te calme. Respira: la noticia viene, y lo que no llegue hoy no significa nada. Mientras esperas, no te inventes versiones: tu paz no debería depender de un timbre.",
+        "En {Pos} las novedades te llegan a medias y la duda arma su casa: sobran indicios, faltan concreciones y tu cabeza junta las piezas a su manera. Antes de concluir, pregunta. Y mientras el asunto se aclara, ocúpate de lo que sí está en tus manos."
+      ]
+    },
+    "Cinco de Copas": {
+      luz: [
+        "En {Pos} la vida se viste de fiesta: llegan celebraciones, reencuentros y el reconocimiento de los tuyos. Si preguntaste por un problema, respira: el desenlace te sonríe. Y si esta carta te señala a ti en la lectura, prepárate: serás el centro de la alegría y el cariño te va a nombrar.",
+        "En {Pos} hay buenas razones para levantar la copa: en familia o en el trabajo, los motivos se juntan. Boda, nacimiento, logro o alegría por una compra bien cerrada: no hay premio pequeño si se comparte. La próxima temporada te invita a festejar cada paso."
+      ],
+      sombra: [
+        "En {Pos} el festejo se te pasa al lado: la vida te ofrece una alegría y tú llegas tarde, encargada del cuidado de todos menos del tuyo. Permítete el premio: celebra lo conseguido aunque falte pulir la mesa. La fiesta también se prepara para ti.",
+        "En {Pos} te saboteas la celebración mirando el lado serio de las cosas: hay motivos para el brillo y tú sigues en la sombra del vecino. Hoy no es día de recuentos, es día de aceptar que lo bueno también te pertenece. Sonríe por lo logrado: eso también es trabajo."
+      ]
+    },
+    "Seis de Copas": {
+      luz: [
+        "En {Pos} el pasado viene de visita y te regala un mimo: una persona querida del ayer, un recuerdo que ablanda o la noticia de alguien que no olvidas. Vuelve a tu infancia lo que sembró ternura en ti y úsala como brújula. Lo que viviste de bueno no pasó: solo esperaba un momento como este.",
+        "En {Pos} una pequeña nostalgia se vuelve regalo: guardada con cariño, se convierte en claridad y te recuerda quién fuiste antes de que el mundo te apurara. Si hay una reconciliación pendiente del pasado, esta carta la trae de vuelta. Abraza tu historia: es tu mayor tesoro."
+      ],
+      sombra: [
+        "En {Pos} el pasado te tiene del lado de acá de la ventana: paseas por lo que ya fue y dejas lo que es esperando. La nostalgia que sana mira atrás con cariño y vuelve; la que atrapa, no suelta. Toma lo bueno de ayer y deja el resto: él no va contigo.",
+        "En {Pos} idealizas los viejos tiempos y al mismo tiempo te pesan: hay heridas de entonces que regresan por la puerta de un recuerdo. No las revivas en silencio: conversa, perdona o suelta conscientemente. Vivir anclado al ayer es vivir de prestado."
+      ]
+    },
+    "Siete de Copas": {
+      luz: [
+        "En {Pos} la balanza se inclina: lo que trabajaste empieza a devolverte el esfuerzo y tus deseos más hondos encuentran respuesta. Puede ser la pareja que llega, el empleo que aparece o la vitalidad que se instala. No es pura casualidad: es el resultado de lo que sembraste sin rendirte.",
+        "En {Pos} tu tiempo de recoger se abre: la satisfacción que perseguías toca a tu puerta con las manos llenas. Si la lectura habla de amor, la persona adecuada se acerca; si habla de trabajo, llega el reconocimiento. Estás en un rincón del camino donde lo bueno da la cara."
+      ],
+      sombra: [
+        "En {Pos} la plenitud te resulta sospechosa: habitúas a vivir en falta y cuando lo bueno llega, lo apartas dudando. Pero esta carta no te pide fe, te pide permiso: permítete disfrutar lo que ya es tuyo. La abundancia se asienta donde se agradece.",
+        "En {Pos} confundes tener con gozar: guardas lo logrado como avaro de felicidad y la plenitud se seca en la bodega. Comparte una parte, celebra una parte y deja que el resto descanse. Lo que se disfruta se multiplica; lo que se esconde, se extingue."
+      ]
+    },
+    "Ocho de Copas": {
+      luz: [
+        "En {Pos} el apoyo llega en forma de personas: un contacto, un amigo o un jefe abre una puerta justo cuando la necesitas. Como caído del cielo, das con la persona adecuada en el momento correcto. Agradece, pide y devuelve: los puentes que cruzas hoy son los caminos de mañana.",
+        "En {Pos} tu entorno juega a tu favor: el consejo bueno está cerca, el médico indicado aparece y, en el amor, la pareja comparte tu vida social. Lo que buscabas no es una fórmula, es gente que suma. Rodearte mejor es la mejor estrategia de prosperidad."
+      ],
+      sombra: [
+        "En {Pos} esperas de otros lo que dudas en dar de ti: el favor, la recomendación y la puerta abierta son el plan, y mientras tanto tu impulso se adormece. Pide ayuda sin culpa, pero sostén también tu propio paso. La buena influencia premia a quien se acerca.",
+        "En {Pos} la confianza dependiente te apaga: das por sentado que solo con el apoyo de otros se avanza y te olvidas del motor propio. Cultiva tus contactos, sí, pero también tu criterio. Que nadie decida lo que tú puedes discernir."
+      ]
+    },
+    "Nueve de Copas": {
+      luz: [
+        "En {Pos} se te recuerda la ley de la cosecha: todo lo que siembras, antes o después, vuelve a ti. Ayudar sin medir, querer sin condición y elegir una causa que no reparte dividendos: esa generosidad no se pierde, se multiplica. Si buscas el amor, primero darlo; si necesitas apoyo, primero sostener.",
+        "En {Pos} tu altruismo se vuelve fuerza: en el trabajo, en la familia o en el amor, das sin motivación económica y eso te deja ligero. No es sacrificio: es la forma más honda de estar vivo. Sigue entregándote; la vida lleva la cuenta y paga con creces."
+      ],
+      sombra: [
+        "En {Pos} eso de dar te sale de más y el recibir te cuesta: entregas todo y a la hora de pedir te deshaces en disculpas. La generosidad sin autocrítica se vuelve vacío. Aprende a recibir sin sentir deuda: también es amor permitir que te cuiden.",
+        "En {Pos} te vuelves sombra de ti en el dar: sí a todos, sí siempre, y contigo ni una miga. Escucha pronto: quien no se llena, no sostiene. Agrega tu nombre a la lista de gente que quieres: también tú mereces el trato que regalas."
+      ]
+    },
+    "Sota de Copas": {
+      luz: [
+        "En {Pos} conoces a alguien que lleva el corazón en la manga: sensible, soñadora y creativa, incapaz de imaginarse sin amor. Si la tirada no trata de personas, puede estar hablándote de ti o de una parte tuya que vuelve a ilusionarse. El arte, la medicina alternativa y las cosas hechas con cariño se asocian con ella.",
+        "En {Pos} una sensibilidad despierta y pide su lugar: la creatividad que guardabas o el romance que no te permitías salen a flote. Esta carta disfruta dando y se llena de los gestos tiernos de los demás. Vuelve a imaginar en grande: tu niña soñadora tiene derechos."
+      ],
+      sombra: [
+        "En {Pos} una persona romántica de verdad te confunde con su cuento: vives pendiente de quien te ilusiona y dejas de escuchar lo que de verdad sientes. No abandones tu corazón, pero bájale el volumen a la fantasía. Ama con ojos abiertos.",
+        "En {Pos} te enamoras de la idea de amar más que de lo concreto: das por hecho gestos que no llegan y construyes romance donde hay silencio. Pide, observa y deja que el otro también se muestre. El amor correspondido no se adivina: se comprueba."
+      ]
+    },
+    "Caballero de Copas": {
+      luz: [
+        "En {Pos} alguien milita por ti con devoción de leyenda: el que defiende tu causa, el que pelea por los débiles y no negocia su ideal. Si la lectura habla de amor, hay una entrega profunda donde ambos se dan al máximo. En lo laboral busca lo justo y trabaja con el corazón: un aliado noble que vale su peso en oro.",
+        "En {Pos} tu propia parte soñadora se pone en marcha: la lealtad, la ternura y la lucha por lo que crees salen a cabalgar. Quien lleva esta energía no negocia valores por conveniencia. Cabalga hoy por tu bandera con la misma nobleza que él te muestra a ti."
+      ],
+      sombra: [
+        "En {Pos} un idealismo encantador se te vuelve trampolín al vacío: persigues un amor de cuento o una causa perfecta mientras la vida real espera a la puerta. La nobleza que te gusta no pide renunciar a la tierra: pide aterrizar con elegancia.",
+        "En {Pos} el que admiras cabalga tan alto que nadie le alcanza: su vida emocional es un retablo hermoso e inaccesible. Decide si quieres vida o foto: lo glosable no sustituye lo vivido. Exige que los ideales incluyan a las personas de carne y hueso."
+      ]
+    },
+    "Rey de Copas": {
+      luz: [
+        "En {Pos} la sensibilidad se vuelve madurez: encuentras a alguien, o a una parte de ti, que siente profundo y sabe acompañar sin empujar. En el amor, devoción capaz de gestos locos por conservar a su gente; en el trabajo, ganas de prosperar con corazón. Tu estado mental es buena tierra para sembrar futuro.",
+        "En {Pos} el ánimo marca el ritmo y hoy sopla a favor: lo que imaginas, este rey lo riega con ternura, y tu salud responde mejor cuando andas en calma. Es el momento de gobernar con cariño lo que te importa: tu reino se construye con sensibilidad firme."
+      ],
+      sombra: [
+        "En {Pos} vives en el país de los sueños y las utopías no aterrizan: imaginas mil escenarios, pero los proyectos no cuajan porque no pisan tierra. No es falta de visión, es sobra de castillo. Elige un sueño, ponle fecha y empieza a construir: la fantasía que se decide se vuelve plan.",
+        "En {Pos} el ánimo gobierna tu día: cuando estás entusiasmado todo fluye y cuando la ilusión baja, todo se detiene. Ese vaivén te desgasta y se nota en la salud y en la constancia. Da a tu sensibilidad horarios, estructura y metas chicas: la pasión sin rutina se evapora."
+      ]
+    },
+    /* --- espadas --- */
+    "Cuatro de Espadas": {
+      luz: [
+        "En {Pos} los golpes no caen en vacío y esta carta los frena: un bache de salud o de ánimo se acerca y tu instinto te pide bajar un cambio antes de caer. Retiro voluntario, reposo y silencio: la pausa que eliges hoy te ahorra la pausa que te impondría la fiebre. Descansar a tiempo es avanzar.",
+        "En {Pos} encuentras la calma que se da en la crisis: cuida tu cuerpo como tu principal proyecto y aparta los escenarios que esperan lo peor de tu día. Salir del ruido es sanar: tu fortaleza se mide en el descanso que sabes pedir."
+      ],
+      sombra: [
+        "En {Pos} un bache se dibuja en el horizonte de tu salud o de tu tranquilidad: dolores, intrigas, fatiga y la tentación de aislarte en silencio. No es el fin del mundo, es la señal de amarrar bien el barco. Atiéndete antes que la marea: pedir ayuda a tiempo es tu mejor estrategia.",
+        "En {Pos} te gastas en resistir en vez de en cuidarte: sigues en la trinchera con el cuerpo pidiendo tregua y la mente llena de ruido ajeno. La soledad que anuncias se evita con una conversación honesta. Da al reposo el rango que merece y el bache se vuelve escala."
+      ]
+    },
+    "Cinco de Espadas": {
+      luz: [
+        "En {Pos} la pelea se anuncia y tú decides el terreno: hay un disgusto grande o un enfrentamiento fuerte en camino, y puedes elegir no alimentarlo. Tu lección es salir de la trinchera con la cabeza alta y el honor intacto. Ni infamias ni ruido: quien se retira con dignidad nunca pierde la guerra.",
+        "En {Pos} conviertes la amenaza en advertencia: lo que parecía favorable da señales de giro y, en vez de asustarte, reorganizas tu posición. Los malos pensamientos avisan de que, si no los corriges, te estancas. Ajusta la rosa de los vientos antes de que el viento decida por ti."
+      ],
+      sombra: [
+        "En {Pos} la disputa viene de frente y amenaza con llevarse más de lo pactado: alguien está dispuesto a dar batalla y el riesgo de caer entre infamias y deshonor es real. No respondas desde el golpe, responde desde la estrategia. Y si hay pelea pendiente, que sea la última y la definitiva.",
+        "En {Pos} tú mismo te conviertes en tu adversario: remordimientos, culpas y preocupaciones rondan tu mente y te preparan trampas. Antes de culpar afuera, salda tu parte: paga la deuda emocional que te queda y el cuerpo te deja avanzar."
+      ]
+    },
+    "Seis de Espadas": {
+      luz: [
+        "En {Pos} sabes que el torbellino pasa y preparas tu salida: los conflictos vienen con fecha de caducidad si no los alimentas. Este tramo te pide menos batalla y más paciencia: cuidado con los autoengaños y con las culpas que proyectas en los tuyos. El éxito se hará esperar, pero llega: no abandones a medio río.",
+        "En {Pos} tu fuerza interior navega la tormenta ajena: el camino está lleno de contratiempos y de planes que se encallan, pero tú no vas a hundirte con ellos. Dependes de terceros, sí: usa bien a las personas clave que el destino puso en tu ruta. Un poco más de agua, y se hace la bahía."
+      ],
+      sombra: [
+        "En {Pos} la debilidad se apodera del timón: te hieren con palabras mientras hierves en silencio y culpas a los de cerca de lo que pesa en ti. Las relaciones sentimentales sufren este estado y los viajes se tuercen. Reconoce tu parte, dialoga y verás cuánto se aligera el agua.",
+        "En {Pos} el autoengaño te hace navegar en círculos: repites rutinas que no sanan y esperas que otros escriban tu rumbo. La carta te llama a ordenar tu centro: menos proyección, más verdad. Cuando dejes de echarte culpas y repartirlas, el barco retoma el norte."
+      ]
+    },
+    "Siete de Espadas": {
+      luz: [
+        "En {Pos} la esquina se dobla: un acontecimiento o una persona te devuelve un atisbo de confianza y te deja entrever un futuro mejor. Es un subidón que te da empuje, y esta carta te enseña a usarlo sin dejar que desordene tus decisiones. La esperanza también necesita timón: úsala para remar, no para soñar el rumbo en alta mar.",
+        "En {Pos} además de la esperanza, llega algo de dinero: un ingreso inesperado, un favor que se concreta o un pequeño respiro que acomoda la mesa. Con otras cartas buenas cerca, es señal de que los tiempos mejores asoman. Esta semana alegra el paso: el ánimo sube y el bolsillo lo acompaña."
+      ],
+      sombra: [
+        "En {Pos} la esperanza llega a ráfagas y te hunde justo después: el miedo, el egoísmo y los celos hostigan y vuelven tus relaciones conflictivas. El subidón se desinfla cuando la razón no gobierna. Esta carta no te pide que dejes de esperar: te pide esperar con los ojos abiertos.",
+        "En {Pos} confundes la buena nueva con la carta de victoria: crees en el giro del destino y te olvidas de vigilar los celos ajenos y los planes propios. No abandones tu puesto por el resplandor del horizonte. Los tiempos mejores vienen para quien sigue trabajando mientras espera."
+      ]
+    },
+    "Nueve de Espadas": {
+      luz: [
+        "En {Pos} la carta más cargada también es la más honesta: al reconocer tu angustia y tus miedos como reales, les quitas la oscuridad del sótano. Es la carta de la transformación: lo que hoy te desvela, bien atravesado, te entrega la energía que necesitas para el tramo que viene. Nombra el miedo, y se encoge.",
+        "En {Pos} encuentras la salida que empieza en la confesión: la ansiedad que sentías por la persona amada deja de gobernarte cuando la toman en serio. Es momento de cuidar cuerpo y mente como se cuida a un herido: con tiempo, luz y ayuda. La tormenta tiene nombre y fecha: no es eterna, es atravesable."
+      ],
+      sombra: [
+        "En {Pos} el peor escenario te visita de noche y se queda: sufrimiento real, ansiedad por lo que amas, temores con fundamento y la sensación de caminar solo. La carta no te anuncia tragedia: te anuncia que este tramo exige cuidados serios. No lo sostengas en soledad: pedir ayuda aquí es inteligencia pura.",
+        "En {Pos} te enredas en peligros que asoman y en miedos que alimentas: la inseguridad, la vergüenza y la vigilia te dejan sin fuerzas para lo esencial. Cuidado con los excesos: el ocio y la intoxicación son compañías peligrosas. Tu mayor victoria hoy es dormir, pedir y soltar el control."
+      ]
+    },
+    "Sota de Espadas": {
+      luz: [
+        "En {Pos} una mujer de pensamiento claro se suma a tu esquina: joven, de postura firme y mirada que ve lo que otros esconden. Es una compañera valiosísima por el apoyo que da y la claridad de sus consejos. Si en la tirada te representa a ti, te toca defender tus ideas con la misma elegancia combativa.",
+        "En {Pos} la inteligencia se vuelve a tu favor: una mente resuelta que no descansa hasta ver sus proyectos encarrilados y capaz de descubrir lo oculto. En tiempos de duda, es la asesora que firmarías. Acércate a ella, o invócala en ti: la claridad decide."
+      ],
+      sombra: [
+        "En {Pos} una figura de mirada afilada puede estar tejiendo en sombra: la misma dama que ayuda también puede urdir intrigas absurdas. No es paranoia, es brújula: observa quién se beneficia de tu desconcierto. La prudencia no es desconfianza: es una carta que se juega bien a tiempo.",
+        "En {Pos} te dejas convencer por la palabra elegante y pierdes el norte: hay discursos bonitos que no resisten un buen interrogatorio. No discutas de frente con quien juega mejor: responde tarde, por escrito y con datos. Tu mejor defensa es no dar carnada."
+      ]
+    },
+    "Caballero de Espadas": {
+      luz: [
+        "En {Pos} el caballero de la fortaleza monta a tu favor: valor, resistencia y defensa de causas justas, dispuesto a arriesgarse si huele injusticia. Es el aliado que encuentra salida en los momentos difíciles y el impulso que te pide afrontar la disputa con decisión, no con ruido. Con él en tu esquina, los muros tiemblan.",
+        "En {Pos} se despierta tu lado firme: la misma leyenda que defiende lo justo vive en ti y hoy pide que salgas a la arena por lo tuyo. No necesitas ganar la batalla, necesitas elegir el frente. Decide hoy el conflicto que vale la pena librar y acude con la cabeza fría."
+      ],
+      sombra: [
+        "En {Pos} el conflicto llega por escrito o de la mano de una mujer y amenaza con tumbar lo que construiste en calma. No respondas a caballo desbocado: el caballero que te visita es castigo si actúas con la misma furia. Convierte el golpe en información y la disputa en estrategia.",
+        "En {Pos} revisa bien el pelotón nuevo que te rodea: alguna amistad reciente puede resultar traicionera y usar tu confianza contra ti. El caballero de la fortaleza también se hace fuerte en las trincheras ocultas. Elige con cuidado a quién le cuentas tu plan."
+      ]
+    },
+    "Rey de Espadas": {
+      luz: [
+        "En {Pos} una autoridad serena se sienta a la mesa: el análisis limpio, el trato honesto y la palabra que corta las dudas de todos. Este rey te pide decidir con la cabeza y no con el ruido: ordena la información, ponla por escrito y actúa con frialdad justa. Tu criterio tiene más fuerza de la que crees.",
+        "En {Pos} tu mente gobierna el día: lo complejo se vuelve manejable cuando lo partes en decisiones chicas y firmes. Esta carta premia la diplomacia y la palabra cumplida: habla claro, honra lo pactado y guarda la calma bajo presión. Esa mesura es la corona que otros notan."
+      ],
+      sombra: [
+        "En {Pos} la relación con la justicia se te atora: te pesan acuerdos no cumplidos, promesas de papel y la sensación de que el trato fue desigual. No es el momento de cerrar los ojos: documenta, aclara y firma lo que haga falta. El orden que recuperas hoy es tu escudo.",
+        "En {Pos} tu mente se vuelve tribunal duro contigo: exiges exactitud donde solo hay seres humanos y castigas tu propio error en silencio. Este rey también es humano. Aplica la ley con ti mismo: reconoce, corrige y sigue, sin más sentencia que la que te ayuda a mejorar."
+      ]
+    },
+    /* --- oros --- */
+    "As de Oros": {
+      luz: [
+        "En {Pos} la mejor carta del mazo te corona: éxito y felicidad en lo que tengas entre manos, y una etapa de prosperidad que abre la puerta a todo proyecto que arranques ahora. Aunque la lectura sea floja, tú acabas levantando la cabeza: tu semilla es de oro. Siembra ya: la tierra pide tu mano.",
+        "En {Pos} el oro nombra tu asunto: si habla de dinero, llega la abundancia; si las copas la rodean, es amor; si hay bastos, el trabajo se enciende. La carta te dice que el resultado final es bueno, pase lo que pase en medio. Respira: la balanza ya se decidió a tu favor."
+      ],
+      sombra: [
+        "En {Pos} te cuesta creer que lo bueno también te toca: la carta del triunfo llega y tú sigues mirando la factura en vez del premio. Esta energía no exige merecimiento, exige recepción. Abre la mano, acepta el regalo de la rueda y no lo devuelvas por costumbre.",
+        "En {Pos} el billete de ida a la prosperidad duerme sin usar: sabes lo que hay que hacer, pero sigues con el pie en el freno por miedo al cambio de estatus. El oro premia al que se aproxima: un movimiento real hacia tu proyecto, tu venta o tu trato. Hazlo hoy: la etapa buena espera tu decisión."
+      ]
+    },
+    "Dos de Oros": {
+      luz: [
+        "En {Pos} la rivalidad se vuelve señal, no sentencia: hay una tercera persona compitiendo por tu lugar, en lo sentimental o en los negocios, y saberlo ya es media partida. No arranques proyectos nuevos a ciegas: consolida lo tuyo antes. Alerta, no paranoia: esta carta te protege si la vigilas.",
+        "En {Pos} llega un mensaje que despeja la niebla: una carta, una conversación o una noticia, buena o mala según lo que la rodee. Esperas emociones intensas y algo de agitación, pero también un ingreso que suaviza la orilla. No decidas en caliente: lo que el día deje claro, mañana se confirma."
+      ],
+      sombra: [
+        "En {Pos} los celos encienden su casa y la envidia se sienta a la mesa: comparas, desconfías y dejas que un rival, real o imaginario, te robe el sueño. La carta te advierte, no te condena: habla, verifica y vuelve a tu centro. La agitación que sientes no es la verdad: es el síntoma.",
+        "En {Pos} las cuentas se ponen difíciles: cheques, pagarés o deudas que vuelven a la mesa y te complican la vida de forma pasajera. No entres en pánico: es un tramo económico con nombre y fecha. Prepara el plan, negocia plazos y mantén la calma: esta carta no es sentencia, es señal de remo."
+      ]
+    },
+    "Tres de Oros": {
+      luz: [
+        "En {Pos} la fortuna se apellida fecundidad: una idea, un proyecto o, si la lectura es de mujer, la posibilidad de un embarazo. Tus ideas tienen fuerza y están en el punto exacto para materializarse: habilidad para los negocios, reconocimiento y generosidad empujan tus planes. El momento de sembrar es este, no esperes el permiso de otros.",
+        "En {Pos} lo que comenzó empieza a dar la cara: el talento que pusiste empieza a ser visto y el trabajo rinde. La carta de la concreción te invita a pulir, presentar y exprimir tu mejor jugada. La generosidad compartida multiplica el plan: no guardes el mapa solo para ti."
+      ],
+      sombra: [
+        "En {Pos} la falta de madurez cuesta caro: actos poco meditados, frivolidad y decisiones sin pensar que complican la economía de casa. La carta no es un no, es un paren antes de firmar. Piensa dos veces, consulta a alguien con cabeza fría y reserva algo para el imprevisto.",
+        "En {Pos} el éxito que esperabas llega en miniatura y te decepciona: esperabas el gol y la carta es en realidad el entrenamiento. No descartes la jugada: afina, ajusta y vuelve. La fecundidad que anuncia esta carta también necesita práctica perseverante."
+      ]
+    },
+    "Cuatro de Oros": {
+      luz: [
+        "En {Pos} llega la prosperidad y el éxito profesional o de negocios: inversiones que dan resultados y beneficios excelentes. También se asoma un obsequio, un regalo o un préstamo que te da seguridad para afrontar cualquier complicación. El bienestar llama a tu puerta con las manos llenas: recibe sin culpa y agradece en voz alta.",
+        "En {Pos} el tesoro de lo construido se vuelve respaldo: lo que sembraste en trabajo y dinero se convierte en la red que te sostiene. La carta premia la prudencia y la previsión, y te devuelve el control. Disfruta la seguridad sin olvidar de dónde vino tu suerte: la generosidad también se cultiva."
+      ],
+      sombra: [
+        "En {Pos} el amor al dinero se vuelve tacañería: cuentas el cariño como se cuenta el cambio y el corazón se aprieta con los tuyos. No es avaricia por maldad, es miedo. La carta te invita a soltar un poco la mano: regalar desactiva la mezquindad que te enfría.",
+        "En {Pos} se avecinan desórdenes que no quieres ver: soluciones que no llegan, líos con la ley o un trato con las autoridades que puede complicarse. Cuatro de oros invertido te pide prevenir: revisa papeles, acuerdos y cuentas antes de que hablen otros por ti."
+      ]
+    },
+    "Cinco de Oros": {
+      luz: [
+        "En {Pos} un compromiso afectivo se concreta y marca un antes y un después: un vínculo de los que no se olvidan, un encuentro favorable, un lugar donde ocurre lo bueno. El karma te paga con amor: descubres en gente cercana el cariño que citabas lejos. Este cinco es una promesa con fecha de cumplimiento.",
+        "En {Pos} los vínculos se celebran como se celebra una cosecha: alegría, reconocimiento y la certeza de que el amor que mueve tu vida está en buenas manos. Sea amistad, pareja o duelo superado, la carta te invita a honrar lo que te sostiene. Nombra a quien te hace bien y verás cuánto crece."
+      ],
+      sombra: [
+        "En {Pos} el amor fuerte se tuerce como los destinos que se enredan: desavenencias, discusiones y alguna pérdida económica enturbian lo que venía bien. No es el fin de la historia, es su capítulo más serio. Si el vínculo te importa de verdad, baja las armas y conversa antes de que el daño haga raíces.",
+        "En {Pos} la frivolidad y la dependencia del otro te juegan en contra: estás atado a decisiones de otra persona o a tus propios caprichos, y la balanza se desnivela. Nombra tu parte con honestidad y suelta la rienda del otro: la resolución empieza en tu propio centro."
+      ]
+    },
+    "Seis de Oros": {
+      luz: [
+        "En {Pos} las dificultades se encumbran un rato y luego se disuelven solas: los obstáculos del camino financiero resultan fáciles de salvar y hasta aumentan las ganancias esperadas. Pronto se acercan acontecimientos positivos que te ablandan y te vuelven más generoso y desprendido. Este seis es un suspiro: el aprieto pasó antes de apretar.",
+        "En {Pos} la generosidad que das y recibes equilibra el plato: un favor, un apoyo inesperado o una ayuda que llega justo cuando la necesitabas. La carta del reparto justo te recuerda que también es tu turno de aceptar. Te toca recibir: abre la mano y no lo conviertas en deuda."
+      ],
+      sombra: [
+        "En {Pos} la codicia empaña la bonanza: una racha que podía ser feliz se enreda en envidias, celos y comparaciones que enturbian lo que viene. Este seis invertido te pide vigilar a tu propio envidioso antes que a los ajenos. Suelta la comparación y verás cómo la suerte vuelve a circular.",
+        "En {Pos} lo poco te fastidia más que la escasez real: miras el plato del otro y sientes que el reparto fue injusto contigo. La carta te recuerda que tu pan está subiendo. Vuelve a tu proyecto, agradece lo que sí tienes y guarda el resentimiento: no se lo eches a los que vienen a apoyarte."
+      ]
+    },
+    "Nueve de Oros": {
+      luz: [
+        "En {Pos} se asoman cambios en lo laboral, lo comercial y lo sentimental, y esta carta te dice por qué: problemas viejos que quedaron sin resolver vuelven para que los cierres de una vez. Es una carta positiva que augura éxitos y conquistas, aunque se tiñe de lo que la rodea. Aprovecha la energía buena para saldar lo pendiente.",
+        "En {Pos} tomas la decisión que otros posponen: cero dramas viejos, cero promesas a medias. Este nueve premia al que cierra círculos y se presenta con las cuentas claras ante la vida. Los cambios que asoman son tu oportunidad: transiciona con la cabeza alta y el corazón agradecido."
+      ],
+      sombra: [
+        "En {Pos} la incertidumbre se vuelve moneda cotidiana y los cambios que asoman te dan miedo: miedo a decidir, a cerrar, a perder lo conocido aunque ya no te sostenga. La carta no te pide certidumbres, te pide pasos. Ordena lo que depende de ti y suelta con estilo lo que ya cumplió.",
+        "En {Pos} engaños, promesas que no se cumplen y una amistad querida que se pierde enturbian el panorama: el mantel se tiende con menos gente de la esperada. No es el final del banquete, es el ajuste de mesa. Guarda las promesas cumplidas, llora un momento y sigue invitando a la vida con la puerta abierta."
+      ]
     }
   },
 
@@ -856,6 +1240,143 @@ const TIRADAS = {
     "El Mundo": [
       "Cierra el ciclo con los honores que le tocan: la última tarea, el agradecimiento, la celebración. No te quedes a medio paso de la meta por vértigo del después. Termina hoy y deja preparado el rincón donde entrará tu siguiente historia.",
       "Recoge los frutos y festéjate: lo que lograste merece reconocimiento y descanso. Concluye lo pendiente con pulcritud, agradece a quien te ayudó y date permiso de habitar tu victoria antes de arrancar la siguiente."
+    ],
+    /* ------------------------- arcanos menores ------------------------- */
+    "Dos de Bastos": [
+      "Programa un plan cercano esta semana: un paseo, una mesa con gente querida, una escapada corta. Lo bueno está más cerca de lo que tu vista busca.",
+      "Regálate o regala un gesto pequeño hoy: una llamada, un favor, una invitación. La felicidad de lo inmediato se construye con estos ladrillos chicos."
+    ],
+    "Tres de Bastos": [
+      "Practica hoy un acto de hermandad con alguien que no lo espera: sin mérito, sin recompensa, solo amor que se da. Esa es la espiritualidad que esta carta venera.",
+      "Permite que una relación profundice sin huir: si el vínculo te remueve, es exactamente el punto donde crece el amor universal. Deja la orilla y nada un tramo."
+    ],
+    "Cuatro de Bastos": [
+      "Organiza una celebración pequeña y concreta con tu gente: una mesa, un brindis, un motivo. Poner la fiesta también se aprende a propósito.",
+      "Haz que tu casa respire a hogar: un rato sin pantallas, una comida compartida, una conversación que acompañe. La estabilidad se disfruta cuando se invita a entrar."
+    ],
+    "Seis de Bastos": [
+      "Trata hoy tu ánimo como herida que se cura, no como defecto que se castiga: un paseo, una terapia, una conversación de verdad. La ayuda profesional no es para débiles: es para los que quieren volver.",
+      "Pide o concreta apoyo concreto esta semana: un profesional, un grupo, un amigo que sostenga. Y nombra el porqué de tu bajón: el motivo nombrado pierde la mitad de su fuerza."
+    ],
+    "Siete de Bastos": [
+      "Presenta tu cadena de valor esta semana: un logro, un proyecto, una conversación clara sobre tu posición. El trabajo premia a quien se muestra en movimiento.",
+      "Recuerda por qué empezaste: revisa si tu labor hoy te sigue mirando igual. Si no, diseña el cambio de rumbo: la responsabilidad también se elige."
+    ],
+    "Ocho de Bastos": [
+      "Identifica una sola atadura real y trabájala con ayuda esta semana: una conversación, un profesional, un límite concreto. La libertad se hace de cortes limpios y pequeños.",
+      "Fortalece el autocontrol y la confianza: una rutina clara, un hábito que sostienes, una palabra que cumples contigo. Lo que dependía de otros vuelve a tu mano cuando te la das."
+    ],
+    "Sota de Bastos": [
+      "Haz una inversión de fuego en ti hoy: empieza el proyecto, expón tu idea, estrena tu carisma. Tu seguridad se demuestra en actos visibles.",
+      "Vigila que el temperamento no gobierne tus finanzas ni tus celos: compra con cabeza, ama con entrega y elige tus batallas. La pasión es fuerza cuando la diriges tú."
+    ],
+    "Rey de Bastos": [
+      "Busca hoy el consejo de alguien que ya hizo ese camino y aplícalo con tu propio carácter. La experiencia ajena es el atajo que te da esta carta.",
+      "Gobierna con templanza tu energía: fija metas, descansa a tiempo y deja vías de escape al control. El verdadero poder se mantiene por años, no por ratos."
+    ],
+    "As de Copas": [
+      "Vuelve hoy a lo tuyo: llama a tu familia, pon en orden tu casa o da el primer paso del hogar o proyecto que sueñas. El bienestar se construye con presencia, no con promesas.",
+      "Haz de tu casa un refugio de verdad: un gesto de cariño, un espacio arreglado, una noche sin pantallas en compañía. Tu energía empieza a ir bien cuando tu nido está cuidado."
+    ],
+    "Dos de Copas": [
+      "Da de comer a una sola semilla: elige entre el amor, el hijo o el proyecto que sueñas y dedícale un gesto hoy. La fecundidad responde al cuidado constante, no a la emoción de un día.",
+      "Mira qué lleva tiempo gestando dentro de ti y nómbralo: crear es lo mismo que amar. Si quieres hijos o una obra, riega primero tu capacidad de darte sin medida."
+    ],
+    "Tres de Copas": [
+      "Prepárate para la noticia en vez de perseguirla: deja claro el canal por donde debe llegar y el resto fluye. Y cuando llegue, decide con calma, no golpe.",
+      "Convierte la espera en señal de autonomía: lo que está por venir no define tu valor. Mientras llega, responde tan solo a lo que ya es seguro."
+    ],
+    "Cinco de Copas": [
+      "Ponle fecha a tu reconocimiento: celebra algo concreto esta semana, en grande o en pequeño. Lo que festejas crece; lo que agradeces vuelve.",
+      "Deja la preparación perfecta y llega a la mesa: brinda con quien te quiere, acepta el elogio sin rebajarlo y nota lo que el éxito sabe mejor cuando se comparte."
+    ],
+    "Seis de Copas": [
+      "Usa un recuerdo bueno como mapa para hoy: haz algo esta semana que huela a tu alegría de siempre. El pasado es brújula, no cárcel.",
+      "Suelta el recuerdo que pesa: una conversación, una carta o una despedida consciente de lo que ya fue. Honrar tu historia es agradecerla y soltar el resto a tiempo."
+    ],
+    "Siete de Copas": [
+      "Recoge un fruto concreto de tu esfuerzo hoy: reconócete un logro, compártelo y no lo demores. La plenitud se cimenta en gratitud pequeña y diaria.",
+      "Deja de vivir a medio gas: date permiso de querer y de recibir. Lo que deseas merece ser aceptado con los brazos abiertos, sin culpa."
+    ],
+    "Ocho de Copas": [
+      "Activa tu red con generosidad: llama, ofrece ayuda, pide consejo. La buena suerte rara vez es solitaria: casi siempre viene con nombre propio.",
+      "Rodéate mejor: identifica a alguien que sume y acercaos un paso esta semana. Y no olvides que las puertas se abren más fácil cuando tú también sabes abrirlas."
+    ],
+    "Nueve de Copas": [
+      "Da de verdad hoy: un gesto, un tiempo, una escucha completa sin esperar nada. Y deja que llegado el día también te toque recibir sin dar explicaciones.",
+      "Reparte tu entrega con justicia: primero tu vaso lleno, luego el de los otros. La ayuda que nace de la plenitud se sostiene; la que nace del vacío, se apaga."
+    ],
+    "Sota de Copas": [
+      "Permite que esta semana algo dentro de ti se ilusione: un deseo, un plan tierno, una meta creativa. Y verifica con hechos que lo que te mueve también te corresponde.",
+      "Cuida tu sensibilidad sin esconderla: tu capacidad de soñar es tu fuerza, no tu ingenuidad. Úsala para crear, no para herirte con la realidad de otros."
+    ],
+    "Caballero de Copas": [
+      "Defiende hoy una causa pequeña con toda tu pasión: la lealtad se practica en las cosas mínimas antes de usarse en las grandes.",
+      "No dejes que tu idealismo se convierta en excusa para huir: comprométete con una persona real y un plan concreto. Tu capacidad de amar es grande: que encuentre también donde aterrizar."
+    ],
+    "Rey de Copas": [
+      "Convierte un sueño en plan concreto esta semana: papel, fecha y primer paso. Tus utopías necesitan tierra donde echar raíces.",
+      "Regula tu ánimo con rutinas que te anclen: descanso, movimiento y una meta clara. Tu sensibilidad es tu radar, pero el timón lo llevas tú."
+    ],
+    "Cuatro de Espadas": [
+      "Programa un alto real esta semana: horas de sueño, un chequeo, un día de silencio. Tu cuerpo no pide capricho: pide tregua, y dártela es sabiduría.",
+      "No camines solo por el tramo quebrado: pide ayuda antes de derrumbarte. Atender la salud física y emocional a tiempo convierte el bache en simple ruta."
+    ],
+    "Cinco de Espadas": [
+      "Elige con cabeza la única pelea de esta temporada y prepara bien el terreno: ni golpes por impulso ni rendiciones por miedo. Quien pelea por elección, pelea a favor.",
+      "Sanciona tu mente contradictoria: cuando el pensamiento te sabotea, escríbelo y contrasta con datos. Cuida lo que te dices: también eso es campo de batalla."
+    ],
+    "Seis de Espadas": [
+      "Ordena tu verdad interna antes de remar: anota qué es tuyo y qué no, y habla claro con quien te importa. La claridad endereza la navegación.",
+      "No confundas debilidad con destino: el tramo es difícil, no eterno. Sostén el plan, rodéate de aliados y celebra cada milla: el puerto sigue ahí."
+    ],
+    "Siete de Espadas": [
+      "Usa la esperanza que llega como combustible de un plan: fija una meta a corto plazo y dale un paso hoy. Esperar con acción es creer en serio.",
+      "Vigila el ruido interior que sabotea: los celos y el miedo no son del destino, son tuyos. Acógelos, nómbralos y decide desde la razón que esta carta te devuelve."
+    ],
+    "Nueve de Espadas": [
+      "Trata tu angustia como herida seria, no como defecto: duerme, habla con alguien de confianza y reduce el alcohol y las vigilias. El descanso es el mejor remedio inicial.",
+      "Quita el poder al peor escenario poniéndolo por escrito y contrastándolo: casi nunca resiste el día. Traza un plan chico para el tramo duro: el susto baja cuando entra la luz."
+    ],
+    "Sota de Espadas": [
+      "Rodéate de una mente valiosa esta semana y escúchala de verdad: la claridad ajena es atajo. Y devuelve el favor siendo honesto con sus puntos débiles.",
+      "Ejercita tu mirada: observa, pregunta, contrasta. Tu mejor defensa en este momento es pensar antes de sentir y documentar antes de afirmar."
+    ],
+    "Caballero de Espadas": [
+      "Pon toda tu determinación en una sola causa justa y defiéndela con datos, no con furia. El valor que se expone en orden vence a la fuerza que llega gritando.",
+      "Ante la disputa que viene, actúa con decisión y sin venganza: prepara tu posición, guarda los fierros y deja que el tiempo dé la razón a quien peleó derecho."
+    ],
+    "Rey de Espadas": [
+      "Resuelve hoy un asunto pendiente con un papel y una fecha clara: la claridad administrativa también es coraje. Tu palabra y tu estructura son tu mejor armadura.",
+      "No dejes que la razón se vuelva rigidez: decide con criterio, pero con ternura. El equilibrio entre mente y corazón es la verdadera forma de gobernar tu vida."
+    ],
+    "As de Oros": [
+      "Emprende el proyecto que llevas nombrando: esta semana dale fecha, papel y primer paso. El oro bendice al que siembra en movimiento.",
+      "Comparte una parte de tu buena racha y agradécele a tu suerte: la abundancia que circula se renueva. Tu prosperidad se consolida cuando la haces circular."
+    ],
+    "Dos de Oros": [
+      "Si algo te despierta celos o rivalidad, conviértelo en conversación honesta en vez de monólogo interno: el dato real desactiva casi todo el drama.",
+      "Ordena el tema económico pendiente con un calendario y plazos claros: quitarle el misterio a la deuda es el primer paso para que deje de agobiarte."
+    ],
+    "Tres de Oros": [
+      "Presenta tu proyecto o tu idea en su versión lista: hoy es buen día para mostrar lo que sabes. La fortuna favorece al que se expone en el momento justo.",
+      "Medita bien una sola decisión antes de ejecutarla: que la madurez te cuide donde la impulsividad quiso cobrarse. Reserva un colchón para lo imprevisto y firma con calma."
+    ],
+    "Cuatro de Oros": [
+      "Da hoy un gesto de generosidad con dinero o tiempo y observa cómo se afloja la mano: la cuenta no es tu identidad. Tu bienestar se expande cuando circula.",
+      "Prevé el lío antes de que llegue: revisa un papel, un acuerdo o una cuenta con fecha larga. La seguridad se construye con prevención y no con temor."
+    ],
+    "Cinco de Oros": [
+      "Concreta hoy un gesto de afecto con quien de verdad te sostiene: un llamado, una visita, una palabra clara. Los lazos se nutren con presencia, no con promesas.",
+      "Si hay desavenencias, despliega la conversación grande: qué falta, qué sobra y qué se puede ceder. Arreglar a tiempo es la mitad del milagro."
+    ],
+    "Seis de Oros": [
+      "Da y pide en equilibrio esta semana: ofrece ayuda desinteresada y también un sincero puedo recibir. La marea sube para quien fluye con ella.",
+      "Suelta la comparación: la codicia y los celos solo nublan tu propio camino. Cuenta lo tuyo, agradece lo mínimo y deja que tu generosidad te devuelva la alegría."
+    ],
+    "Nueve de Oros": [
+      "Cierra hoy un asunto pendiente, por pequeño que sea: una deuda de palabra, una conversación debida, un trámite olvidado. Los cambios bendicen a quien va ligero de equipaje.",
+      "Toma una decisión que llevas posponiendo en lo laboral o sentimental: la inestabilidad se sana con elección, no esperando a que el escenario se aclare solo."
     ]
   },
 
