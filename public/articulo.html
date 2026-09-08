@@ -3,29 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Artículo · El ORA🌙ULO de ZIGURATH Y ANAIA</title>
-  <meta name="description" content="Artículo de tarot, espiritualidad y guía angelical de El ORA🌙ULO de ZIGURATH Y ANAIA.">
+  <title>Artículo · EL CENDERO DE LOS AR🌙ANGELES</title>
+  <meta name="description" content="Artículo de tarot, espiritualidad y guía angelical de EL CENDERO DE LOS AR🌙ANGELES.">
   <meta name="keywords" content="tarot, espiritualidad, rituales, arcángeles, luna, sol, portales energéticos">
-  <meta name="author" content="El ORA🌙ULO de ZIGURATH Y ANAIA">
+  <meta name="author" content="EL CENDERO DE LOS AR🌙ANGELES">
   <meta property="og:type" content="article">
-  <meta property="og:site_name" content="El ORA🌙ULO de ZIGURATH Y ANAIA">
-  <meta property="og:title" content="Artículo · El ORA🌙ULO de ZIGURATH Y ANAIA">
+  <meta property="og:site_name" content="EL CENDERO DE LOS AR🌙ANGELES">
+  <meta property="og:title" content="Artículo · EL CENDERO DE LOS AR🌙ANGELES">
   <meta property="og:description" content="Información práctica sobre espiritualidad, rituales, arcángeles, luna y sol.">
   <meta property="og:url" content="https://oraculo1-hhwc.onrender.com/articulo.html">
   <meta property="og:image" content="https://oraculo1-hhwc.onrender.com/og-imagen.png">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Artículo · El ORA🌙ULO de ZIGURATH Y ANAIA">
+  <meta name="twitter:title" content="Artículo · EL CENDERO DE LOS AR🌙ANGELES">
   <meta name="twitter:description" content="Información práctica sobre espiritualidad, rituales, arcángeles, luna y sol.">
   <link id="canonical-articulo" rel="canonical" href="https://oraculo1-hhwc.onrender.com/articulo.html">
   <script id="datos-articulo" type="application/ld+json">{}</script>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔮</text></svg>">
-  <link rel="stylesheet" href="/css/estilo.css?v=12">
+  <link rel="stylesheet" href="/css/estilo.css?v=17">
 </head>
 <body>
 
   <header class="nav">
     <div class="nav-inner">
-      <a class="logo" href="/"><span>☾</span> El ORA🌙ULO de ZIGURATH Y ANAIA</a>
+      <a class="logo" href="/"><span>☾</span> EL CENDERO DE LOS AR🌙ANGELES</a>
       <nav class="menu">
         <a href="/tarot.html">Tarot</a>
         <a href="/blog.html">Blog</a>
@@ -80,11 +80,11 @@
   </main>
 
   <footer class="pie">
-    <div class="logo"><span>☾</span> El ORA🌙ULO de ZIGURATH Y ANAIA</div>
+    <div class="logo"><span>☾</span> EL CENDERO DE LOS AR🌙ANGELES</div>
     <p>Que la luz te acompañe</p>
   </footer>
 
-  <script src="/js/app.js?v=10"></script>
+  <script src="/js/app.js?v=13"></script>
   <script>
     const id = new URLSearchParams(location.search).get("id");
 
@@ -99,7 +99,7 @@
       const grupo = grupos.find(item => item.coincide.test(post.titulo + " " + post.cuerpo)) || grupos[2];
       const descripcion = (post.resumen || post.cuerpo || "").replace(/\s+/g, " ").trim().slice(0, 155);
       const url = `${location.origin}/articulo.html?id=${post.id}`;
-      document.title = `${post.titulo} · El ORA🌙ULO de ZIGURATH Y ANAIA`;
+      document.title = `${post.titulo} · EL CENDERO DE LOS AR🌙ANGELES`;
       document.querySelector('meta[name="description"]').setAttribute("content", descripcion);
       document.querySelector('meta[name="keywords"]').setAttribute("content", grupo.palabras.join(", "));
       document.querySelector('meta[property="og:title"]').setAttribute("content", post.titulo);
@@ -116,7 +116,7 @@
         description: descripcion,
         image: post.portada ? [post.portada] : [],
         author: { "@type": "Person", name: post.autor },
-        publisher: { "@type": "Organization", name: "El ORA🌙ULO de ZIGURATH Y ANAIA" },
+        publisher: { "@type": "Organization", name: "EL CENDERO DE LOS AR🌙ANGELES" },
         datePublished: post.creado_en,
         dateModified: post.actualizado || post.creado_en,
         mainEntityOfPage: url,

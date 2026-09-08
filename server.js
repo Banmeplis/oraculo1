@@ -471,6 +471,26 @@ app.put("/api/perfil/password", requiereAuth, (req, res) => {
   res.json({ ok: true });
 });
 
+/* --------------------------- contador de visitas ------------------------ */
+app.get("/api/visita", (req, res) => {
+  try {
+    const row = db.prepare("SELECT total FROM visitas WHERE id = 1").get();
+    res.json({ total: (row && row.total) || 0 });
+  } catch (e) {
+    res.json({ total: 0 });
+  }
+});
+
+app.post("/api/visita", (req, res) => {
+  try {
+    db.prepare("UPDATE visitas SET total = total + 1, actualizado = datetime('now') WHERE id = 1").run();
+    const row = db.prepare("SELECT total FROM visitas WHERE id = 1").get();
+    res.json({ total: row.total });
+  } catch (e) {
+    res.status(500).json({ error: "No se pudo registrar la visita" });
+  }
+});
+
 /* --------------------------------- webapp ------------------------------- */
 app.listen(PUERTO, () => {
   console.log("✦ Oráculo corriendo en  http://localhost:" + PUERTO);

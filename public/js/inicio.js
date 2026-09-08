@@ -8,13 +8,13 @@ window.INICIO = (function () {
 
   /* Los 7 arcángeles regentes según el día de la semana (tradición) */
   var ARCANGELES = {
-    miguel:  { nombre: "Arcángel Miguel", dia: 0, regencia: "Protección, fuerza y valor",  emoji: "⚔️", color: [59, 130, 246] },
-    jofiel:  { nombre: "Arcángel Jofiel", dia: 1, regencia: "Sabiduría, iluminación y lucidez", emoji: "🌸", color: [250, 204, 21] },
-    chamuel: { nombre: "Arcángel Chamuel", dia: 2, regencia: "Amor, unión familiar y perdón", emoji: "💖", color: [244, 114, 182] },
-    gabriel: { nombre: "Arcángel Gabriel", dia: 3, regencia: "Pureza, comunicación y guía", emoji: "🕊️", color: [226, 232, 240] },
-    rafael:  { nombre: "Arcángel Rafael", dia: 4, regencia: "Salud, sanación y bienestar",  emoji: "💚", color: [74, 222, 128] },
-    uriel:   { nombre: "Arcángel Uriel", dia: 5, regencia: "Abundancia, paz y prosperidad", emoji: "🔥", color: [249, 115, 22] },
-    zadkiel: { nombre: "Arcángel Zadkiel", dia: 6, regencia: "Perdón, libertad y transformación", emoji: "💜", color: [147, 51, 234] }
+    miguel:  { nombre: "Arcángel Miguel", dia: 0, regencia: "Protección, fuerza y valor",  emoji: "⚔️", img: "/arcangeles/miguel.jpeg",  color: [59, 130, 246] },
+    jofiel:  { nombre: "Arcángel Jofiel", dia: 1, regencia: "Sabiduría, iluminación y lucidez", emoji: "🌸", img: "/arcangeles/jofiel.jpeg",  color: [250, 204, 21] },
+    chamuel: { nombre: "Arcángel Chamuel", dia: 2, regencia: "Amor, unión familiar y perdón", emoji: "💖", img: "/arcangeles/chamuel.jpeg", color: [244, 114, 182] },
+    gabriel: { nombre: "Arcángel Gabriel", dia: 3, regencia: "Pureza, comunicación y guía", emoji: "🕊️", img: "/arcangeles/gabriel.jpeg", color: [226, 232, 240] },
+    rafael:  { nombre: "Arcángel Rafael", dia: 4, regencia: "Salud, sanación y bienestar",  emoji: "💚", img: "/arcangeles/rafael.jpeg",  color: [74, 222, 128] },
+    uriel:   { nombre: "Arcángel Uriel", dia: 5, regencia: "Abundancia, paz y prosperidad", emoji: "🔥", img: "/arcangeles/uriel.jpeg",   color: [249, 115, 22] },
+    zadkiel: { nombre: "Arcángel Zadkiel", dia: 6, regencia: "Perdón, libertad y transformación", emoji: "💜", img: "/arcangeles/zadkiel.jpeg", color: [147, 51, 234] }
   };
 
   var SEMANA = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
@@ -112,6 +112,73 @@ window.INICIO = (function () {
     return fraccion;
   }
 
+  /* ------------------- solsticios y equinoccios del año ------------------ */
+  var EVENTOS = [
+    { nombre: "Equinoccio de primavera", emoji: "🌸", mes: 2, dia: 20 },
+    { nombre: "Solsticio de verano",     emoji: "☀️", mes: 5, dia: 21 },
+    { nombre: "Equinoccio de otoño",     emoji: "🍂", mes: 8, dia: 22 },
+    { nombre: "Solsticio de invierno",   emoji: "❄️", mes: 11, dia: 21 }
+  ];
+
+  function renderEstaciones() {
+    var pts = document.getElementById("estaciones-puntos");
+    if (!pts) return;
+    var hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+    var fsA = EVENTOS.map(function (e) { return new Date(hoy.getFullYear(), e.mes, e.dia); });
+    var estacion = 3;
+    if (hoy >= fsA[3]) estacion = 3;
+    else if (hoy >= fsA[2]) estacion = 2;
+    else if (hoy >= fsA[1]) estacion = 1;
+    else if (hoy >= fsA[0]) estacion = 0;
+    pts.innerHTML = "";
+    EVENTOS.forEach(function (e, i) {
+      var s = document.createElement("span");
+      s.className = "cosmico-pt" + (i === estacion ? " activo" : "");
+      s.textContent = e.emoji;
+      s.title = e.nombre;
+      pts.appendChild(s);
+    });
+  }
+
+  /* --------------------- contador de visitas (odómetro) ------------------ */
+  function renderOdometer() {
+    var caja = document.getElementById("od-caja");
+    if (!caja) return;
+    var hoy = new Date().toDateString();
+    var ultimo = localStorage.getItem("oraculoContadorFecha");
+    var nuevo = ultimo !== hoy;
+    var fin = function (total) {
+      var txt = String(total).padStart(7, "0");
+      caja.innerHTML = "";
+      for (var i = 0; i < txt.length; i++) {
+        var r = document.createElement("div");
+        r.className = "od-rueda";
+        var tira = document.createElement("div");
+        tira.className = "od-listado";
+        tira.style.setProperty("--d", Number(txt[i]));
+        for (var j = 0; j < 10; j++) {
+          var d = document.createElement("span");
+          d.className = "od-digito";
+          d.textContent = j;
+          tira.appendChild(d);
+        }
+        r.appendChild(tira);
+        caja.appendChild(r);
+      }
+      requestAnimationFrame(function () { caja.classList.add("od-girando"); });
+    };
+    fetch("/api/visita", {
+      method: nuevo ? "POST" : "GET",
+      headers: { "Content-Type": "application/json" }
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        localStorage.setItem("oraculoContadorFecha", hoy);
+        fin(data.total || 0);
+      })
+      .catch(function () { fin(0); });
+  }
+
   /* ------------------------ portal energético del día --------------------- */
   var PORTAL_NIVELES = {
     ninguno:    { etiqueta: "Sin portal energético" },
@@ -206,7 +273,7 @@ window.INICIO = (function () {
 
     document.getElementById("rd-fecha").textContent = fHoy;
     var seal = document.getElementById("rd-seal");
-    seal.textContent = arc.emoji;
+    seal.innerHTML = '<img src="' + arc.img + '" alt="' + arc.nombre + '" loading="lazy">';
     seal.style.background =
       "radial-gradient(circle at 35% 30%, rgba(255,255,255,0.45), transparent 60%), linear-gradient(160deg, rgba(" + arc.color.join(",") + ",0.95), rgba(140,110,220,0.8))";
     seal.style.boxShadow = "0 10px 30px rgba(" + arc.color.join(",") + ",0.6)";
@@ -221,6 +288,8 @@ window.INICIO = (function () {
   function init() {
     renderCicloLunar();
     renderRegenteDia();
+    renderEstaciones();
+    renderOdometer();
   }
 
   document.addEventListener("DOMContentLoaded", init);

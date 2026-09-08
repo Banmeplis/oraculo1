@@ -164,6 +164,8 @@ nav.menu a.destacado:hover { filter: brightness(1.1); color: var(--nocturno); }
   justify-content: center;
   gap: 8px;
   flex-wrap: wrap;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .btn-nav,
@@ -217,6 +219,23 @@ nav.menu a.destacado:hover { filter: brightness(1.1); color: var(--nocturno); }
   height: 32px;
   border-radius: 50%;
   object-fit: cover;
+  border: 1px solid rgba(233, 206, 143, 0.6);
+  box-shadow: 0 0 18px rgba(233, 206, 143, 0.25);
+}
+
+.user-avatar-inicial {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  background: linear-gradient(135deg, var(--dorado-fuerte), var(--dorado));
+  color: var(--nocturno);
+  font-weight: 700;
+  font-size: 0.95rem;
   border: 1px solid rgba(233, 206, 143, 0.6);
   box-shadow: 0 0 18px rgba(233, 206, 143, 0.25);
 }
@@ -629,7 +648,7 @@ h3 { font-size: 1.25rem; }
 .resultado .arcangel-sello-nuevo > span { font-size: 2rem; filter: drop-shadow(0 0 12px rgba(var(--arc-color),0.8)); }
 .resultado .arcangel-sello-nuevo small { color: var(--blanco-humo); }
 .resultado .arcangel-bloque-nueva .carta-texto { flex: 1; }
-.resultado .arcangel-bloque-nueva .carta-texto .interp { font-size: 1.2rem; }
+.resultado .arcangel-bloque-nueva .carta-texto .interp { font-size: 1.48rem; line-height: 1.6; }
 .contexto-arcangel { margin-top: 16px; padding: 14px 16px; border-left: 3px solid rgb(var(--arc-color)); border-radius: 0 12px 12px 0; background: rgba(var(--arc-color),0.1); color: var(--blanco-humo) !important; font-family: var(--fuente-serif); font-size: 1.12rem !important; line-height: 1.55 !important; text-align: left; }
 .resultado .arcangel-bloque-nueva .carta-texto { text-align: center; }
 .resultado .arcangel-bloque-nueva .carta-texto .interp { text-align: left; }
@@ -669,13 +688,16 @@ h3 { font-size: 1.25rem; }
   .resultado .carta-grande.carta-interpretacion-nueva { flex-wrap: wrap; }
   .resultado .carta-grande .sello-interpretacion { margin: 0 auto; }
   .resultado .carta-grande .arcangel-seccion-nueva { flex-basis: 100%; }
+  .escenario.estrellas, .escenario.cruz-celta { height: auto; width: 100%; align-content: stretch; padding: 8px 0; }
+  .escenario.estrellas .carta-plaza, .escenario.cruz-celta .carta-plaza { position: static; margin: 6px; transform: none; }
+  .mazo.mazo-layout { margin-top: 8px; margin-bottom: 0; }
 }
 .dorso-mini::before { content: "✦"; color: var(--dorado); font-size: 1.5rem; text-shadow: 0 0 14px rgba(212, 175, 55, 0.9); }
 .dorso-mini::after { content: ""; position: absolute; inset: 7px; border: 1px solid rgba(212, 175, 55, 0.45); border-radius: 6px; }
 .dorso-mini { position: relative; }
 
 /* Escenario de tirada: cartas boca abajo */
-.escenario { display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; padding: 40px 0; }
+.escenario { display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; padding: 40px 0; position: relative; align-items: flex-start; }
 .carta-plaza {
   width: 112px; height: 176px;
   border-radius: 14px;
@@ -727,6 +749,47 @@ h3 { font-size: 1.25rem; }
   letter-spacing: 1px;
   text-transform: uppercase;
 }
+
+/* Estrella de 5 cartas: plazas formando una estrella */
+.escenario.estrellas { height: 620px; width: 640px; max-width: 100%; padding: 0; }
+.escenario.estrellas .carta-plaza {
+  position: absolute; left: 50%; top: 50%; margin: 0;
+  transform: translate(-50%, -50%) rotate(calc(var(--i) * 72deg)) translateY(-195px) rotate(calc(var(--i) * -72deg));
+}
+
+/* Cruz Celta: cruz (4 direcciones + staff de 4 a la derecha) */
+.escenario.cruz-celta { height: 640px; width: 900px; max-width: 100%; padding: 0; }
+.escenario.cruz-celta .carta-plaza {
+  position: absolute; left: 50%; top: 50%; margin: 0;
+  transform: translate(calc(var(--cx) * 1px), calc(var(--cy) * 1px)) translate(-50%, -50%) rotate(var(--rot, 0deg));
+}
+
+/* El mazo fluye debajo del escenario (fuera de él) para no tapar las plazas */
+.mazo.mazo-layout { margin-top: 14px; margin-bottom: 4px; }
+
+/* Avatar de arcángel con partículas (resultados y chips) */
+.arc-avatar { position: relative; display: inline-block; width: 26px; height: 26px; border-radius: 50%; flex: none; }
+.arc-avatar img { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; display: block; border: 2px solid rgb(var(--chip)); box-shadow: 0 0 12px rgba(var(--chip), 0.9); mix-blend-mode: screen; }
+.arc-avatar i { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: rgb(var(--chip)); box-shadow: 0 0 6px 1px rgba(var(--chip), 0.9); animation: arcP 2.6s ease-in-out infinite; }
+.arc-avatar i:nth-child(1) { top: -6px; left: 50%; animation-delay: -0.4s; }
+.arc-avatar i:nth-child(2) { top: 50%; right: -7px; animation-delay: -1.2s; }
+.arc-avatar i:nth-child(3) { bottom: -7px; left: 40%; animation-delay: -2s; }
+.arc-avatar i:nth-child(4) { top: 8%; left: -7px; animation-delay: -2.8s; }
+@keyframes arcP {
+  0%, 100% { opacity: 0; transform: translateY(2px) scale(0.6); }
+  50% { opacity: 1; transform: translateY(-2px) scale(1.25); }
+}
+.ar-chip .arc-avatar { margin-right: 8px; }
+
+/* Partículas flotantes dentro del div del arcángel (bloques de resultado) */
+.bloque-categoria, .mensaje-poderoso { position: relative; }
+.arc-part { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; border-radius: inherit; }
+.bloque-categoria > :not(.arc-part), .mensaje-poderoso > :not(.arc-part) { position: relative; z-index: 1; }
+.arc-part i { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: rgb(var(--arc-color, 212, 175, 55)); box-shadow: 0 0 10px 2px rgba(var(--arc-color, 212, 175, 55), 0.85); opacity: 0; animation: particulaArcangel 4.5s linear infinite; }
+.arc-part i:nth-child(1) { left: 8%; top: 22%; animation-delay: -1s; }
+.arc-part i:nth-child(2) { right: 12%; top: 55%; animation-delay: -2.6s; }
+.arc-part i:nth-child(3) { left: 18%; bottom: 12%; animation-delay: -3.6s; }
+.arc-part i:nth-child(4) { right: 20%; bottom: 30%; animation-delay: -1.8s; }
 
 /* ------------------------------- blog ----------------------------------- */
 .post {
@@ -1115,14 +1178,14 @@ h3 { font-size: 1.25rem; }
 }
 .bloque-categoria p {
   font-family: var(--fuente-serif);
-  font-size: 1.4rem;
+  font-size: 1.48rem;
   line-height: 1.6;
   color: var(--blanco-humo);
   text-align: justify;
 }
 .bloque-categoria .presencia-arc {
   font-family: var(--fuente-cuerpo);
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 500;
   letter-spacing: 0.4px;
   color: rgba(var(--color-arc), 1);
@@ -1250,6 +1313,7 @@ footer.pie .enlace { color: var(--dorado); text-decoration: none; }
 .barra-lunar {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 14px;
   flex-wrap: wrap;
   padding: 10px 24px;
@@ -1263,9 +1327,27 @@ footer.pie .enlace { color: var(--dorado); text-decoration: none; }
 .barra-lunar .lunar-texto { display: flex; flex-direction: column; line-height: 1.15; }
 .barra-lunar .lunar-texto strong { color: var(--dorado); font-family: var(--fuente-titulo); letter-spacing: 0.5px; }
 .barra-lunar .lunar-texto span { color: var(--lavanda-suave); font-size: 0.78rem; }
-.barra-lunar .lunar-puntos { margin-left: auto; display: flex; gap: 4px; font-size: 0.95rem; }
+.barra-lunar .lunar-puntos { margin-left: 0; display: flex; gap: 4px; font-size: 0.95rem; }
 .barra-lunar .lunar-pt { opacity: 0.35; filter: grayscale(0.4); transition: 0.3s; }
 .barra-lunar .lunar-pt.activo { opacity: 1; transform: scale(1.35); filter: drop-shadow(0 0 6px rgba(212,175,55,0.9)); }
+.barra-lunar .estaciones-puntos {
+  display: flex;
+  gap: 5px;
+  font-size: 0.95rem;
+  margin-left: 6px;
+  padding-left: 14px;
+  border-left: 1px solid rgba(212, 175, 55, 0.25);
+}
+.barra-lunar .estaciones-puntos .cosmico-pt {
+  opacity: 0.35;
+  filter: grayscale(0.6);
+  transform: scale(0.9);
+}
+.barra-lunar .estaciones-puntos .cosmico-pt.activo {
+  opacity: 1;
+  filter: drop-shadow(0 0 7px rgba(212, 175, 55, 0.95));
+  transform: scale(1.45);
+}
 .barra-lunar .lunar-portal {
   flex-shrink: 0;
   margin-left: 14px;
@@ -1302,7 +1384,24 @@ footer.pie .enlace { color: var(--dorado); text-decoration: none; }
 }
 @media (max-width: 600px) {
   .barra-lunar .lunar-puntos { display: none; }
+  .barra-lunar .estaciones-puntos { display: none; }
   .barra-lunar .lunar-portal { margin-left: 0; }
+}
+
+/* ==================== solsticios y equinoccios (en la barra lunar) ====== */
+.cosmico-pt {
+  font-size: 1rem;
+  line-height: 1;
+  opacity: 0.4;
+  filter: grayscale(0.5);
+  transition: 0.3s;
+  cursor: default;
+  transform-origin: center;
+}
+.cosmico-pt.activo {
+  opacity: 1;
+  transform: scale(1.35);
+  filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.9));
 }
 
 /* ==================== arcángel regente del día ========================= */
@@ -1344,12 +1443,17 @@ footer.pie .enlace { color: var(--dorado); text-decoration: none; }
 .regente-dia .rd-fecha { color: var(--lavanda-suave); font-size: 0.85rem; }
 .regente-dia .rd-cuerpo { display: flex; align-items: center; gap: 24px; padding: 26px 28px; }
 .regente-dia .rd-seal {
-  width: 96px; height: 96px; flex: none;
+  width: 280px; height: 280px; flex: none;
   border-radius: 50%;
+  overflow: hidden;
   display: grid; place-items: center;
-  font-size: 2.7rem;
-  background: rgba(var(--arc-dia, 212,175,55), 0.2);
-  box-shadow: 0 10px 30px rgba(var(--arc-dia, 212,175,55), 0.5);
+  border: 3px solid rgba(var(--arc-dia, 212,175,55), 0.95);
+  box-shadow: 0 0 0 7px rgba(var(--arc-dia, 212,175,55), 0.18), 0 18px 44px rgba(var(--arc-dia, 212,175,55), 0.55);
+}
+.regente-dia .rd-seal img {
+  width: 100%; height: 100%; object-fit: cover;
+  display: block; border-radius: 50%;
+  mix-blend-mode: screen;
 }
 .regente-dia .rd-contenido { flex: 1; min-width: 0; }
 .regente-dia .rd-contenido h2 {
@@ -1383,6 +1487,7 @@ footer.pie .enlace { color: var(--dorado); text-decoration: none; }
   .regente-dia .rd-cuerpo { flex-direction: column; text-align: center; padding: 24px 20px; }
   .regente-dia .rd-cabecera { justify-content: center; }
   .regente-dia .rd-mensaje { font-size: 1.15rem; }
+  .regente-dia .rd-seal { width: 200px; height: 200px; }
 }
 
 /* ============================ anuncios ================================== */
@@ -1397,4 +1502,104 @@ footer.pie .enlace { color: var(--dorado); text-decoration: none; }
   background: rgba(255,255,255,0.02);
   font-size: 0.85rem;
   color: var(--lavanda-suave);
+}
+
+/* ============================ botón WhatsApp ============================ */
+.btn-whatsapp,
+nav.menu a.btn-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #25d366, #1ebe5d);
+  color: #fff !important;
+  font-weight: 700;
+  font-size: 0.92rem;
+  letter-spacing: 0.4px;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.4);
+  transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+  white-space: nowrap;
+}
+.btn-whatsapp:hover,
+nav.menu a.btn-whatsapp:hover {
+  background: linear-gradient(135deg, #1ebe5d, #128c46);
+  color: #fff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(37, 211, 102, 0.55);
+}
+.btn-whatsapp .wa-ico { width: 18px; height: 18px; flex: none; }
+
+/* ==================== contador de visitantes (odómetro) ================= */
+.odometro {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: 0 auto 22px;
+  padding: 18px 26px 16px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.18), transparent 60%),
+    linear-gradient(180deg, #1a1630, #0f0b1f);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 16px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.od-etiqueta {
+  font-family: var(--fuente-titulo);
+  letter-spacing: 3px;
+  font-size: 0.72rem;
+  color: var(--dorado);
+  text-transform: uppercase;
+}
+.od-caja {
+  display: flex;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #0a0813, #171226);
+  border: 1px solid rgba(0, 0, 0, 0.7);
+  box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.85), inset 0 -2px 6px rgba(255, 255, 255, 0.06), 0 4px 14px rgba(0, 0, 0, 0.5);
+}
+.od-rueda {
+  width: 42px; height: 60px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 5px;
+  background: linear-gradient(180deg, #d8d2bd 0%, #efe9d6 45%, #c9c2ab 100%);
+  box-shadow: inset 0 10px 16px rgba(90, 80, 60, 0.55), inset 0 -8px 12px rgba(70, 62, 45, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+.od-listado {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.od-caja.od-girando .od-listado {
+  transform: translateY(calc(var(--d, 0) * -60px));
+}
+.od-digito {
+  height: 60px;
+  display: grid;
+  place-items: center;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2.6rem;
+  font-weight: 700;
+  color: #2a2417;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+.od-sub {
+  font-family: var(--fuente-serif);
+  font-size: 0.78rem;
+  color: var(--lavanda-suave);
+  font-style: italic;
+}
+@media (max-width: 600px) {
+  .od-rueda { width: 34px; height: 52px; }
+  .od-digito { height: 52px; font-size: 2.1rem; }
+  .od-caja.od-girando .od-listado { transform: translateY(calc(var(--d, 0) * -52px)); }
 }

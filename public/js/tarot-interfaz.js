@@ -2,6 +2,8 @@
 (function () {
   "use strict";
 
+  if (typeof TIRADAS !== "undefined") return;
+
   const catalogo = [
     { id: "1-carta", nombre: "Mensaje para hoy", icono: "🕯️", corto: "Una carta, un mensaje para tu día.", n: 1 },
     { id: "3-cartas", nombre: "Pasado · Presente · Futuro", icono: "💫", corto: "Tres cartas para ver tu línea del tiempo.", n: 3 },
@@ -34,20 +36,6 @@
       enlace.href = "/tirada.html?tirada=" + lectura.id;
       enlace.innerHTML = `<span class="icono">${lectura.icono}</span><strong>${lectura.nombre}</strong><br><small>${lectura.corto}</small>`;
       contenedor.appendChild(enlace);
-    });
-
-    const mazo = barajar(ORACULO.soloMayores()).slice(0, 12);
-    const bloque = document.createElement("section");
-    bloque.className = "mazo-presentacion tarjeta";
-    bloque.innerHTML = `<h3>Tu mazo está listo</h3><p>Elige una lectura y después toca las cartas para comenzar.</p><div class="mazo" id="mazo-presentacion"></div>`;
-    contenedor.parentElement.insertBefore(bloque, contenedor.nextElementSibling);
-    const zona = bloque.querySelector("#mazo-presentacion");
-    mazo.forEach((carta, indice) => {
-      const cartaEl = document.createElement("div");
-      cartaEl.className = "minicarta carta-presentacion";
-      cartaEl.style.animationDelay = `${indice * 70}ms`;
-      cartaEl.innerHTML = `<div class="dorso-mini"></div><span class="nom">✦</span>`;
-      zona.appendChild(cartaEl);
     });
   }
 

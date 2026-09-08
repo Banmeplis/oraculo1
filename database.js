@@ -3,9 +3,25 @@ const fs = require("fs");
 const path = require("path");
 
 const DB_DIR = process.env.DATA_DIR || path.join(__dirname, "data");
+const DB_PATH = path.join(DB_DIR, "oraculo.db");
 fs.mkdirSync(DB_DIR, { recursive: true });
 
-const db = new DatabaseSync(path.join(DB_DIR, "oraculo.db"));
+/* Si se despliega con una BD pre-sembrada en el repo (data/oraculo.db) y el
+   volumen persistido de Render aún está vacío, copiarla al volumen para que
+   la producción herede el contenido (artículos, usuarios, etc.). */
+const SEED_DB = path.join(__dirname, "data", "oraculo.db");
+if (DB_DIR !== path.join(__dirname, "data") &&
+    fs.existsSync(SEED_DB) &&
+    !fs.existsSync(DB_PATH)) {
+  try {
+    fs.copyFileSync(SEED_DB, DB_PATH);
+    console.log("DB sembrada copiada al volumen: " + DB_PATH);
+  } catch (e) {
+    console.error("No se pudo copiar la DB sembrada:", e.message);
+  }
+}
+
+const db = new DatabaseSync(DB_PATH);
 
 db.exec(`
   PRAGMA journal_mode = WAL;
@@ -54,6 +70,14 @@ db.exec(`
     cuerpo    TEXT NOT NULL,
     creado_en TEXT NOT NULL DEFAULT (datetime('now'))
   );
+
+  CREATE TABLE IF NOT EXISTS visitas (
+    id          INTEGER PRIMARY KEY CHECK (id = 1),
+    total       INTEGER NOT NULL DEFAULT 0,
+    actualizado TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  INSERT OR IGNORE INTO visitas (id, total) VALUES (1, 0);
 `);
 
 /* migraciones para DBs existentes */

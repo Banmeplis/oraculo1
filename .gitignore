@@ -6,11 +6,13 @@ config.json
 node_modules/
 
 # Datos y medios generados
-data/
 uploads/
-*.db
 *.db-wal
 *.db-shm
+
+# BD local de desarrollo: se SIEMBRA esta copia al volumen en despliegues nuevos
+# data/
+# *.db
 
 # Sistema
 .DS_Store
