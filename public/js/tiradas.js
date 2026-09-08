@@ -354,21 +354,29 @@ const TIRADAS = {
 
     const cuerpo = piezas.slice(0, 4).join(" ");
     const resto = sombras.length > 4 ? ` Y no te engañes: hay más cartas en sombra detrás de estas, todas apuntando al mismo centro. ` : "";
-    const puente = this.elegirDe([
+    const puente = (sombras.length === 1 ? [
+      `No lo mires como un castigo: te está señalando exactamente lo que estás listo para soltar.`,
+      `Pon atención a esa carta: no vino por casualidad, repite un tema que ya te está llamando.`,
+      `No te pido que la adivines: te pido que la obedezcas como la única señal que hoy hace falta.`
+    ] : [
       `No lo mires como un castigo: estas cartas te señalan exactamente lo que estás listo para soltar.`,
       `Pon atención al hilo que las une: no hay casualidad en que se repita el mismo tema.`,
       `Cada una te habla de algo distinto, pero juntas cuentan una sola historia.`,
       `No son varias lecturas: es una sola lección dicha de cuatro maneras.`,
       `Fíjate cómo se señalan entre ellas: la sombra de una confirma la de la otra.`
     ]);
-    const cierre = this.elegirDe([
+    const cierre = (sombras.length === 1 ? [
+      `Yo, ${A}, desde mi ${R}, te pido una sola cosa hoy: convierte lo que te dolió leer en acción. No necesitas más señales, necesitas obediencia.`,
+      `Mira de nuevo la carta que te señalé: no pidas otra señal, ya tienes la tuya. ${A} te lo dice con amor duro: actúa hoy y demuestra que esta lectura no cayó al vacío.`,
+      `Esta carta te deja una sola tarea: elige hoy una decisión pequeña y real, y hazla. Yo, ${A}, desde mi ${R}, empujo contigo mientras la cumples.`
+    ] : [
       `Yo, ${A}, desde mi ${R}, te pido una sola cosa hoy: elige la que más te dolió leer y conviértela en acción. Cambia una cosa y las demás girarán solas.`,
       `Mira de nuevo las cartas que te señalé: no necesitas más señales, necesitas obediencia. ${A} te lo dice con amor duro: levántate hoy y demuestra que esta lectura no cayó al vacío.`,
       `No te pido que cambies de golpe: te pido una decisión pequeña y real antes de que termine el día. Yo, ${A}, desde mi ${R}, estaré ahí para sostenerte mientras obedeces.`,
       `Cuando quieras comprobar que estas cartas no vinieron al azar, mira que todas señalan lo mismo: tu corazón ya sabe por dónde empezar. ${A} te acompaña desde mi ${R}.`
     ]);
 
-    return `${apertura} ${cuerpo}${resto} ${puente} ${cierre}`;
+    return `${apertura} ${cuerpo}${resto} ${this.elegirDe(puente)} ${this.elegirDe(cierre)}`;
   },
 
   /* tarjetas de carta con su propio mensaje, para el regaño por bloque */
@@ -549,28 +557,32 @@ const TIRADAS = {
       `${regente.nombre} te mira fijo y no te deja apartar la vista:`,
       `${regente.nombre} levanta la voz para que la escuches, y lo dice con amor de fuego:`
     ]);
-    if (resultado.fuerte) {
-      finalBloques.push({
-        icono: "🔥",
-        area: "fuerte",
-        titulo: "El regaño final",
-        arcangel: regente,
-        regano: true,
-        presencia: presenciaRegano,
-        texto: this.regañoDeCartas(resultado, regente),
-        cartasHtml: this.reganoCartaHtml(resultado.cartas)
-      });
-    } else if (propor < 0.5) {
-      finalBloques.push({
-        icono: "🔥",
-        area: "regano",
-        titulo: "Lo que tus cartas te regañan",
-        arcangel: regente,
-        regano: true,
-        presencia: presenciaRegano,
-        texto: this.regañoDeCartas(resultado, regente),
-        cartasHtml: this.reganoCartaHtml(resultado.cartas.filter(c => c.invertido))
-      });
+    /* el regaño moldeado por las cartas solo tiene sentido con 3+ cartas:
+       con una sola carta no hay sombras que contrastar ni combinación que formar */
+    if (resultado.cartas.length >= 3) {
+      if (resultado.fuerte) {
+        finalBloques.push({
+          icono: "🔥",
+          area: "fuerte",
+          titulo: "El regaño final",
+          arcangel: regente,
+          regano: true,
+          presencia: presenciaRegano,
+          texto: this.regañoDeCartas(resultado, regente),
+          cartasHtml: this.reganoCartaHtml(resultado.cartas)
+        });
+      } else if (propor < 0.5) {
+        finalBloques.push({
+          icono: "🔥",
+          area: "regano",
+          titulo: "Lo que tus cartas te regañan",
+          arcangel: regente,
+          regano: true,
+          presencia: presenciaRegano,
+          texto: this.regañoDeCartas(resultado, regente),
+          cartasHtml: this.reganoCartaHtml(resultado.cartas.filter(c => c.invertido))
+        });
+      }
     }
 
     /* la combinación de cartas solo aparece a partir de 3 cartas: con una sola
