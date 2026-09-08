@@ -187,13 +187,22 @@ const TIRADAS = {
     return String(t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   },
 
+  /* busca una palabra clave dentro de un texto ya normalizado. Las claves muy
+     cortas (2-3 letras, ej: «fe», «ex») deben ser palabra completa para no
+     sonar falsas dentro de otras palabras (ej: «jefe» contiene «fe») */
+  contienePalabra(texto, palabra) {
+    const k = this.normalizarTexto(palabra);
+    if (k.length <= 3) return new RegExp("\\b" + k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b").test(texto);
+    return texto.includes(k);
+  },
+
   /* ------------------- lectura por pregunta -----------------------------
      analiza el contexto de la pregunta y elige el arcángel más idóneo para
      ese tema: solo él responde y solo se habla de ese terreno de la vida */
   temasPregunta: {
     amor: {
       clave: "chamuel", titulo: "Amor y relaciones", icono: "💗",
-      palabras: ["amor", "pareja", "novio", "novia", "ex", "relacion", "casar", "casarme", "boda", "matrimonio", "me quiere", "regreso", "vuelta", "corazon", "celos", "ruptura", "terminamos", "enamor", "compromiso", "afecto", "separar", "separacion", "infidelidad", "quiere volver", "me deja", "quiere volver conmigo", "vuelve", "volvera", "familia", "hijo", "hija"]
+      palabras: ["amor", "pareja", "novio", "novia", "ex", "relacion", "casar", "casarme", "boda", "matrimonio", "me quiere", "me ama", "me amas", "le gusto", "le gustas", "regreso", "vuelta", "corazon", "celos", "ruptura", "terminamos", "enamor", "compromiso", "afecto", "separar", "separacion", "infidelidad", "quiere volver", "me deja", "quiere volver conmigo", "vuelve", "volvera", "familia", "hijo", "hija"]
     },
     dinero: {
       clave: "uriel", titulo: "Economía y abundancia", icono: "💰",
@@ -230,7 +239,7 @@ const TIRADAS = {
       const def = this.temasPregunta[tema];
       let puntaje = 0;
       for (const palabra of def.palabras) {
-        if (limpia.includes(this.normalizarTexto(palabra))) puntaje++;
+        if (this.contienePalabra(limpia, palabra)) puntaje++;
       }
       if (puntaje > mejorPuntaje) {
         mejorPuntaje = puntaje;
@@ -238,6 +247,23 @@ const TIRADAS = {
       }
     }
     return mejor || { tema: "mensaje", ...this.temasPregunta.mensaje };
+  },
+
+  /* detecta todos los temas que toca una pregunta (para consultas combinadas:
+     «¿Cómo me irá en el amor y el trabajo?» responde por cada área) */
+  temasEnPregunta(pregunta) {
+    const limpia = this.normalizarTexto(pregunta);
+    const coincidencias = [];
+    for (const tema of Object.keys(this.temasPregunta)) {
+      const def = this.temasPregunta[tema];
+      let puntaje = 0;
+      for (const palabra of def.palabras) {
+        if (this.contienePalabra(limpia, palabra)) puntaje++;
+      }
+      if (puntaje > 0) coincidencias.push({ puntaje, tema, ...def });
+    }
+    coincidencias.sort((a, b) => b.puntaje - a.puntaje);
+    return coincidencias;
   },
 
   /* --------------------------- esencia de cada carta ------------------------
@@ -255,7 +281,7 @@ const TIRADAS = {
     "El Carro":       { grupo: "decision",    luz: "la voluntad enfocada que llega a la victoria", sombra: "la dispersión que no llega a ninguna parte" },
     "La Fuerza":      { grupo: "animo",       luz: "el coraje sereno que doma tus miedos",         sombra: "la voz interior que te dice que no puedes" },
     "El Ermitaño":    { grupo: "espiritual",  luz: "el silencio sabio y tu guía interior",         sombra: "el aislamiento por miedo, no por paz" },
-    "La Rueda":       { grupo: "animo",       luz: "el destino que gira a tu favor",               sombra: "aferrarte a lo que la rueda ya dejó atrás" },
+    "La Rueda de la Fortuna": { grupo: "animo", luz: "el destino que gira a tu favor",               sombra: "aferrarte a lo que la rueda ya dejó atrás" },
     "La Justicia":    { grupo: "decision",    luz: "la verdad y el equilibrio que regresan",       sombra: "la responsabilidad que esquivas" },
     "El Colgado":     { grupo: "animo",       luz: "una pausa que te enseña con otra mirada",      sombra: "la quietud por miedo, el sacrificio que vacía" },
     "La Muerte":      { grupo: "animo",       luz: "el final que abre paso a un renacer",          sombra: "el pasado que no sueltas y ocupa tu presente" },
@@ -881,10 +907,11 @@ const TIRADAS = {
     const arc = this.arcangeles[analisis.clave];
     const A = this.nombreCorto(arc.nombre);
     const R = arc.regencia.toLowerCase();
+    const q = `«${this.escapar(String(resultado.pregunta || "").trim())}»`;
     return this.elegirDe([
-      `Sobre tu pregunta, yo, ${A}, respondo desde mi ${R}:`,
-      `He leído tu pregunta en el silencio del cielo y, ${A}, te respondo desde mi ${R}:`,
-      `Quien responde por este tema es ${A}, el arcángel que cuida la ${R}. Escucha:`
+      `Yo, ${A}, respondo desde mi ${R} directamente a tu pregunta ${q}:`,
+      `He leído en el silencio del cielo tu pregunta ${q} y, ${A}, te respondo desde mi ${R}:`,
+      `${A}, el arcángel que cuida la ${R}, ha escuchado tu pregunta ${q}. Escucha su respuesta:`
     ]);
   },
 
@@ -899,31 +926,380 @@ const TIRADAS = {
     ]);
   },
 
+  /* consulta combinada: la pregunta toca 2+ terrenos a la vez. Cada arcángel
+     responde por su área, todos comparten las cartas de la lectura */
+  interpretacionCombinada(resultado) {
+    const bloques = [];
+    const temas = resultado.__temasPregunta || this.temasEnPregunta(resultado.pregunta);
+    const cartas = resultado.cartas;
+    const q = this.escapar(String(resultado.pregunta || "").trim());
+    const lista = cartas.map(c => `${c.nombre}${c.invertido ? " invertida" : ""}`).join(", ");
+    const titulos = temas.map(t => t.titulo.toLowerCase());
+
+    if (!temas.length) return this.interpretacionPregunta(resultado);
+
+    bloques.push({
+      icono: "✦",
+      area: "pregunta",
+      titulo: "La respuesta de los arcángeles",
+      arcangel: this.arcangeles[temas[0].clave],
+      regano: false,
+      texto: this.elegirDe([
+        `Tu consulta «${q}» toca ${temas.length} terrenos de tu vida a la vez: ${titulos.join(", ")}. Por eso, no uno sino ${temas.length} arcángeles han venido a responderte, cada uno desde su área. ${lista} son las cartas que sostienen toda la consulta. Escúchalos uno por uno:`,
+        `Has preguntado por ${titulos.join(", ")} en una sola pregunta, y el cielo responde igual de claro: un arcángel para cada terreno. Las cartas «${lista}» dibujan el momento completo que vives:`
+      ])
+    });
+
+    temas.forEach((tema, i) => {
+      const arc = this.arcangeles[tema.clave];
+      const A = this.nombreCorto(arc.nombre);
+      const R = arc.regencia.toLowerCase();
+      const carta = cartas[i % cartas.length];
+      const e = this.esencia[carta.nombre];
+      const faceta = carta.invertido ? (e ? e.sombra : "una señal que pide atención") : (e ? e.luz : "una luz que te acompaña");
+      const pal = (carta.palabras || []).slice(0, 2).join(" y ");
+      bloques.push({
+        icono: arc.emoji,
+        area: tema.clave,
+        titulo: `${A} · ${R} · ${tema.titulo}`,
+        arcangel: arc,
+        regano: carta.invertido,
+        texto: this.elegirDe([
+          `${A} responde por el terreno de ${tema.titulo.toLowerCase()}: ${carta.nombre}${carta.invertido ? " invertida" : ""} te muestra ${faceta}. ${carta.invertido ? "En esta área hay algo que pide tu atención antes de avanzar: revisa, corrige y no fuerces." : "La energía de esta área te respalda: cuídala con una decisión concreta y avanza sin miedo."} Las claves de esta carta, ${pal}, son tu brújula en este terreno.`,
+          `En ${tema.titulo.toLowerCase()}, ${A} te dice: ${faceta} es lo que trae ${carta.nombre}${carta.invertido ? " invertida" : ""}. ${carta.invertido ? "Aquí no es momento de forzar: ordena lo pendiente y los resultados llegan solos." : "Este terreno está a tu favor: actúa con calma y constancia y verás frutos."}`
+        ])
+      });
+    });
+
+    if (cartas.length >= 3) bloques.push(this.bloqueCombinacionGlobal(resultado));
+
+    const an = resultado.__analisis;
+    const arc = this.arcangeles[an.clave];
+    const A = this.nombreCorto(arc.nombre);
+    bloques.push({
+      cierre: true,
+      texto: this.elegirDe([
+        `${A} y los demás arcángeles han respondido juntos por ${temas.length} terrenos. No tienes que resolverlo todo el mismo día: elige UNA de las áreas que preguntaste, da tu primer paso hoy y deja que las demás florezcan en su tiempo. Las cartas ya están contigo.`,
+        `Cada arcángel habló de su terreno, pero la lectura es una sola: ${lista}. Lo que se repite entre las áreas te marca la prioridad: empieza por ahí y el resto se acomoda paso a paso.`
+      ]),
+      cita: this.citas[Math.floor(Math.random() * this.citas.length)]
+    });
+
+    return bloques;
+  },
+
   interpretacionPregunta(resultado) {
     const bloques = [];
     const an = resultado.__analisis;
+    if (resultado.__tipoPregunta === "combinado") return this.interpretacionCombinada(resultado);
     const arc = this.arcangeles[an.clave];
     const cartas = resultado.cartas;
-    const bien = cartas.filter(c => !c.invertido).length;
-    const propor = bien / cartas.length;
-    const tono = propor >= 0.5 ? "luz" : "sombra";
-    const vTexto = this.voces[an.clave] ? this.voces[an.clave][tono] : arc.mensaje;
     const A = this.nombreCorto(arc.nombre);
     const regania = this.reganoDePregunta(resultado);
+    const tipo = resultado.__tipoPregunta;
+    const refNombre = tipo === "persona" ? (this.personaDePregunta(resultado.pregunta) || "esa persona") : null;
 
     bloques.push({
       icono: arc.emoji,
       area: an.clave,
-      titulo: `${A} · ${arc.regencia} · ${an.titulo}`,
+      titulo: refNombre ? `${A} · ${arc.regencia} · sobre ${refNombre}` : `${A} · ${arc.regencia} · ${an.titulo}`,
       arcangel: arc,
       regano: regania,
-      texto: `${this.aperturaPregunta(an, resultado)} ${vTexto}`
+      respuestaIA: true,
+      texto: this.respuestaDirecta(resultado)
     });
 
     if (cartas.length >= 3) bloques.push(this.bloqueCombinacionGlobal(resultado));
 
     bloques.push({ cierre: true, texto: this.cierrePregunta(resultado), cita: this.citas[Math.floor(Math.random() * this.citas.length)] });
     return bloques;
+  },
+
+  /* ------------------- respuesta directa a la pregunta ---------------------
+     detecta si la pregunta es de sí/no, sobre una persona (por su nombre) o
+     sobre una situación general, y redacta la respuesta citando la pregunta
+     tal cual. Luego la IA puede pulirla y mejorarla. */
+  esPreguntaSiNo(pregunta) {
+    const l = this.normalizarTexto(pregunta);
+    const directa = /(^|[^a-z])si o no([^a-z]|$)/.test(l) || /^si([ .?!¿]|$)/.test(l) || /^no([ .?!¿]|$)/.test(l);
+    const claves = /\b(volvera|regresara|regrese|vuelve|vuelva|me ama|me amas|me quiere|me quieres|querra|pensara|debo|deberia|debiera|puedo|podria|conviene|convenga|es bueno|es malo|es cierto|es verdad|sera|seria|me ira bien|me iria bien|ira bien|saldra bien|funcionara|resultara|lograre|conseguire|aceptara|me perdonara|quiere estar conmigo|va a funcionar|voy a|terminamos|sigamos|debemos|habra|me es fiel|me engaña|es sincero|me miente|le gusto|le caigo bien|esta enamorado|esta enamorada|se siente atraido|se siente atraida)\b/.test(l);
+    return directa || claves;
+  },
+
+  tipoDePregunta(pregunta) {
+    const l = this.normalizarTexto(pregunta);
+    const pidePersona = /\b(nombre|se llama|mi pareja|mi ex|mis ex|novio|novia|esposo|esposa|marido|mi esposo|mi marido|amigo|amiga|hermano|hermana|papa|mama|familia|esa persona|ese hombre|esa mujer|ese muchacho|esa muchacha|alguien|me engaña|me es fiel|es sincero|es sincera|me miente|le gusto|piensa en mi|le caigo bien|jefe|jefa|companero|companera|colega|vecino|vecina|socio|socia|suegra|suegro|cuñado|cuñada|que esconde|que oculta|que me oculta|que me esconde|que no me dice|que no me cuenta|que me guarda|que siente (por mi|realmente)|que piensa de mi|que opina de mi|que esta pensando|en quien piensa|esconde algo|tiene algo escondido|guarda un secreto|que intenciones tiene)\b/.test(l);
+
+    /* temas con prioridad sobre sí/no y sobre persona */
+    const esFallecido =
+      /(^|[^a-z])(murio|fallecio|fallecida|fallecido|difunto)([^a-z]|$)/.test(l) ||
+      /(^|[^a-z])(abuelo|abuela|papa|mama|tio|tia|hermano|hermana|esposo|esposa|novio|novia|amigo|amiga) (que )?(murio|fallecio)/.test(l) ||
+      /descansa en paz/.test(l);
+    const esEspiritus = /\b(espiritus|espiritu|entidad(es)?|fantasma(s)?|ser(es)? de luz|tabla ouija|medium|presencias)\b/.test(l);
+    const esEnergias = /\b(energ[ií]a(s)?|aura(s)?|vibraci(ones|ón)|campo energ[ií]tico|limpia energ[ií]tica|limpieza de energ[ií]as|mala energ[ií]a|buena energ[ií]a|ambiente cargado|protecci[oó]n energ[ií]tica)\b/.test(l);
+    const esSalud = /\b(salud|enfermedad|enfermo\w*|operaci[oó]n|m[ié]dico|doctor|dolor(es)?|curar|sanar|c[aá]ncer|coraz[oó]n|mareo|insomnio|cansancio|alimentaci[oó]n|respirar|sano|sana|me recupero|siento bien)\b/.test(l) || /\bembarazad\w*\b/.test(l) || /\bme siento mal\b/.test(l);
+    const esConsejo = /\b(qu[eé] (hago|hacer|me aconsejas|me recomiendas|debo hacer|deber[ií]a hacer|camino tom[oó]|camino sigo|me conviene hacer)|orient[aá]me|ay[uú]dame a decidir|d[ií]me qu[eé] hacer|qu[eé] sugieres|qu[eé] consejo)\b/.test(l);
+
+    const siNo = this.esPreguntaSiNo(pregunta);
+    const persona = pidePersona || !!this.personaDePregunta(pregunta);
+
+    if (esFallecido) return "fallecido";
+    if (esEspiritus) return "espiritus";
+    if (esEnergias) return "energias";
+    if (this.temasEnPregunta(pregunta).filter(t => t.tema !== "futuro").length >= 2) return "combinado";
+    if (esSalud) return "salud";
+    if (esConsejo) return "consejo";
+    if (siNo && !persona) return "si-no";
+    if (persona) return "persona";
+    return "situacion";
+  },
+
+  personaDePregunta(pregunta) {
+    const prohibidas = new Set(["el","la","los","las","un","una","si","no","que","cuanto","donde","como","cuando","sera","seria","es","son","soy","sea","fue","puede","puedo","puedes","podria","estoy","esta","estas","voy","quiere","quiero","necesito","tengo","debo","deberia","mi","me","te","se","por","para","con","sin","lo","le","su","al","del","oraculo","tarot","amor","dinero","trabajo","salud","suerte","futuro","familia","persona","pregunta","respuesta","vuelve","vuelva","vuelvo","volvera","regresa","regresara","regrese","pasa","pasara","hara","hare","haran","habra","sigue","funciona","funcionara","termino","terminamos","lograre","conseguire","aceptara","pensara","dejare","puedo","debia","debamos","empezar","comenzar","significa","significado","nombre","opinion","otra","mejor","nuevo","papa","mama","mama","mama","mamita","madre","padre","abuela","abuelo","tia","tio","hija","hijo","esposa","esposo","marido","novia","novio","amiga","amigo","hermana","hermano","relacion","relaciones","vida","energia","espiritu","espiritu","casa","alma","economia","asunto","tema","situacion","empresa","negocio","proyecto","verdad","secreto","intencion","intenciones"]);
+    const t = String(pregunta || "");
+    let nombres = (t.match(/\b([A-ZÁÉÍÓÚÑ][a-záéíóúñ]{2,})\b/g) || []).filter(n => !prohibidas.has(this.normalizarTexto(n)));
+    if (!nombres.length) {
+      const m = t.match(/\bsobre\s+([a-záéíóúñ]{3,})\b/i);
+      if (m && !prohibidas.has(this.normalizarTexto(m[1]))) nombres = [m[1]];
+    }
+    return nombres[0] || null;
+  },
+
+  parentescoDePregunta(pregunta) {
+    const l = this.normalizarTexto(pregunta);
+    const m = l.match(/\b(abuelo|abuela|papa|mama|mamita|tio|tia|hermano|hermana|hijo|hija|esposo|esposa|novio|novia|amigo|amiga)\b/);
+    return m ? m[0] : null;
+  },
+
+  respuestaDirecta(resultado) {
+    const an = resultado.__analisis;
+    const arc = this.arcangeles[an.clave];
+    const A = this.nombreCorto(arc.nombre);
+    const cartas = resultado.cartas;
+    const tipo = this.tipoDePregunta(resultado.pregunta);
+    const derechas = cartas.filter(c => !c.invertido).length;
+    const sombras = cartas.length - derechas;
+    const principal = cartas[0];
+    const e = this.esencia[principal.nombre];
+    const faceta = principal.invertido ? (e ? e.sombra : "una lección que te pide mirar hacia dentro") : (e ? e.luz : "un mensaje de luz y confianza");
+    const lista = cartas.map(c => `${c.nombre}${c.invertido ? " invertida" : ""}`).join(", ");
+    const apertura = this.aperturaPregunta(an, resultado);
+    const anTema = an.titulo.toLowerCase();
+
+    if (tipo === "fallecido") {
+      const nombre = this.personaDePregunta(resultado.pregunta);
+      const rel = this.parentescoDePregunta(resultado.pregunta);
+      const ref = (rel ? "tu " + rel : (nombre || "esa persona"));
+      let nucleo;
+      if (sombras === 0) {
+        nucleo = this.elegirDe([
+          `${ref} se muestra en tus cartas en paz y con luz: ${lista}. ${A} te dice que no hay nada que temer por ella: el descanso es suyo, y el recuerdo que te dejó es tu fuerza. Honra lo que vivió con algo pequeño y real cuando lo sientas.`,
+          `sobre ${ref}, la lectura está limpia y serena: ${lista}. ${A} confirma que encontró su paz y que la conexión que sientes no es invención: es cariño que atraviesa el velo. Queda agradecer y seguir viviendo por lo que sembró.`
+        ]);
+      } else if (sombras < derechas) {
+        nucleo = this.elegirDe([
+          `entre luz y avisos, ${ref} aparece en tu lectura: ${lista}. ${A} ve que hay algo sin cerrar entre ustedes o contigo mismo: una conversación, un perdón, una promesa. Honra ese gesto pendiente y sentirás llegar su paz a la tuya.`,
+          `${ref} se dibuja con calma pero con un hilo sin cortar: ${lista}. ${A} te sugiere un ritual sencillo de memoria: una vela, una carta escrita, una visita a su lugar. Eso te devuelve el cierre que buscas.`
+        ]);
+      } else {
+        nucleo = this.elegirDe([
+          `las cartas traen a ${ref} entre penumbras, y eso no es mal augurio: ${lista}. ${A} ve que el duelo todavía se te pesa. El dolor no es traición: es amor que cambió de forma. Déjalo llorar y agradece, y la ausencia se vuelve compañía.`,
+          `sobre ${ref}, tu lectura muestra el peso que guardas: ${lista}. ${A} te dice que no necesitas soltar a esa persona, solo soltar la culpa y la pena. Ella quiere verte entero: honrarla es vivir bien tu propia vida.`
+        ]);
+      }
+      return `${apertura} ${nucleo}`;
+    }
+
+    if (tipo === "espiritus") {
+      let nucleo;
+      if (sombras === 0) {
+        nucleo = this.elegirDe([
+          `la presencia que percibes te llega con luz: ${lista}. ${A} no ve amenaza en tu entorno: ve una voz que quiere comunicar algo bueno. Abre tu escucha, pero pide siempre claridad y respeto: el miedo es tuyo, la paz es de ellos.`,
+          `tus cartas confirman que hay compañía espiritual cercana y es benevolente: ${lista}. ${A} te enseña a diferenciar presencias: las de luz piden escucha, no sacrificio. Saluda con respeto y no entregues tu energía a quien no la cuida.`
+        ]);
+      } else if (sombras < derechas) {
+        nucleo = this.elegirDe([
+          `hay presencia real, pero mezclada con avisos: ${lista}. ${A} percibe guía y a la vez un llamado de atención. Si sientes algo cerca, ponle nombre y límite: tú decides a quién haces caso en tu casa y en tu energía.`,
+          `la lectura muestra un puente con el otro lado que aún necesita orden: ${lista}. ${A} te dice que se comunica quien tiene permiso de tu luz, y nada más. Acompaña el momento con calma y limpieza, sin miedo y sin curiosidad.`
+        ]);
+      } else {
+        nucleo = this.elegirDe([
+          `las cartas caen en sombra frente a tu pregunta espiritual: ${lista}. ${A} no te asusta: te ordena. Ese ambiente pide protección, no conversación: cierra la puerta con respeto, limpia tu espacio y tu mente, y no alimentes con miedo lo que no puedes ver.`,
+          `tu lectura advierte con cartas en sombra: ${lista}. ${A} te dice que intentemos siempre la luz primero: respira hondo, enciende una vela cuando lo sientas y recupera tu centro. La claridad nunca nace del miedo.`
+        ]);
+      }
+      return `${apertura} ${nucleo}`;
+    }
+
+    if (tipo === "energias") {
+      let nucleo;
+      if (sombras === 0) {
+        nucleo = this.elegirDe([
+          `tu campo energético está claro y protegido: ${lista}. ${A} te confirma que lo que sientes alrededor es luz que trabaja a tu favor. Mantén el orden, el descanso y la gente buena cerca: tu energía se cuida sola cuando la rodeas de lo que te hace bien.`,
+          `la lectura confirma buenas vibraciones en tu camino: ${lista}. ${A} ve tu copa llena. No la desbordes entregándola toda: quien camina lleno, llega. Agradece hoy lo que fluye.`
+        ]);
+      } else if (sombras < derechas) {
+        nucleo = this.elegirDe([
+          `hay energía buena, pero algo te la drena sin que lo notes: ${lista}. ${A} ve un gasto que no es tuyo: personas, lugares o costumbres que te vacían. Recupera lo que te roban de a uno: ordena tus horarios, tus lazos y tu casa, y la corriente vuelve.`,
+          `tu lectura mezcla luz y avisos de energía: ${lista}. ${A} te aconseja una limpieza simple y real: abre las ventanas, ordena, pon sal en los rincones que sientas pesados y corta lazos que repiten cansancio.`
+        ]);
+      } else {
+        nucleo = this.elegirDe([
+          `tu ambiente aparece cargado en la lectura: ${lista}. ${A} te dice que la energía pesada se instala donde encuentra miedo o desorden. Prende la luz, limpia, ventila y pon límites a lo que te entra por la puerta: la carga se disuelve con tu calma.`,
+          `las cartas señalan una energía densa a tu alrededor: ${lista}. ${A} no quiere que lo tomes como miedo, sino como tarea: una limpieza del espacio (orden, sal, luz, incienso) y del ánimo (descanso, música buena, lindas compañías). Vuelves a respirar.`
+        ]);
+      }
+      return `${apertura} ${nucleo}`;
+    }
+
+    if (tipo === "salud") {
+      const esSiNoS = this.esPreguntaSiNo(resultado.pregunta);
+      let nucleo;
+      if (esSiNoS) {
+        const veredicto = sombras === 0 ? "SÍ, con la energía a tu favor" : (derechas > sombras ? "sí, pero el proceso pide tiempo y cuidado" : "todavía no está de cara");
+        nucleo = this.elegirDe([
+          `sobre tu salud, la lectura responde ${veredicto}: ${lista}. ${A} ve tu cuerpo y tu ánimo hablando el mismo idioma: atiende hoy lo que ya sabes que te pide (descanso, chequeo, alimento) y la señal mejora con tu acción, no con tu miedo.`,
+          `${lista} responden a tu consulta de salud con la luz de ${A}: ${veredicto}. No es una sentencia, es un mapa: el cuerpo se acompaña, no se asusta. Da un paso concreto y humano hoy.`
+        ]);
+      } else if (sombras === 0) {
+        nucleo = this.elegirDe([
+          `tu energía vital está en buen pulso: ${lista}. ${A} te dice que tu cuerpo responde y que tu mayor aliado es tu calma. Descansa lo que pida, hidrátate, muévete y escucha las señales sin dramatizarlas: vas bien.`,
+          `la lectura de tu salud está limpia: ${lista}. ${A} ve vitalidad y recuperación en marcha. No se trata de esperar milagros: se trata de sostener cada día con cuidado y gratitud.`
+        ]);
+      } else if (sombras < derechas) {
+        nucleo = this.elegirDe([
+          `hay una mejora real, pero hay algo que sigues descuidando: ${lista}. ${A} te lo señala con suavidad: el cansancio que normalizas, la revisión que pospones, el sueño que recortas. Tu cuerpo te habla: dale la cita que merece.`,
+          `tus cartas mezclan luz y avisos en tu salud: ${lista}. ${A} ve avance con un nudo pendiente. Atiende primero lo que más se repite en tu mente: ese es el tema que tu cuerpo te pide mirar.`
+        ]);
+      } else {
+        nucleo = this.elegirDe([
+          `tu lectura en salud pide frenar y mirar: ${lista}. ${A} no te augura, te acompaña: cuando las sombras tocan el cuerpo, la respuesta es humildad y cuidado. Consulta, descansa y deja de cargar a solas lo que tiene apoyo.`,
+          `las cartas te muestran la parte de tu salud que evitas: ${lista}. ${A} te dice que el cuerpo no se persigue con miedo, se sostiene con constancia. Empieza por una cita o un descanso real: ese es el primer paso de la sanación.`
+        ]);
+      }
+      return `${apertura} ${nucleo}`;
+    }
+
+    if (tipo === "consejo") {
+      let nucleo;
+      if (sombras === 0) {
+        nucleo = this.elegirDe([
+          `tu lectura te anima a avanzar sin miedo: ${lista}. ${A} te aconseja elegir hoy una meta pequeña y real, fijar rumbo y caminar con fe: el cielo está contigo y no inventa obstáculos donde tú los ves.`,
+          `el consejo del oráculo es claro: confía en el paso que ya sientes correcto. ${lista} te respaldan. ${A} te dice: decide con calma, comprométete y camina; la luz se va aclarando mientras avanzas.`
+        ]);
+      } else if (sombras === cartas.length) {
+        nucleo = this.elegirDe([
+          `antes de decidir, calla y suelta: ${lista}. ${A} te aconseja frenar el impulso y responder desde la calma, no desde el miedo. El pájaro no decide en pleno vuelo: aterriza, mira y recién entonces elige.`,
+          `tu lectura pide humildad antes de dar el paso: ${lista}. ${A} te dice que no tomes decisiones grandes cuando el ánimo está nublado. Suelta lo que pesa, pide ayuda y decide con cabeza fría.`
+        ]);
+      } else {
+        nucleo = this.elegirDe([
+          `hay luz para avanzar y avisos para corregir: ${lista}. ${A} te aconseja avanzar con lo que ya funciona y ajustar solo lo que las sombras te señalan: sin cambios radicales hoy, con un paso firme cada día.`,
+          `el consejo es equilibrar: sostén lo bueno y suelta lo que pesa. ${lista} te lo muestran. ${A} te acompaña a dar un paso a la vez: las decisiones más sabias no apuran, ordenan.`
+        ]);
+      }
+      return `${apertura} ${nucleo}`;
+    }
+
+    if (tipo === "si-no") {
+      const nucleo = sombras === 0
+        ? `la lectura te responde que SÍ, y con fuerza: ${lista} brillan del derecho y no hay carta en sombra que lo frene. ${A} ve tu asunto destrabado: si la decisión es tuya, esta es la señal para dar el paso.`
+        : (derechas > sombras
+          ? `la lectura es un SÍ, pero con una condición que no puedes saltarte: ${lista}. Las cartas en sombra te marcan lo que llevas sin mirar. ${A} dice que lo que pides llega cuando ajustas eso primero.`
+          : (derechas === 0
+            ? `la lectura te responde NO por ahora, y no es castigo: es un “aún no” del cielo. ${lista} te muestran el revés de este tiempo. ${A} te pide frenar, soltar y cambiar el rumbo: cuando lo hagas, la puerta se abre.`
+            : `la lectura es un NO por ahora: ${lista}. ${A} ve que insistes donde la energía todavía no te acompaña. No es rechazo, es orden de pasos: atiende la señal y vuelve a preguntar con el corazón liviano.`));
+      return `${apertura} ${nucleo}`;
+    }
+
+    if (tipo === "persona") {
+      const nombre = this.personaDePregunta(resultado.pregunta);
+      const l = this.normalizarTexto(resultado.pregunta);
+      const ref = nombre || "esa persona";
+      const romantico = /\b(amor|pareja|novio|novia|esposo|esposa|marido|me ama|me amas|me quiere|me quieres|ex|regreso|regresa|vuelve|ruptura|enamor|me engaña|infiel|cortej)\b/.test(l);
+      const afecto = /\b(amigo|amiga|hermano|hermana|papa|mama|familia|confi)\b/.test(l);
+      const vinculo = romantico ? "con el corazón en juego" : (afecto ? "desde el lazo afectivo" : "con lazos a tu alrededor");
+      const intencion = /(esconde|escondiendo|escondia|oculta|ocultando|ocultaba|no me dice|no me cuenta|me guarda|encubre|secreto|guarda algo|que siente|que piensa|que opina|esta pensando|en quien piensa|tiene algo escondido|algo oculto|algo que no sabe|algo que calla)/.test(l);
+
+      let nucleo;
+      if (intencion) {
+        if (sombras === 0) {
+          nucleo = this.elegirDe([
+            `sobre ${ref}, las cartas no muestran secretos de peso: ${lista}. ${A} ve a ${ref} transparente contigo en lo esencial: lo que guarda no es contra ti, es simple prudencia. Confía en lo que ya te demuestra y no busques verdad donde no hay mentira.`,
+            `${ref} se dibuja a la luz en tu lectura: ${lista}. ${A} ve que la duda que traes (si te oculta algo, si te esconde algo) no tiene raíz en ${ref} sino en tu propia inseguridad. No hay sombra en sus cartas: pregunta con calma y deja que el tiempo lo confirme.`
+          ]);
+        } else if (sombras < derechas) {
+          nucleo = this.elegirDe([
+            `hay algo que ${ref} todavía no te dice: ${lista}. ${A} ve una reserva que no nace de mala intención: nace del miedo o de la prudencia. No la acorrales a preguntas, acércate con confianza: lo que guarda saldrá solo cuando se sienta segura.`,
+            `sobre ${ref}, tus cartas mezclan luz y señales de silencio: ${lista}. ${A} percibe que sí hay algo que no cuenta, pero no es lo que temes: es algo que está decidiendo en voz baja. No fuerces: dale una puerta abierta y escucha cuando llegue.`
+          ]);
+        } else if (sombras === derechas) {
+          nucleo = this.elegirDe([
+            `${ref} se mantiene en equilibrio entre lo que muestra y lo que guarda: ${lista}. ${A} ve que ni te oculta una verdad clara ni está lista para abrirse: ni siquiera ${ref} misma tiene decidido cómo contártelo. Espera su propio paso, no el tuyo.`
+          ]);
+        } else {
+          nucleo = this.elegirDe([
+            `${ref} llega en sombras a tu consulta: ${lista}. ${A} te dice que sí hay algo que se calla, y tiene nombre, pero no es la amenaza que imaginas: es algo que ${ref} prefiere no mirar todavía. No es una acusación, es una señal: dale espacio, deja que la verdad respire y no intentes arrebatársela con presión.`
+          ]);
+        }
+        return `${apertura} ${nucleo}`;
+      }
+
+      if (sombras === 0) {
+        nucleo = this.elegirDe([
+          `${ref} aparece en tus cartas con luz clara: ${lista}. ${A} ve a ${ref} con energía afín a la tuya y confirma que lo que preguntas tiene verdad. La señal favorece el vínculo: acércate sin miedo y deja que se demuestre solo.`,
+          `sobre ${ref}, tu lectura es favorable: ${lista} no tiene sombra. ${A} ve que esa persona sí forma parte de tu camino y que la respuesta que buscas se abrirá con tiempo y paciencia: ni la distancia ni la prisa la romperán.`
+        ]);
+      } else if (sombras < derechas) {
+        nucleo = this.elegirDe([
+          `${ref} se dibuja ${vinculo} con una mezcla de luz y distancia: ${lista}. ${A} ve que el lazo existe, pero hay algo importante sin decir. Háblale con honestidad: esa conversación que evitas es la que destraba todo.`,
+          `tu lectura muestra a ${ref} entre señales claras y avisos: ${lista}. ${A} percibe intención, sí, pero también reservas. No adivines, pregunta; lo que calles pesará más que lo que digas.`
+        ]);
+      } else if (sombras === derechas) {
+        nucleo = this.elegirDe([
+          `${ref} llega en equilibrio exacto, mitad luz y mitad aviso: ${lista}. ${A} te dice que aún no está decidido, y que esa indecisión no es tuya: es un tiempo de espera que exige paciencia, no presión.`,
+          `${ref} aparece en el centro de tu lectura: ${lista}. ${A} ve un vínculo en transición. No busques una respuesta final hoy: deja que lo que se está moviendo aclare su propia dirección.`
+        ]);
+      } else {
+        nucleo = this.elegirDe([
+          `${ref} llega a tu lectura en sombra: ${lista}. ${A} te avisa que hoy pides demasiado de quien todavía tiene lecciones y procesos propios. No lo tomes como rechazo: el tiempo ordena lo que la prisa no alcanza.`,
+          `sobre ${ref}, las cartas hablan con sombras: ${lista}. ${A} ve distancia o un bache que no depende de ti. Suelta la presión, recupera tu centro y deja que la verdad se muestre sin forzarla.`
+        ]);
+      }
+
+      if (this.esPreguntaSiNo(resultado.pregunta)) {
+        const veredicto = sombras === 0 ? "SÍ, sin condiciones" : (sombras < derechas ? "SÍ, con una condición" : "NO por ahora");
+        nucleo = `La respuesta es ${veredicto}: ${nucleo}`;
+      }
+      return `${apertura} ${nucleo}`;
+    }
+
+    const nucleo = this.elegirDe([
+      `tu lectura dice así: ${lista}. ${principal.nombre} ${principal.invertido ? "está de cabeza" : "brilla del derecho"} y anuncia ${faceta}. ${A} te guía en ${anTema}: mira las señales repetidas, porque tu respuesta no llega por una sola puerta.`,
+      `las cartas responden al corazón de tu consulta: ${lista}. ${principal.nombre} ${principal.invertido ? "te pide voltear la mirada" : "se pone de tu lado"} con su mensaje: ${faceta}. ${A} lo confirma en ${anTema}: lo que preguntas ya está en movimiento, solo fíjate hacia dónde.`
+    ]);
+    return `${apertura} ${nucleo}`;
+  },
+
+  /* pide a la IA del servidor la respuesta afinada a la pregunta (si la hay).
+     Devuelve null cuando no hay IA disponible y se conserva la determinista. */
+  async pedirReflexionIA(resultado) {
+    const an = resultado.__analisis;
+    const cartas = (resultado.cartas || []).map((c, i) => ({
+      nombre: c.nombre,
+      invertido: !!c.invertido,
+      posicion: (resultado.tirada.posiciones[i] || [])[0] || "",
+      significado: (c.texto || "").slice(0, 200)
+    }));
+    try {
+      const data = await fetchJSON("/api/ia/pregunta", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pregunta: resultado.pregunta, tema: an.titulo, cartas })
+      });
+      if (data && data.ok && data.respuesta) return data.respuesta;
+    } catch (e) { /* sin IA, se mantiene la determinista */ }
+    return null;
   },
 
   /* si las cartas salen de cabeza, el arcángel acompaña su respuesta con un
@@ -1118,11 +1494,18 @@ const TIRADAS = {
 
     let arcangeles;
     if (esPregunta) {
-      const analisis = this.analizarPregunta(resultadoHTML.pregunta);
+      const temas = this.temasEnPregunta(resultadoHTML.pregunta);
+      const tipo = this.tipoDePregunta(resultadoHTML.pregunta);
+      const analisis = temas[0] || this.analizarPregunta(resultadoHTML.pregunta);
       resultadoHTML.__analisis = analisis;
-      resultadoHTML.__arcangeles = [{ clave: analisis.clave, ...this.arcangeles[analisis.clave] }];
+      resultadoHTML.__tipoPregunta = tipo;
+      resultadoHTML.__temasPregunta = temas;
+      resultadoHTML.__arcangeles = tipo === "combinado"
+        ? temas.map(t => ({ clave: t.clave, ...this.arcangeles[t.clave] }))
+        : [{ clave: analisis.clave, ...this.arcangeles[analisis.clave] }];
       arcangeles = resultadoHTML.__arcangeles;
     } else {
+      resultadoHTML.__tipoPregunta = null;
       arcangeles = this.arcangelesDeLectura(resultadoHTML);
       resultadoHTML.__arcangeles = arcangeles;
     }
@@ -1130,7 +1513,7 @@ const TIRADAS = {
     this.aplicarFondo(arcangeles);
     html += `<div class="arcangel-regente vidrio">
       <p class="ar-presentes">
-        <span class="ar-titulo">${esPregunta ? "El arcángel que te responde:" : "Arcángeles presentes:"}</span>
+        <span class="ar-titulo">${esPregunta ? (resultadoHTML.__tipoPregunta === "combinado" ? "Los arcángeles que te responden:" : "El arcángel que te responde:") : "Arcángeles presentes:"}</span>
         ${arcangeles.map(a => `<span class="ar-chip" style="--chip:${a.color}"><span class="arc-avatar"><img src="${a.img}" alt="${this.nombreCorto(a.nombre)}" loading="lazy"><i></i><i></i><i></i><i></i></span>${this.nombreCorto(a.nombre)}</span>`).join("")}
       </p>
     </div>`;
@@ -1144,7 +1527,7 @@ const TIRADAS = {
         <p class="pregunta-texto">“${this.escapar(resultadoHTML.pregunta)}”</p>
         <div class="pregunta-arc">
           <span class="arc-avatar" style="--chip:${aR.color}"><img src="${aR.img}" alt="${this.nombreCorto(aR.nombre)}" loading="lazy"><i></i><i></i><i></i><i></i></span>
-          <span class="pregunta-arc-texto"><strong>${this.nombreCorto(aR.nombre)}</strong><small>${an.titulo} · ${aR.regencia}</small></span>
+          <span class="pregunta-arc-texto"><strong>${this.nombreCorto(aR.nombre)}</strong><small>${resultadoHTML.__tipoPregunta === "combinado" ? `${an.titulo} · responde con ${arcangeles.length} arcángeles` : `${an.titulo} · ${aR.regencia}`}</small></span>
         </div>
       </div>`;
     }
@@ -1176,7 +1559,9 @@ const TIRADAS = {
     const tituloFinal = resultadoHTML.fuerte
       ? "🔥 ¡¡ LECTURA FUERTE !! 🔥"
       : esPregunta
-        ? "✨ La respuesta del arcángel a tu pregunta ✨"
+        ? (resultadoHTML.__tipoPregunta === "combinado"
+          ? "✨ La respuesta de los arcángeles a tu pregunta ✨"
+          : "✨ La respuesta del arcángel a tu pregunta ✨")
         : esGranTirada
           ? "✨ La palabra de los siete arcángeles ✨"
           : "✨ Interpretación final de tu tirada ✨";
@@ -1201,7 +1586,7 @@ const TIRADAS = {
             ${b.combinacion ? `<span class="combo-tag combo-${b.combinacion.tipo}">combinación ${b.combinacion.tipo}</span>` : ""}
           </h4>
           ${b.presencia ? `<p class="presencia-arc">${b.presencia}</p>` : ""}
-          ${b.texto ? `<p>${b.texto}</p>` : ""}
+          ${b.respuestaIA ? `<p class="respuesta-ia" id="respuesta-ia">${b.texto}</p>` : (b.texto ? `<p>${b.texto}</p>` : "")}
           ${b.cartasHtml ? `<div class="regano-cartas">${b.cartasHtml}</div>` : ""}
           ${b.combinacion ? (b.combinacion.cartas && b.combinacion.cartas.length ? `<div class="combo-visual">
             ${b.combinacion.cartas.map(c => this.comboCartaHtml(c)).join('<span class="combo-mas">+</span>')}
@@ -1451,6 +1836,19 @@ function mostrarResultado(r) {
   escena.appendChild(d);
   document.getElementById("btn-nueva-tirada").addEventListener("click", () => location.reload());
   document.getElementById("btn-guardar").addEventListener("click", () => TIRADAS.guardar(r));
+
+  if (r.tirada && r.tirada.pregunta && r.pregunta) {
+    const nodo = document.getElementById("respuesta-ia");
+    if (nodo) nodo.style.opacity = "0.55";
+    TIRADAS.pedirReflexionIA(r).then(resp => {
+      if (resp && nodo) {
+        nodo.textContent = resp;
+        nodo.style.opacity = "1";
+      } else if (nodo) {
+        nodo.style.opacity = "1";
+      }
+    });
+  }
 }
 
 /* iniciar si hay tipo en la URL */

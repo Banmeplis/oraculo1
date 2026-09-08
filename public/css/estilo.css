@@ -700,12 +700,7 @@ h3 { font-size: 1.25rem; }
   .opcion-corto { max-width: 126px; font-size: 0.6rem; }
   .opcion-orbita { inset: -5px; }
 }
-@media (prefers-reduced-motion: reduce) {
-  .palos-opciones::before, .palos-opciones::after,
-  .opcion-palo::before, .opcion-orbita, .opcion-luz i,
-  .opcion-chispas i, .faro { animation: none; }
-  .opcion-palo { animation: none; }
-}
+
 
 .mazo { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; }
 .mazo-eleccion { position: relative; z-index: 5; pointer-events: auto; }

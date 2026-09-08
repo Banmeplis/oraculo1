@@ -205,6 +205,64 @@ app.post("/api/ia/reflexion", async (req, res) => {
   }
 });
 
+/* IA para la tirada "Pregunta al Oráculo": genera una respuesta escrita que
+   contesta a la pregunta EXACTA del consultante, citándola y apoyándose en
+   las cartas que salieron. Si no hay token o la API falla, devuelve ok:false
+   y el cliente conserva su respuesta determinística. */
+app.post("/api/ia/pregunta", async (req, res) => {
+  try {
+    const { pregunta, tema, cartas } = req.body || {};
+    if (!pregunta) return res.status(400).json({ error: "Sin pregunta" });
+
+    const HF_TOKEN = process.env.HF_TOKEN || "";
+    if (!HF_TOKEN || HF_TOKEN === "hf_tu_token_aqui" || HF_TOKEN.includes("tu_token")) {
+      return res.json({ ok: false, error: "sin token" });
+    }
+
+    const cartasDesc = (cartas || []).map((c, i) =>
+      `${i + 1}. ${c.nombre}${c.invertido ? " (invertida)" : ""} — ${c.posicion || "posición"}: ${String(c.significado || "").slice(0, 220)}`
+    ).join("\n") || "ninguna (no se enviaron cartas)";
+
+    const prompt = `Eres el Oráculo de Zigurath y Anaia, un consejero espiritual que interpreta el tarot angelical para una persona que busca orientación. Hablas en español cálido, directo y práctico.
+
+El consultante pregunta EXACTAMENTE esto: "${pregunta}"
+
+El tema que pregunta es: ${tema || "su vida"}.
+
+Las cartas que salieron (Arcanos Mayores), con su posición, son:
+${cartasDesc}
+
+Responde a ESA pregunta concreta y solo a ella, no a otra ni en general. Habla del tema exacto que pregunta. Si es una pregunta de sí o no, comienza tu respuesta con "sí" o "no" y explica por qué las cartas responden así. Si pregunta por un nombre o una persona, di qué muestran las cartas sobre esa persona. Cita la pregunta y justifica con las cartas.
+
+Máximo 4 frases, en un solo párrafo, sin listas y sin encabezados.`;
+
+    const modelos = (process.env.HF_MODELOS || "mistralai/Mistral-7B-Instruct-v0.2,google/flan-t5-large,bigscience/bloom-560m").split(",").map(m => m.trim()).filter(Boolean);
+    let respuesta = "";
+    for (const modelo of modelos) {
+      try {
+        const response = await fetch(`https://api.huggingface.co/models/${modelo}`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${HF_TOKEN}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ inputs: prompt, parameters: { max_new_tokens: 220, temperature: 0.7, return_full_text: false } })
+        });
+        if (!response.ok) continue;
+        const result = await response.json();
+        const texto = (typeof result === "string" ? result : result[0]?.generated_text || result.generated_text || "").trim();
+        if (texto.length > 20) { respuesta = texto; break; }
+      } catch { /* probar el siguiente modelo */ }
+    }
+
+    const limpia = respuesta.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().slice(0, 520);
+    if (!limpia) return res.json({ ok: false, error: "respuesta vacía" });
+    res.json({ ok: true, respuesta: limpia });
+  } catch (e) {
+    res.json({ ok: false, error: "error" });
+  }
+});
+
 /* Mensaje de fallback determinístico cuando la IA falla */
 function fallbackReflexion(area, numCartas) {
   const bases = {

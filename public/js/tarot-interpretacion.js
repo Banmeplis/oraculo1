@@ -40,7 +40,7 @@
   }
 
   function animarInterpretacion(raiz) {
-    if (!window.gsap || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!window.gsap) return;
     gsap.from(raiz.querySelectorAll(".interpretacion-cabecera-nueva, .interpretacion-angelical-nueva, .carta-interpretacion-nueva, .arcangel-bloque-nueva, .combinacion-seccion-nueva, .mensaje-final-seccion-nueva"), {
       opacity: 0,
       y: 24,
