@@ -19,10 +19,11 @@ const TIRADAS = {
     { id: "gran-tirada", nombre: "La Gran Tirada", icono: "🛡️", corto: "Catorce cartas y los siete arcángeles regentes: la lectura total para cada rincón de tu vida.", n: 14, posiciones: [["Situación general", "El clima que envuelve tu presente"], ["Amor y relaciones", "El estado de tus vínculos"], ["Economía y abundancia", "El flujo de tus recursos"], ["Trabajo y proyecto", "Tu camino profesional"], ["Familia y hogar", "Tu entorno cercano"], ["Salud y energía", "Tu vitalidad y cuerpo"], ["Espiritualidad y fe", "Tu conexión con lo divino"], ["Bloqueo a liberar", "Lo que te frena en secreto"], ["Pasado que te marcó", "La raíz de tu historia"], ["Presente que te sostiene", "Tu energía de hoy"], ["Futuro que se acerca", "El rumbo que se prepara"], ["Consejo del cielo", "La guía que te dan"], ["Lección del alma", "Lo que este tiempo te enseña"], ["Resultado final", "La síntesis de todo"] ] },
     { id: "lectura-fuerte", nombre: "Lectura Fuerte", icono: "🔥", corto: "Los siete arcángeles hablan sin rodeos y con amor severo: verdad firme para tu momento.", n: 3, posiciones: [["Tu verdad", "Lo que necesitas escuchar"], ["Lo que evitas", "El bloqueo que escondes"], ["Tu fuerza", "El paso firme que sigue"] ] },
     { id: "cruz-celta", nombre: "Cruz Celta", icono: "🕊️", corto: "La lectura clásica y profunda de diez cartas.", n: 10, posiciones: [["Corazón del asunto", "El centro de la consulta"], ["Lo que cruza", "Las influencias que la atraviesan"], ["Lo que está por encima", "Consciente o metas"], ["Lo que está por debajo", "Inconsciente o raíces"], ["Lo que pasó", "Pasado reciente"], ["Lo que viene", "Futuro cercano"], ["Tu actitud", "Cómo te enfrentas a ello"], ["El entorno", "Influencias externas"], ["Esperanzas y miedos", "Lo que anhelas y temes"], ["Resultado", "La síntesis final"] ] },
-    { id: "si-no",     nombre: "Sí o No directo", icono: "🎯", corto: "Una carta, una respuesta clara para tu pregunta.", n: 1, posiciones: [["Tu respuesta", "El veredicto del oráculo"]] }
+    { id: "si-no",     nombre: "Sí o No directo", icono: "🎯", corto: "Una carta, una respuesta clara para tu pregunta.", n: 1, posiciones: [["Tu respuesta", "El veredicto del oráculo"]] },
+    { id: "pregunta",  nombre: "Pregunta al Oráculo", icono: "🃏", corto: "Escribe tu pregunta y el arcángel idóneo responderá solo ese tema con tres cartas.", n: 3, pregunta: true, posiciones: [["Tu pregunta", "Lo que consultas al cielo"], ["La lección", "Lo que debes mirar"], ["La respuesta", "La señal del oráculo"]] }
   ],
 
-  elegantIcono: { "1-carta": "🕯️", "3-cartas": "💫", "5-cartas": "🌟", "gran-tirada": "🛡️", "lectura-fuerte": "🔥", "cruz-celta": "🕊️", "si-no": "🎯" },
+  elegantIcono: { "1-carta": "🕯️", "3-cartas": "💫", "5-cartas": "🌟", "gran-tirada": "🛡️", "lectura-fuerte": "🔥", "cruz-celta": "🕊️", "si-no": "🎯", "pregunta": "🃏" },
   estrellas: ["✦", "✧", "⋆", "✩", "·"],
 
   /* ------------------------------ utilidades ------------------------------ */
@@ -40,7 +41,7 @@ const TIRADAS = {
     if (!t) return null;
     this.definirMazo();
     const mazo = this.barajar(this.mazo);
-    return { tirada: t, cartas: [], mazo, fuerte: tipo === "lectura-fuerte" ? true : Math.random() < 0.3 };
+    return { tirada: t, cartas: [], mazo, fuerte: tipo === "lectura-fuerte" ? true : (t.pregunta ? false : Math.random() < 0.3) };
   },
 
   /* construye la carta a partir del arcano, decidiendo sentido al azar */
@@ -173,6 +174,70 @@ const TIRADAS = {
   elegirDe(variantes) {
     const arr = Array.isArray(variantes) ? variantes : [variantes];
     return arr[Math.floor(Math.random() * arr.length)];
+  },
+
+  /* escapa HTML para texto del usuario */
+  escapar(t) {
+    return String(t == null ? "" : t)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  },
+
+  /* quita acentos y pasa a minúsculas, para comparar la pregunta con las palabras clave */
+  normalizarTexto(t) {
+    return String(t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  },
+
+  /* ------------------- lectura por pregunta -----------------------------
+     analiza el contexto de la pregunta y elige el arcángel más idóneo para
+     ese tema: solo él responde y solo se habla de ese terreno de la vida */
+  temasPregunta: {
+    amor: {
+      clave: "chamuel", titulo: "Amor y relaciones", icono: "💗",
+      palabras: ["amor", "pareja", "novio", "novia", "ex", "relacion", "casar", "casarme", "boda", "matrimonio", "me quiere", "regreso", "vuelta", "corazon", "celos", "ruptura", "terminamos", "enamor", "compromiso", "afecto", "separar", "separacion", "infidelidad", "quiere volver", "me deja", "quiere volver conmigo", "vuelve", "volvera", "familia", "hijo", "hija"]
+    },
+    dinero: {
+      clave: "uriel", titulo: "Economía y abundancia", icono: "💰",
+      palabras: ["dinero", "plata", "economia", "trabajo", "empleo", "negocio", "salario", "sueldo", "venta", "clientes", "gasto", "deuda", "prestamo", "ahorro", "inversion", "invertir", "comprar", "riqu", "abundancia", "ascenso", "paro", "despid", "socios", "proyecto", "renta"]
+    },
+    salud: {
+      clave: "rafael", titulo: "Salud y energía", icono: "💚",
+      palabras: ["salud", "enfermedad", "enfermo", "dolor", "cansancio", "energia", "cuerpo", "operacion", "medico", "medicina", "remedio", "sano", "sanar", "animo", "depresion", "ansiedad", "sueño", "descanso", "gripe", "fiebre", "peso", "ejercicio", "sano", "curar"]
+    },
+    mensaje: {
+      clave: "gabriel", titulo: "Mensajes y señales", icono: "📯",
+      palabras: ["mensaje", "respuesta", "senal", "señal", "signo", "estudio", "examen", "universidad", "carrera", "proposito", "mision", "llamado", "viaje", "comunicacion", "habla", "noticia", "aviso", "espiritu", "fe", "dios", "creo", "voz"]
+    },
+    proteccion: {
+      clave: "miguel", titulo: "Protección y fuerza", icono: "🛡️",
+      palabras: ["peligro", "enemigo", "miedo", "proteger", "proteccion", "defensa", "seguridad", "amenaza", "lucha", "pelea", "conflicto", "problema", "jefe", "poder", "rival", "perder", "ganar", "defender", "cuidarme", "resguardo", "dano", "danar", "danarme", "persiguen"]
+    },
+    liberacion: {
+      clave: "zadkiel", titulo: "Bloqueos y liberación", icono: "🔓",
+      palabras: ["culpa", "perdon", "perdonar", "rencor", "bloqueo", "trauma", "pasado", "soltar", "atadura", "dependencia", "obsesion", "apego", "fracaso", "error", "peso", "libertad", "liberacion", "ciclo", "cerrar", "dejar ir", "maldad", "maldicion", "sombra"]
+    },
+    futuro: {
+      clave: "jofiel", titulo: "Futuro e inspiración", icono: "🌟",
+      palabras: ["futuro", "destino", "sueño", "sueno", "meta", "exito", "triunfo", "proyecto", "creatividad", "inspiracion", "idea", "avanzar", "progreso", "cambio", "comenzar", "empezar", "nuevo", "oportunidad", "plan", "camino", "crecer", "brillar"]
+    }
+  },
+
+  /* analiza la pregunta: devuelve el tema y el arcángel que mejor lo cuida */
+  analizarPregunta(pregunta) {
+    const limpia = this.normalizarTexto(pregunta);
+    let mejor = null;
+    let mejorPuntaje = 0;
+    for (const tema of Object.keys(this.temasPregunta)) {
+      const def = this.temasPregunta[tema];
+      let puntaje = 0;
+      for (const palabra of def.palabras) {
+        if (limpia.includes(this.normalizarTexto(palabra))) puntaje++;
+      }
+      if (puntaje > mejorPuntaje) {
+        mejorPuntaje = puntaje;
+        mejor = { tema, ...def };
+      }
+    }
+    return mejor || { tema: "mensaje", ...this.temasPregunta.mensaje };
   },
 
   /* --------------------------- esencia de cada carta ------------------------
@@ -808,6 +873,78 @@ const TIRADAS = {
     }]);
   },
 
+  /* ------------------- interpretación de la pregunta ---------------------
+     el arcángel elegido por analizarPregunta responde solo el tema de la
+     pregunta: su mensaje directo, la combinación de las tres cartas como
+     respuesta y un cierre breve con su señal */
+  aperturaPregunta(analisis, resultado) {
+    const arc = this.arcangeles[analisis.clave];
+    const A = this.nombreCorto(arc.nombre);
+    const R = arc.regencia.toLowerCase();
+    return this.elegirDe([
+      `Sobre tu pregunta, yo, ${A}, respondo desde mi ${R}:`,
+      `He leído tu pregunta en el silencio del cielo y, ${A}, te respondo desde mi ${R}:`,
+      `Quien responde por este tema es ${A}, el arcángel que cuida la ${R}. Escucha:`
+    ]);
+  },
+
+  cierrePregunta(resultado) {
+    const an = resultado.__analisis;
+    const arc = this.arcangeles[an.clave];
+    const A = this.nombreCorto(arc.nombre);
+    return this.elegirDe([
+      `Así responde ${A}. Las cartas son la señal que pediste: elige una sola acción de este consejo y ponla en práctica hoy.`,
+      `${A} ha respondido. No busques más señales: la respuesta que ya tienes es suficiente para dar tu siguiente paso.`,
+      `Llévate la voz de ${A}: deja de preguntar y empieza a caminar, la señal del oráculo ya va contigo.`
+    ]);
+  },
+
+  interpretacionPregunta(resultado) {
+    const bloques = [];
+    const an = resultado.__analisis;
+    const arc = this.arcangeles[an.clave];
+    const cartas = resultado.cartas;
+    const bien = cartas.filter(c => !c.invertido).length;
+    const propor = bien / cartas.length;
+    const tono = propor >= 0.5 ? "luz" : "sombra";
+    const vTexto = this.voces[an.clave] ? this.voces[an.clave][tono] : arc.mensaje;
+    const A = this.nombreCorto(arc.nombre);
+    const regania = this.reganoDePregunta(resultado);
+
+    bloques.push({
+      icono: arc.emoji,
+      area: an.clave,
+      titulo: `${A} · ${arc.regencia} · ${an.titulo}`,
+      arcangel: arc,
+      regano: regania,
+      texto: `${this.aperturaPregunta(an, resultado)} ${vTexto}`
+    });
+
+    if (cartas.length >= 3) bloques.push(this.bloqueCombinacionGlobal(resultado));
+
+    bloques.push({ cierre: true, texto: this.cierrePregunta(resultado), cita: this.citas[Math.floor(Math.random() * this.citas.length)] });
+    return bloques;
+  },
+
+  /* si las cartas salen de cabeza, el arcángel acompaña su respuesta con un
+     regaño breve y cercano */
+  reganoDePregunta(resultado) {
+    const inv = resultado.cartas.filter(c => c.invertido).length;
+    if (inv === 0) return false;
+    const an = resultado.__analisis;
+    const arc = this.arcangeles[an.clave];
+    const A = this.nombreCorto(arc.nombre);
+    return inv === resultado.cartas.length
+      ? this.elegirDe([
+          `Todas mis cartas están de cabeza, y eso no es un no: es un aviso del cielo. ${A} te dice que estás yendo contra tu propia luz en este tema. Baja la prisa, reconoce el patrón y rectificalo: en ese gesto la suerte da la vuelta.`,
+          `${A} te habla fuerte porque te quiere claro: ninguna carta te da la razón en este momento, y eso se llama tiempo de corregir, no de rendirse. Calla el miedo, escucha lo que ya sabes y cambia la jugada.`
+        ])
+      : this.elegirDe([
+          `${A} nota que una de tus cartas va de cabeza: hay algo de este tema que evitas mirar. Acepta esa parte y la respuesta del oráculo se vuelve completa.`,
+          `Una carta se te dio vuelta en la mesa. ${A} la ves como un espejo: no está ahí para asustarte, está para que no repitas el mismo tropiezo otra vez.`
+        ]);
+  },
+
   /* la combinación de las cartas de cada arcángel: normal (luz), espejada
      (mezcla de derecha e invertida) o en sombra; cada arcángel combina las
      cartas de SUS áreas, muestra sus imágenes y entrega el significado en
@@ -969,6 +1106,7 @@ const TIRADAS = {
   /* -------------------------- motor de la lectura -------------------------- */
   armarResultado(resultadoHTML) {
     const t = resultadoHTML.tirada;
+    const esPregunta = !!resultadoHTML.pregunta;
     let html = '<div class="resultado">';
     html += '<div class="resultado-cabecera"><div class="deco">' + this.elegantIcono[t.id] + "</div>";
     html += "<p>Resultado de la tirada de tarot completa gratis</p></div>";
@@ -978,16 +1116,38 @@ const TIRADAS = {
       <p class="comparte"><small>✨ Comparte tu resultado con quien quieras ✨</small></p>
     </div>`;
 
-    const arcangeles = this.arcangelesDeLectura(resultadoHTML);
-    resultadoHTML.__arcangeles = arcangeles;
+    let arcangeles;
+    if (esPregunta) {
+      const analisis = this.analizarPregunta(resultadoHTML.pregunta);
+      resultadoHTML.__analisis = analisis;
+      resultadoHTML.__arcangeles = [{ clave: analisis.clave, ...this.arcangeles[analisis.clave] }];
+      arcangeles = resultadoHTML.__arcangeles;
+    } else {
+      arcangeles = this.arcangelesDeLectura(resultadoHTML);
+      resultadoHTML.__arcangeles = arcangeles;
+    }
     const arcangel = arcangeles[0];
     this.aplicarFondo(arcangeles);
     html += `<div class="arcangel-regente vidrio">
       <p class="ar-presentes">
-        <span class="ar-titulo">Arcángeles presentes:</span>
+        <span class="ar-titulo">${esPregunta ? "El arcángel que te responde:" : "Arcángeles presentes:"}</span>
         ${arcangeles.map(a => `<span class="ar-chip" style="--chip:${a.color}"><span class="arc-avatar"><img src="${a.img}" alt="${this.nombreCorto(a.nombre)}" loading="lazy"><i></i><i></i><i></i><i></i></span>${this.nombreCorto(a.nombre)}</span>`).join("")}
       </p>
     </div>`;
+
+    if (esPregunta) {
+      const an = resultadoHTML.__analisis;
+      const aR = arcangeles[0];
+      html += `<div class="pregunta-respuesta vidrio" style="--arc-color:${aR.color}">
+        <span class="arc-part" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+        <span class="pregunta-etiqueta">Tu pregunta</span>
+        <p class="pregunta-texto">“${this.escapar(resultadoHTML.pregunta)}”</p>
+        <div class="pregunta-arc">
+          <span class="arc-avatar" style="--chip:${aR.color}"><img src="${aR.img}" alt="${this.nombreCorto(aR.nombre)}" loading="lazy"><i></i><i></i><i></i><i></i></span>
+          <span class="pregunta-arc-texto"><strong>${this.nombreCorto(aR.nombre)}</strong><small>${an.titulo} · ${aR.regencia}</small></span>
+        </div>
+      </div>`;
+    }
 
     resultadoHTML.cartas.forEach((c, i) => {
       const pos = t.posiciones[i];
@@ -1006,16 +1166,20 @@ const TIRADAS = {
     });
 
     const esGranTirada = t.id === "gran-tirada";
-    const finales = esGranTirada ? this.interpretacionGranTirada(resultadoHTML) : this.interpretacionFinal(resultadoHTML);
+    const finales = esPregunta
+      ? this.interpretacionPregunta(resultadoHTML)
+      : (esGranTirada ? this.interpretacionGranTirada(resultadoHTML) : this.interpretacionFinal(resultadoHTML));
     if (resultadoHTML.fuerte) {
       // el cierre único ya viene dentro de interpretacionGranTirada/
       // interpretacionFinal; aquí solo se marca el tono del encabezado
     }
     const tituloFinal = resultadoHTML.fuerte
       ? "🔥 ¡¡ LECTURA FUERTE !! 🔥"
-      : esGranTirada
-        ? "✨ La palabra de los siete arcángeles ✨"
-        : "✨ Interpretación final de tu tirada ✨";
+      : esPregunta
+        ? "✨ La respuesta del arcángel a tu pregunta ✨"
+        : esGranTirada
+          ? "✨ La palabra de los siete arcángeles ✨"
+          : "✨ Interpretación final de tu tirada ✨";
     let htmlFinal = `<div class="interpretacion-final">${resultadoHTML.fuerte ? '<h3 class="titulo-interp-final titulo-fuerte">🔥 ¡¡ LECTURA FUERTE !! 🔥<small style="display:block;font-size:.75rem;color:#ff9e6d;margin-top:6px">Los ángeles hablaron con firmeza porque te aman demasiado para mentirte</small></h3><hr class="raya-fuerte">' : `<h3 class="titulo-interp-final">${tituloFinal}</h3>`}`;
     finales.forEach((b, i) => {
       const arcDeArea = b.arcangel || this.arcangelDeArea(arcangeles, i);
@@ -1095,12 +1259,39 @@ function iniciarTirada(tipo) {
     `<div class="deco">${TIRADAS.elegantIcono[tipo]}</div><h2>${d.tirada.nombre}</h2>
      <p>${d.tirada.corto}</p>`;
 
-  escena.innerHTML = "";
+  if (d.tirada.pregunta) {
+    escena.innerHTML = `
+      <div class="centrado pregunta-box">
+        <p style="margin-bottom:14px">Escribe tu pregunta sobre amor, dinero, trabajo, salud, señales o lo que necesites saber. El arcángel más idóneo para tu tema te responderá única y exclusivamente eso:</p>
+        <textarea id="input-pregunta" maxlength="240" rows="3" placeholder="Ej.: ¿Esta persona volverá a mi vida?" aria-label="Tu pregunta"></textarea>
+        <button class="btn btn-dorado" id="btn-enviar-pregunta">Hacer mi pregunta</button>
+        <p class="oculto" id="aviso-pregunta" style="color:#ff80a0;font-size:.9rem;margin-top:10px">Por favor escribe tu pregunta primero.</p>
+      </div>`;
+    const btn = document.getElementById("btn-enviar-pregunta");
+    const aviso = document.getElementById("aviso-pregunta");
+    const input = document.getElementById("input-pregunta");
+    const enviar = () => {
+      const q = input.value.trim();
+      if (q.length < 4) { aviso.classList.remove("oculto"); input.focus(); return; }
+      aviso.classList.add("oculto");
+      d.pregunta = q;
+      barajeoVisual(d);
+    };
+    btn.addEventListener("click", enviar);
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); enviar(); } });
+    input.focus();
+    return;
+  }
 
-  /* Animación de barajeo: las cartas cambian de lugar */
+  barajeoVisual(d);
+}
+
+/* Animación de barajeo: las cartas cambian de lugar */
+function barajeoVisual(d) {
+  const escena = document.getElementById("escena-tarot");
   escena.innerHTML = `
     <div class="centrado">
-      <p style="margin-bottom:18px">Cierra los ojos, respira profundo y piensa en tu pregunta</p>
+      <p style="margin-bottom:18px">${d.pregunta ? "El oráculo revisa tu pregunta y llama al arcángel que cuida ese tema..." : "Cierra los ojos, respira profundo y piensa en tu pregunta"}</p>
       <div class="spinner oculto" id="spinner-barajo"></div>
       <div class="mazo" id="mazo-barajeo" style="margin-top:26px"></div>
     </div>`;
@@ -1276,12 +1467,60 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   if (document.getElementById("opciones-tiradas")) {
     const cont = document.getElementById("opciones-tiradas");
-    TIRADAS.catalogo.forEach(t => {
+    const colorLectura = {
+      "1-carta": "240, 190, 120", "3-cartas": "212, 175, 55", "5-cartas": "104, 140, 220",
+      "gran-tirada": "160, 110, 240", "lectura-fuerte": "230, 120, 80", "cruz-celta": "90, 200, 160",
+      "si-no": "240, 120, 150", "pregunta": "212, 175, 55"
+    };
+    TIRADAS.catalogo.forEach((t, i) => {
       const b = document.createElement("a");
+      const c = colorLectura[t.id] || "212, 175, 55";
       b.className = "opcion-palo";
       b.href = "/tirada.html?tirada=" + t.id;
-      b.innerHTML = `<span class="icono">${TIRADAS.elegantIcono[t.id]}</span><strong>${t.nombre}</strong><br><small style="opacity:.85">${t.corto}</small>`;
+      b.style.setProperty("--c", c);
+      b.style.setProperty("--delay", (i * 85) + "ms");
+      b.setAttribute("aria-label", t.nombre);
+      b.innerHTML = `
+        <span class="opcion-orbita" aria-hidden="true"></span>
+        <span class="opcion-bola" aria-hidden="true">
+          <span class="opcion-luz"><i></i><i></i><i></i></span>
+          <span class="icono">${TIRADAS.elegantIcono[t.id]}</span>
+        </span>
+        <strong class="opcion-nombre">${t.nombre}</strong>
+        <small class="opcion-corto">${t.corto}</small>
+        <span class="opcion-chispas" aria-hidden="true"><i></i><i></i><i></i><i></i></span>`;
       cont.appendChild(b);
     });
+
+    /* inclinación 3D de cada medallón siguiendo el mouse (solo con ratón fino) */
+    if (typeof window.matchMedia === "function" && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+      cont.querySelectorAll(".opcion-palo").forEach(b => {
+        b.addEventListener("mousemove", (e) => {
+          const r = b.getBoundingClientRect();
+          const px = (e.clientX - r.left) / r.width - 0.5;
+          const py = (e.clientY - r.top) / r.height - 0.5;
+          b.style.setProperty("--rx", (-py * 16).toFixed(2) + "deg");
+          b.style.setProperty("--ry", (px * 16).toFixed(2) + "deg");
+        });
+        b.addEventListener("mouseleave", () => {
+          b.style.removeProperty("--rx");
+          b.style.removeProperty("--ry");
+        });
+      });
+    }
+
+    /* luces espirituales flotando dentro del menú */
+    const paletaFaros = ["212, 175, 55", "160, 110, 240", "104, 140, 220", "240, 120, 150", "230, 150, 60"];
+    for (let k = 0; k < 10; k++) {
+      const f = document.createElement("span");
+      f.className = "faro";
+      f.style.setProperty("--fc", paletaFaros[k % paletaFaros.length]);
+      f.style.setProperty("--fs", (4 + Math.random() * 5).toFixed(1) + "px");
+      f.style.setProperty("--fd", (7 + Math.random() * 6).toFixed(1) + "s");
+      f.style.setProperty("--fdelay", (-Math.random() * 12).toFixed(1) + "s");
+      f.style.setProperty("--fx", (Math.random() * 60 - 30).toFixed(1) + "px");
+      f.style.left = (4 + Math.random() * 92).toFixed(1) + "%";
+      cont.appendChild(f);
+    }
   }
 });
