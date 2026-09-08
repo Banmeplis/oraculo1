@@ -144,10 +144,218 @@ const TIRADAS = {
     return elegidos[0];
   },
 
+  /* contexto temático -> arcángel que lo regenta (para que el regaño lo diga
+     el arcángel que corresponde a las cartas que salieron) */
+  grupoARegente: {
+    afectos: "chamuel", persona: "miguel", decision: "uriel",
+    espiritual: "gabriel", trabajo: "miguel", animo: "jofiel", otro: "rafael"
+  },
+
+  /* elige el arcángel del regaño según el contexto de las cartas, dando más
+     peso a las invertidas; restringido a los presentes (o a la lista 'solo') */
+  arcangelDeMensaje(resultado, solo) {
+    let presentes;
+    if (solo && solo.length) presentes = solo;
+    else if (resultado.__arcangeles) presentes = resultado.__arcangeles.map(a => a.clave);
+    else presentes = this.arcangelesDeLectura(resultado).map(a => a.clave);
+    const peso = {};
+    (resultado.cartas || []).forEach(c => {
+      const e = this.esencia[c.nombre];
+      if (!e) return;
+      const reg = this.grupoARegente[e.grupo] || "miguel";
+      if (presentes.includes(reg)) peso[reg] = (peso[reg] || 0) + (c.invertido ? 2 : 1);
+    });
+    const clave = Object.keys(peso).sort((a, b) => peso[b] - peso[a])[0];
+    return this.arcangeles[clave || presentes[0] || "miguel"];
+  },
+
   /* elige una variante de texto al azar (acepta string o array) */
   elegirDe(variantes) {
     const arr = Array.isArray(variantes) ? variantes : [variantes];
     return arr[Math.floor(Math.random() * arr.length)];
+  },
+
+  /* --------------------------- esencia de cada carta ------------------------
+     grupo: contexto temático de la carta (para combinar cartas del mismo
+            contexto: alegría, tristeza, personas del entorno, decisiones...)
+     luz / sombra: la esencia de su mensaje según el sentido */
+  esencia: {
+    "El Loco":        { grupo: "animo",       luz: "libertad y un comienzo nuevo",                sombra: "imprudencia, huir de la propia responsabilidad" },
+    "El Mago":        { grupo: "decision",    luz: "tu poder y tus dones creando lo que imaginas", sombra: "talentos dormidos, promesas que no se cumplen" },
+    "La Sacerdotisa": { grupo: "espiritual",  luz: "tu intuición que sabe en silencio",            sombra: "verdades que callas y te pesan" },
+    "La Emperatriz":  { grupo: "afectos",     luz: "el florecer de lo que cuidas y siembras",      sombra: "el descuido de ti, tu tierra sin nutrir" },
+    "El Emperador":   { grupo: "persona",     luz: "una figura firme y bases sólidas",             sombra: "el control rígido que asfixia" },
+    "El Hierofante":  { grupo: "persona",     luz: "una guía o un aprendizaje que llega",          sombra: "reglas viejas que ya no son tuyas" },
+    "Los Enamorados": { grupo: "afectos",     luz: "una unión y una elección desde el corazón",    sombra: "la duda que divide y traiciona tu verdad" },
+    "El Carro":       { grupo: "decision",    luz: "la voluntad enfocada que llega a la victoria", sombra: "la dispersión que no llega a ninguna parte" },
+    "La Fuerza":      { grupo: "animo",       luz: "el coraje sereno que doma tus miedos",         sombra: "la voz interior que te dice que no puedes" },
+    "El Ermitaño":    { grupo: "espiritual",  luz: "el silencio sabio y tu guía interior",         sombra: "el aislamiento por miedo, no por paz" },
+    "La Rueda":       { grupo: "animo",       luz: "el destino que gira a tu favor",               sombra: "aferrarte a lo que la rueda ya dejó atrás" },
+    "La Justicia":    { grupo: "decision",    luz: "la verdad y el equilibrio que regresan",       sombra: "la responsabilidad que esquivas" },
+    "El Colgado":     { grupo: "animo",       luz: "una pausa que te enseña con otra mirada",      sombra: "la quietud por miedo, el sacrificio que vacía" },
+    "La Muerte":      { grupo: "animo",       luz: "el final que abre paso a un renacer",          sombra: "el pasado que no sueltas y ocupa tu presente" },
+    "La Templanza":   { grupo: "espiritual",  luz: "la armonía que vuelve al punto medio",         sombra: "los excesos que te desbordan" },
+    "El Diablo":      { grupo: "persona",     luz: "ver la cadena y tener ya la llave",            sombra: "ataduras que tú misma eliges volver a ponerte" },
+    "La Torre":       { grupo: "animo",       luz: "una verdad que sacude y a la vez libera",      sombra: "sostener con miedo lo que ya pide caer" },
+    "La Estrella":    { grupo: "espiritual",  luz: "la esperanza y la fe que sanan",               sombra: "apagar tu propia luz en días grises" },
+    "La Luna":        { grupo: "animo",       luz: "la marea emocional que navegas con calma",     sombra: "temor a sombras que tu imaginación agranda" },
+    "El Sol":         { grupo: "animo",       luz: "la alegría plena, el éxito y la vitalidad",    sombra: "tener el sol y andar mirando nubes" },
+    "El Juicio":      { grupo: "espiritual",  luz: "el llamado a despertar y renovarte",           sombra: "dudar de tu valor y quedarte atrás" },
+    "El Mundo":       { grupo: "trabajo",     luz: "el ciclo completo y la meta alcanzada",        sombra: "detenerte a un paso de la meta" }
+  },
+
+  /* agrupa cartas por su contexto (alegría, tristeza, personas, decisiones...) */
+  agruparContexto(cartas) {
+    const grupos = {};
+    cartas.forEach(c => {
+      const k = (this.esencia[c.nombre] && this.esencia[c.nombre].grupo) || "otro";
+      (grupos[k] = grupos[k] || []).push(c);
+    });
+    return Object.keys(grupos).map(k => ({ grupo: k, cartas: grupos[k] }));
+  },
+
+  /* elige las cartas que protagonizan la combinación: prefiere juntar 2 o más
+     cartas del mismo contexto, y si no, toma hasta 3 cartas de la lectura */
+  elegirGrupoCombinacion(cartas, max = 3) {
+    const grupos = this.agruparContexto(cartas);
+    const multi = grupos.filter(g => g.cartas.length >= 2)
+      .sort((a, b) => b.cartas.length - a.cartas.length);
+    const grupo = multi.length ? multi[0].cartas : cartas;
+    return grupo.slice(0, max);
+  },
+
+  /* miniatura de carta para la combinación y los regaños (imagen + nombre) */
+  miniCarta(c) {
+    const rot = c.invertido ? ' style="transform:rotate(180deg)"' : "";
+    return `<div class="combo-mini${c.invertido ? " inv" : ""}">
+      <div class="combo-mini-art">${c.img ? `<img src="${c.img}" alt="${c.nombre}" loading="lazy"${rot}>` : `<div class="c-nm">${c.emoji}</div>`}</div>
+      <span>${c.nombre}${c.invertido ? " <i>invertida</i>" : ""}</span>
+    </div>`;
+  },
+
+  /* carta + carta = significado en conjunto. Compone el mensaje unificado de un
+     grupo de cartas (mismo contexto o mezcla), en la voz del arcángel que
+     custodia ese rincón de la lectura */
+  significadoConjunto(grupo, arc) {
+    const A = this.nombreCorto(arc.nombre);
+    const R = arc.regencia.toLowerCase();
+
+    if (grupo.length === 1) {
+      const c = grupo[0];
+      const sen = this.esencia[c.nombre];
+      const faceta = c.invertido
+        ? (sen ? sen.sombra : "la sombra de su mensaje")
+        : (sen ? sen.luz : "la luz de su mensaje");
+      const claves = (c.palabras || []).slice(0, 2).join(" y ");
+      return this.elegirDe([
+        `Su mensaje domina esta lectura: ${faceta}. Entiende sus claves, ${claves}, y deja que ${A} te lo confirme desde su ${R}: esta carta no te pide más, te pide obedecer su señal.`,
+        `Una sola carta al frente de tu lectura es un mensaje en mayúsculas: ${faceta}. ${A} lo custodia desde su ${R} y las claves, ${claves}, te marcan la dirección: no hay que sumar más, hay que mirar esta.`
+      ]);
+    }
+
+    const derechas = grupo.filter(c => !c.invertido);
+    const invertidas = grupo.filter(c => c.invertido);
+    const facetaDe = c => {
+      const e = this.esencia[c.nombre];
+      return c.invertido ? (e ? e.sombra : "un aviso en sombra") : (e ? e.luz : "un mensaje de luz");
+    };
+    const encadenar = arr => arr
+      .map((c, i) => (i === 0 ? facetaDe(c).charAt(0).toUpperCase() + facetaDe(c).slice(1) : facetaDe(c)))
+      .join(", se enlaza con ");
+
+    if (!invertidas.length) {
+      return this.elegirDe([
+        `${encadenar(derechas)}. Cuando dos luces se tocan, tu momento se acelera: ${A} lo respalda desde su ${R} y te pide que camines con fe, porque lo que viene ya viene armado.`,
+        `${encadenar(derechas)}. Su significado en conjunto es claro: todo se alinea contigo. ${A} lo certifica con su ${R}: esta coincidencia no es azar, es señal de que el cielo te está sumando a favor.`
+      ]);
+    }
+    if (invertidas.length === grupo.length) {
+      return this.elegirDe([
+        `${encadenar(invertidas)}. Cuando toda la sombra se junta no es castigo: es una sola puerta pidiendo ser abierta. ${A} te habla desde su ${R} para que la abras hoy, no mañana.`,
+        `${encadenar(invertidas)}. Su conjunto te grita lo mismo: hay un patrón que se repite. ${A} lo nombra desde su ${R}: no escaparás de él hasta que lo mires de frente.`
+      ]);
+    }
+    return this.elegirDe([
+      `${encadenar(derechas)}; y en paralelo, ${encadenar(invertidas)} es el aviso que la luz necesita para asentarse. ${A} sostiene esa balanza desde su ${R}: aprovecha lo que ya avanza y desactiva hoy lo que pesa.`,
+      `${encadenar(derechas)}; mientras tanto, ${encadenar(invertidas)}. Juntas dibujan tu tarea: afirmar lo que brilla y voltear lo que pesa. ${A} te acompaña desde su ${R} en ese equilibrio.`
+    ]);
+  },
+
+  /* regaño moldeado por las cartas reales: usa los nombres, la posición y el
+     propio mensaje de cada carta en sombra, agrupados por contexto, en la voz
+     del arcángel que regenta la lectura */
+  regañoDeCartas(resultado, arc) {
+    const cartas = resultado.cartas || [];
+    const posiciones = (resultado.tirada.posiciones || []).map(p => p[0]);
+    const sombras = cartas.filter(c => c.invertido);
+    const luces = cartas.filter(c => !c.invertido);
+    const A = this.nombreCorto(arc.nombre);
+    const R = arc.regencia.toLowerCase();
+
+    /* apertura según el peso de la sombra */
+    const apertura = this.elegirDe([
+      `Te he puesto tu lectura sobre la mesa y hoy no vengo a consolarte: vengo a abrirte los ojos. Yo, ${A}, te hablo desde mi ${R}.`,
+      `He escuchado en silencio lo que tus cartas te cuentan, y soy yo, ${A}, quien te lo dice sin rebajas, desde mi ${R}.`,
+      `No me gusta hablarte así, pero tu lectura lo pide. Soy ${A} y te agarro fuerte la mano antes de decirte la verdad.`,
+      `He bajado del cielo a propósito para esto: tus cartas llevan tiempo intentando hablarte y no las escuchas. ${A} te lo señala, desde mi ${R}.`,
+      `Tu lectura no tiene filtro esta vez, y yo, ${A}, vengo a decírtelo cara a cara, con mi ${R} como respaldo.`
+    ]);
+
+    if (!sombras.length) {
+      const frag = luces.slice(0, 3).map(c => {
+        const e = this.esencia[c.nombre];
+        return `${c.emoji} ${c.nombre}: ${e ? e.sombra : "el filo de su mensaje"}`;
+      }).join(" ");
+      return this.elegirDe([
+        `${apertura} Estás caminando por la cornisa y casi no lo ves: ${frag}. No esperes a que una carta se ponga de espaldas: hoy que todo parece "bien", es el mejor día para corregir. Desde mi ${R}, detente, revisa y ajusta antes de que el golpe llegue gratis.`,
+        `${apertura} Tus cartas no se han volteado, y sin embargo yo levanto la voz: ${frag}. La vida no siempre avisa con cartas invertidas. Desde mi ${R} te pido que atiendas esto hoy, no cuando se vuelva urgente.`,
+        `${apertura} Tus cartas salieron derechas, pero yo sé leer entre líneas: ${frag}. El peligro no está en lo que cayó, sino en lo que llevas tiempo ignorando. Desde mi ${R}, corrígelo antes de que la vida te obligue.`
+      ]);
+    }
+
+    const grupos = this.agruparContexto(sombras).filter(g => g.cartas.length);
+
+    const piezas = grupos.map(g => {
+      if (g.cartas.length === 1) {
+        const c = g.cartas[0];
+        const e = this.esencia[c.nombre];
+        const pos = posiciones[cartas.indexOf(c)] ? ` en ${posiciones[cartas.indexOf(c)].toLowerCase()}` : "";
+        return `${c.emoji} ${c.nombre}${c.invertido ? " invertida" : ""}${pos} toca tu punto más delicado: ${e ? e.sombra : "lo que no quieres ver"}. Y te dice: «${c.texto}»`;
+      }
+      const cs = g.cartas;
+      const eSombra = cs.map(c => (this.esencia[c.nombre] ? this.esencia[c.nombre].sombra : "")).filter(Boolean);
+      const repetidas = cs.length === 2
+        ? `${cs.map(c => c.nombre).join(" y ")} repiten la misma lección en sombra`
+        : `${cs.map(c => c.nombre).join(", ")} repiten el mismo patrón en sombra`;
+      return `${cs.map(c => c.emoji).join("")} ${repetidas}: ${eSombra.join(" y ")}. Juntas te dicen: «${cs[0].texto}»${cs.length > 1 ? " y «" + cs[1].texto + "»" : ""}`;
+    });
+
+    const cuerpo = piezas.slice(0, 4).join(" ");
+    const resto = sombras.length > 4 ? ` Y no te engañes: hay más cartas en sombra detrás de estas, todas apuntando al mismo centro. ` : "";
+    const puente = this.elegirDe([
+      `No lo mires como un castigo: estas cartas te señalan exactamente lo que estás listo para soltar.`,
+      `Pon atención al hilo que las une: no hay casualidad en que se repita el mismo tema.`,
+      `Cada una te habla de algo distinto, pero juntas cuentan una sola historia.`,
+      `No son varias lecturas: es una sola lección dicha de cuatro maneras.`,
+      `Fíjate cómo se señalan entre ellas: la sombra de una confirma la de la otra.`
+    ]);
+    const cierre = this.elegirDe([
+      `Yo, ${A}, desde mi ${R}, te pido una sola cosa hoy: elige la que más te dolió leer y conviértela en acción. Cambia una cosa y las demás girarán solas.`,
+      `Mira de nuevo las cartas que te señalé: no necesitas más señales, necesitas obediencia. ${A} te lo dice con amor duro: levántate hoy y demuestra que esta lectura no cayó al vacío.`,
+      `No te pido que cambies de golpe: te pido una decisión pequeña y real antes de que termine el día. Yo, ${A}, desde mi ${R}, estaré ahí para sostenerte mientras obedeces.`,
+      `Cuando quieras comprobar que estas cartas no vinieron al azar, mira que todas señalan lo mismo: tu corazón ya sabe por dónde empezar. ${A} te acompaña desde mi ${R}.`
+    ]);
+
+    return `${apertura} ${cuerpo}${resto} ${puente} ${cierre}`;
+  },
+
+  /* tarjetas de carta con su propio mensaje, para el regaño por bloque */
+  reganoCartaHtml(cartas) {
+    return (cartas || []).map(c => `
+      <div class="reg-carta">
+        ${this.miniCarta(c)}
+        <p>"${c.texto}"</p>
+      </div>`).join("");
   },
 
   /* tiñe el fondo con la energía de los arcángeles que guían la lectura */
@@ -272,7 +480,14 @@ const TIRADAS = {
 
     /* filtra solo las áreas de los arcángeles que participan en esta lectura */
     const elegidos = (resultado.__arcangeles || this.arcangelesDeLectura(resultado)).map(a => a.clave);
-    const areas = allAreas.filter(a => elegidos.includes(a.clave));
+    let areas = allAreas.filter(a => elegidos.includes(a.clave));
+
+    /* en la Lectura Fuerte corta, no siempre se repiten las mismas 7 áreas:
+       se muestra una mezcla de 5 para variar de lectura en lectura */
+    if (resultado.fuerte && areas.length > 5) {
+      const sobrantes = this.barajar([...areas]).slice(0, areas.length - 5);
+      areas = areas.filter(a => !sobrantes.includes(a));
+    }
 
     const cierrePoderoso = propor >= 0.5
       ? this.elegirDe([
@@ -302,28 +517,37 @@ const TIRADAS = {
       };
     });
 
+    // regaño moldeado por las cartas reales, dicho por el arcángel que
+    // corresponde al contexto de las cartas (no siempre el mismo).
+    const clavesAreas = areas.map(a => a.clave);
+    const regente = this.arcangelDeMensaje(resultado, clavesAreas);
+    const presenciaRegano = this.elegirDe([
+      `${regente.nombre} no te suelta la mano, pero hoy te aprieta fuerte:`,
+      `${regente.nombre} se planta frente a ti con su ${regente.regencia.toLowerCase()} en la mano:`,
+      `${regente.nombre} te mira fijo y no te deja apartar la vista:`,
+      `${regente.nombre} levanta la voz para que la escuches, y lo dice con amor de fuego:`
+    ]);
     if (resultado.fuerte) {
-      const regente = this.arcangelRegente(resultado);
-      const A = this.nombreCorto(regente.nombre);
-      const posiciones = (resultado.tirada.posiciones || []).map(p => p[0]);
-      const nombradas = resultado.cartas.slice(0, 4).map((c, i) => {
-        const tema = posiciones[i] ? ` (${posiciones[i]})` : "";
-        return `${c.emoji} ${c.nombre}${tema} ${c.sentido}`;
-      }).join(", ");
-      const llave = resultado.cartas.find(c => c.invertido) || resultado.cartas[resultado.cartas.length - 1];
-      const apertura = this.elegirDe([
-        "He escuchado todo lo que tu alma no se atreve a decir en voz alta, y vengo desde el cielo a decírtelo yo.",
-        "No pedí suavidad para hablarte: pedí verdad. El cielo ya no te susurra, te habla con voz plena.",
-        "Basta de medias palabras. Hoy la lectura no tiene filtro porque tu momento no lo tiene."
-      ]);
       finalBloques.push({
         icono: "🔥",
         area: "fuerte",
         titulo: "El regaño final",
         arcangel: regente,
         regano: true,
-        presencia: `${regente.nombre} no te suelta la mano, pero hoy te aprieta fuerte:`,
-        texto: `${apertura} Hoy tus cartas no se andan con rodeos: ${nombradas}. No es casualidad: apuntan al mismo centro y no te dejan escapatoria. ${A} te habla con la dureza de quien te ama: deja de esconderte detrás de excusas, de cansancio y del 'mañana empiezo'. Esta lectura fue fuerte porque tu momento lo pide: ${llave.nombre}${llave.invertido ? " invertida" : ""} te marca la salida que sigues eligiendo ignorar. No vengo a castigarte, ${A}: despierta, muévete y no le des más vueltas a lo que ya sabes que tienes que hacer.`
+        presencia: presenciaRegano,
+        texto: this.regañoDeCartas(resultado, regente),
+        cartasHtml: this.reganoCartaHtml(resultado.cartas)
+      });
+    } else if (propor < 0.5) {
+      finalBloques.push({
+        icono: "🔥",
+        area: "regano",
+        titulo: "Lo que tus cartas te regañan",
+        arcangel: regente,
+        regano: true,
+        presencia: presenciaRegano,
+        texto: this.regañoDeCartas(resultado, regente),
+        cartasHtml: this.reganoCartaHtml(resultado.cartas.filter(c => c.invertido))
       });
     }
 
@@ -359,7 +583,9 @@ const TIRADAS = {
       sombra: "Arcángel Miguel te regaña: has bajado el escudo demasiado pronto. Te estás exponiendo donde no hay protección y entregando tu fuerza donde no te valoran. Es hora de ponerte firme, de reclamar tu lugar y de dejar de dar tu poder a quien no lo merece. Levántate y defiéndete.",
       fuerte: [
         "¡Basta de hacerse el fuerte por fuera y el frágil por dentro! Arcángel Miguel te habla sin paños calientes: estás permitiendo que entren a tu vida quien no debería, y tú, con tus propias manos, les abres la puerta. Deja de pedir permiso para protegerte y deja de explicar por qué te cuidas. Tu paz no se negocia: se defiende. Hoy mismo pon los límites que has estado posponiendo.",
-        "¡Levántate y defiéndete! Arcángel Miguel no te suelta la mano, pero hoy no vino a consolarte: vino a armarte. Llevas tanto tiempo cediendo tu lugar, agachando la cabeza y dejando que otros decidan por ti, que ya confundiste humildad con rendición. Vuelve a tu trono: reafirma lo tuyo, corta en seco lo que te desgasta y camina con la dignidad de quien sabe que la luz que lo protege también lo obliga. Ya es hora."
+        "¡Levántate y defiéndete! Arcángel Miguel no te suelta la mano, pero hoy no vino a consolarte: vino a armarte. Llevas tanto tiempo cediendo tu lugar, agachando la cabeza y dejando que otros decidan por ti, que ya confundiste humildad con rendición. Vuelve a tu trono: reafirma lo tuyo, corta en seco lo que te desgasta y camina con la dignidad de quien sabe que la luz que lo protege también lo obliga. Ya es hora.",
+        "¡Tu tiempo no se regala! Arcángel Miguel coloca su espada entre tú y esa gente que solo aparece cuando necesita algo. Sí, te he visto: dices que no puedes negarte, que te da vergüenza, que 'mejor no hacer ruido'. Y mientras tanto ellos se llenan de tu energía y tú llenas sus vacíos. Deja de ser el banco emocional que nunca cobra: desde mi protección te pido un alto hoy mismo.",
+        "¡Deja de defenderlos! Arcángel Miguel te mira con dureza: pones tu escudo delante de quien jamás lo pondría por ti. Explícate a ti misma por qué eres tan generosa con tu paciencia y tan tacaña con tu respeto. Defiende a quien también te defienda, aguanta a quien también te espere. Tu protección no es un regalo: es un derecho que repartiste mal y hoy recuperas."
       ]
     },
     chamuel: {
@@ -368,7 +594,9 @@ const TIRADAS = {
       sombra: "Arcángel Chamuel te regaña: estás poniendo tu corazón donde no lo cuidan, o cerrando la puerta a quien sí te quiere bien. Deja de mendigar cariño donde solo hay ego. Quiérete con dignidad: el amor que mereces empieza por el que tú misma te das.",
       fuerte: [
         "¡Abre los ojos! Arcángel Chamuel te habla sin dulzura esta vez: sigues entregando tu corazón a quien te lo devuelve roto, y encima te sientes culpable. Deja de confundir amor con sacrificio y de perdonar lo que ni siquiera te han pedido perdón. Quiérete con dignidad o el amor pasará de largo frente a tu puerta. Basta de mendigar cariño: el amor que mereces emana de ti.",
-        "¡No ames desde la falta! Arcángel Chamuel trae su rosa al revés para que la veas: buscas en otros lo que te niegas a darte, y por eso cada vínculo termina doliendo igual. El patrón no son ellos: eres tú eligiendo quedarte donde no te valoran. Hoy corta el círculo: pon tu nombre primero en tu propia lista, y el amor que pide entrar encontrará una casa que ya sabe cuánto vale."
+        "¡No ames desde la falta! Arcángel Chamuel trae su rosa al revés para que la veas: buscas en otros lo que te niegas a darte, y por eso cada vínculo termina doliendo igual. El patrón no son ellos: eres tú eligiendo quedarte donde no te valoran. Hoy corta el círculo: pon tu nombre primero en tu propia lista, y el amor que pide entrar encontrará una casa que ya sabe cuánto vale.",
+        "¡No es el mismo amor con otras caras! Arcángel Chamuel te muestra el guion que se repite: empiezas ilusionada, luego haces todas las concesiones, y terminas sintiéndote vacía mientras te dices 'es que esta vez es distinto'. No lo es, y lo sabes en el alma. La única carta que cambia el juego eres tú. Cambia tu parte y el libreto entero se rompe.",
+        "¡Deja de pedir permiso para amarte! Arcángel Chamuel te lo grita con su luz rosa dura: no hace falta que otro te escoja para que tú te quieras. Ese amor que esperas entrar por la puerta de enfrente ya está en tu casa: es el que no te has dado. Quiérete primero, sin condiciones, y observa cómo cambia la fila en tu puerta."
       ]
     },
     rafael: {
@@ -377,7 +605,9 @@ const TIRADAS = {
       sombra: "Arcángel Rafael te regaña: deja de descuidarte. Te das a todos y no te queda nada para ti, y tu cuerpo te lo está avisando. No postergues más tu salud ni tu paz: el descanso y el cuidado no se ganan, se toman. Empieza hoy.",
       fuerte: [
         "¡Detente! Arcángel Rafael habla en serio: estás apagando la única vela que ilumina tu vida, y esa vela eres tú. Siempre postergas tu salud y tu descanso para el final, siempre eres el último en tu lista, y tu cuerpo ya te está cobrando. Deja de sacrificarte por quienes ni se dan cuenta. Cuidarte no es egoísmo: es tu obligación contigo. Hoy mismo, una cosa: descansa.",
-        "¡No te desaparezcas dando! Arcángel Rafael levanta la voz: cuidas a todos menos a ti, sostienes, escuchas, cargas, y cuando miras tu propio reflejo no reconoces el rostro. Tu energía no es ilimitada y tu alma no es un banco sin fondo. Pon un alto hoy: di no a lo que te vacía, di sí al descanso que evitas, y deja que la sanación empiece por la única persona que puede hacerlo por ti."
+        "¡No te desaparezcas dando! Arcángel Rafael levanta la voz: cuidas a todos menos a ti, sostienes, escuchas, cargas, y cuando miras tu propio reflejo no reconoces el rostro. Tu energía no es ilimitada y tu alma no es un banco sin fondo. Pon un alto hoy: di no a lo que te vacía, di sí al descanso que evitas, y deja que la sanación empiece por la única persona que puede hacerlo por ti.",
+        "¡El vaso ya rebosa! Arcángel Rafael sostiene tu mano y te enseña la cuenta que tu cuerpo lleva: cansancio que niegas, dolores que normalizas, ansiedad que escondes. No necesito más cartas para saber qué te pasa: lo estás contando con los hombros, la respiración y el sueño. Hoy no te pido grandeza, te pido un favor pequeño: elige una cosa que te cuide y hazla como si fuera sagrada.",
+        "¡Tu cuerpo te está hablando y no lo escuchas! Arcángel Rafael te lo dice como médico y como amigo: cada señal que ignoras hoy se convierte en diagnóstico mañana. Deja de tratar tu salud como un trámite que haces 'cuando puedas'. Tu energía es el suelo donde crece todo lo demás: si no te cuidas, nada de lo que quieres puede florecer."
       ]
     },
     gabriel: {
@@ -386,7 +616,9 @@ const TIRADAS = {
       sombra: "Arcángel Gabriel te regaña: has dejado de escuchar. Repites lo que quieres oír en vez de lo que necesitas, y por eso sigues en el mismo lugar. Cállate un momento, vuelve a preguntar y abre los oídos: la respuesta no llega hasta que te haces silencio.",
       fuerte: [
         "¡Deja de hacerte la sorda! Arcángel Gabriel te habla fuerte para que lo escuches de una vez: llevas años oyendo lo que quieres y tapando lo que necesitas. Te escondes detrás del ruido, del miedo y de las excusas. Hoy calla todo, siéntate y escucha la verdad que ya sabes: la respuesta siempre estuvo ahí, esperándote. No pidas más señales si no piensas obedecerlas.",
-        "¡El mensaje ya llegó, no pidas otro! Arcángel Gabriel te mira a los ojos: andas coleccionando señales como si el universo no te hubiera hablado ya mil veces. La respuesta no cambia porque no te gusta. Lo que falta no es una señal nueva: falta tu obediencia a la que ya tienes. Deja de negociar con el cielo y haz lo que ya sabes que debes hacer."
+        "¡El mensaje ya llegó, no pidas otro! Arcángel Gabriel te mira a los ojos: andas coleccionando señales como si el universo no te hubiera hablado ya mil veces. La respuesta no cambia porque no te gusta. Lo que falta no es una señal nueva: falta tu obediencia a la que ya tienes. Deja de negociar con el cielo y haz lo que ya sabes que debes hacer.",
+        "¡Deja de hacerte el despistado! Arcángel Gabriel aparta el ruido de golpe: no necesitas más información, necesitas silencio para digerir la que ya tienes. Te dices 'no sé qué hacer', pero sí lo sabes; solo te asusta hacerlo. Cállate un día las excusas y escucha tu propia voz: esa también es mía llegándote por dentro.",
+        "¡La señal no es más visible, es más avisada de lo que crees! Arcángel Gabriel te cuenta las veces que pasó frente a tus ojos: esa conversación, esa coincidencia, ese aviso repetido. Llevas tiempo respondiendo 'qué casualidad' cuando era una llamada palpitándote en la cara. Deja de preguntarle al tarot lo mismo y empieza a obedecer lo que ya te respondió."
       ]
     },
     uriel: {
@@ -395,7 +627,9 @@ const TIRADAS = {
       sombra: "Arcángel Uriel te regaña: estás actuando por impulso y dejando que la emoción nuble tu juicio, y eso te está costando caro. Pide tiempo, toma distancia y decide desde la luz, no desde el miedo. No corras: primero mira.",
       fuerte: [
         "¡Decide de una vez! Arcángel Uriel te habla sin rodeos: llevas tanto tiempo dudando que ya no es prudencia, es miedo con disfraz. No actúes por impulso, sí, pero tampoco te quedes paralizada por siempre: la vida también se te pasa esperando el momento perfecto. Mira con claridad, decide con firmeza y camina. El que no elige, elige perder.",
-        "¡Enciende la luz o elige la oscuridad! Arcángel Uriel no te da más tiempo: has colocado tu vida en pausa esperando garantías que nunca llegarán, y mientras tanto el tiempo pasa y las oportunidades se alejan. No necesitas ver todo el camino: necesitas prender la antorcha y caminar. Decidir es vivir. Estás a una sola decisión firme de cambiar tu rumbo: tómala hoy."
+        "¡Enciende la luz o elige la oscuridad! Arcángel Uriel no te da más tiempo: has colocado tu vida en pausa esperando garantías que nunca llegarán, y mientras tanto el tiempo pasa y las oportunidades se alejan. No necesitas ver todo el camino: necesitas prender la antorcha y caminar. Decidir es vivir. Estás a una sola decisión firme de cambiar tu rumbo: tómala hoy.",
+        "¡Tu parálisis tiene nombre: miedo! Arcángel Uriel te lo traduce sin piedad: esa 'prudencia' que invocas es excusa para no equivocarte, y no equivocarte se ha vuelto tu forma de no vivir. Examina, sí, pero con plazo. La sabiduría no es esperar a tener certeza: es decidir con la luz que ya tienes y ajustar en el camino. Prende la antorcha y anda.",
+        "¡Una decisión tomada a tiempo vale más que diez perfectas tarde! Arcángel Uriel levanta la luz sobre el tiempo que pierdes revisando lo mismo: el análisis ya cumplió. Lo que estudias un millón de veces no gana verdad, gana retraso. Elige hoy una dirección con tus mejores datos y comprométete: el camino se ilumina mientras caminas, no mientras ensayas."
       ]
     },
     zadkiel: {
@@ -404,7 +638,9 @@ const TIRADAS = {
       sombra: "Arcángel Zadkiel te regaña: llevas demasiado tiempo atada a la culpa, al rencor o a un pasado que ya no existe. Cada día que no perdonas, la cadena pesa más. Suelta la piedra, perdónate y perdona: tu alma no fue hecha para cargar tanto.",
       fuerte: [
         "¡Suelta esa piedra! Arcángel Zadkiel te habla sin compasión a medias: el pasado que arrastras es tuyo porque tú lo cargas, no porque te lo hayan puesto. Perdonar no es para el otro: es para ti. Y si el otro no se arrepiente, perdonas igual, para soltarte tú. El rencor te está comiendo viva, y lo sabes. Basta de justificarlo.",
-        "¡No eres tu cicatriz! Arcángel Zadkiel rompe la cadena con un golpe: llevas años presentándote como alguien que fue herido, como si ese recuerdo fuera tu identidad. Lo que te pasó ya no te define, salvo que tú lo mantengas en el trono. Mirada afuera: hay vida esperándote lejos de ese capítulo. Suelta la historia que te cuentas sobre tu pasado y deja que hoy sea otro principio."
+        "¡No eres tu cicatriz! Arcángel Zadkiel rompe la cadena con un golpe: llevas años presentándote como alguien que fue herido, como si ese recuerdo fuera tu identidad. Lo que te pasó ya no te define, salvo que tú lo mantengas en el trono. Mirada afuera: hay vida esperándote lejos de ese capítulo. Suelta la historia que te cuentas sobre tu pasado y deja que hoy sea otro principio.",
+        "¡El pasado no tiene llaves de tu casa! Arcángel Zadkiel te lo grita con su luz violeta: ese agravio, esa culpa y esa persona ya se fueron, pero tú sigues pagando su alquiler con paz, sueño y presente. Cada vez que vuelves a contarlo, la cadena vuelve a cerrarse. Hoy corta el ciclo: perdona no porque lo merezcan, sino porque tú necesitas soltar el peso.",
+        "¡Deja de llevar cuentas de quién te falló! Arcángel Zadkiel te mira con franqueza: mientras mides cada traición y la repasas, el otro está viviendo su vida y tú vives la de él, en bucle. Perdonar no borra lo que pasó: deja de cobrárselo a tu presente. Suelta la factura, agradece la lección y vuelve a tu propia vida, que te está esperando."
       ]
     },
     jofiel: {
@@ -413,7 +649,9 @@ const TIRADAS = {
       sombra: "Arcángel Jofiel te regaña: dejaste de ver la luz que sí tienes. Te comparas con otros y ensombreces tu propio camino, y así la inspiración huye de ti. Deja de mirar a lado y enciende tu propia lámpara: tu belleza no necesita permiso.",
       fuerte: [
         "¡Enciende tu luz! Arcángel Jofiel te habla con energía: tienes un sol dentro y pasas la vida mirando la lámpara del vecino. Te comparas, te menosprecias y apagas tu propia chispa. Tu camino no es el de nadie más y tu belleza no pide permiso. Deja de mirar hacia los lados, mira hacia ti, y verás cómo todo lo que buscas ya estaba en ti.",
-        "¡Deja de apagarte para que otros brillen! Arcángel Jofiel levanta tu barbilla: cedes tu luz, tu tiempo y tu creatividad, y te quedas con lo que sobra. Tu inspiración no es un favor que prestas: es un derecho que ejerces. Vuelve a ti, retoma lo que amas y acéptalo en voz alta. Cuando tu luz se prende por fin, nada ni nadie podrá ensombrecerla."
+        "¡Deja de apagarte para que otros brillen! Arcángel Jofiel levanta tu barbilla: cedes tu luz, tu tiempo y tu creatividad, y te quedas con lo que sobra. Tu inspiración no es un favor que prestas: es un derecho que ejerces. Vuelve a ti, retoma lo que amas y acéptalo en voz alta. Cuando tu luz se prende por fin, nada ni nadie podrá ensombrecerla.",
+        "¡Comparar es apagar tu propia estrella! Arcángel Jofiel te toma de la cara y te mira: cuando miras el camino de otros, dejas de ver el tuyo, que es el único que te corresponde. Detrás de esa vida que envidias hay un precio que no pagaste. Vuelve a tus propios sueños, retómalos desde donde los dejaste, y verás que tu luz siempre estuvo encendida.",
+        "¡Tu alegría también está atrasada! Arcángel Jofiel te señala la fecha: llevas tanto tiempo posponiendo lo que te ilumina 'para cuando todo esté bien' que se te olvidó cómo se siente. La inspiración no espera a que merezcas; se cultiva en el ahora. Retoma hoy una sola cosa que amas, solo una, y deja que tu sonrisa recuerde el camino."
       ]
     }
   },
@@ -441,10 +679,20 @@ const TIRADAS = {
     return bloques.map(b => {
       const inv = b.temas.filter(t => t.carta.invertido).length;
       const tenor = inv === 0 ? "luz" : (inv === b.temas.length ? "sombra" : "mixto");
-      const texto = resultado.fuerte
-        ? this.elegirDe(this.voces[b.clave].fuerte)
-        : this.elegirDe(this.voces[b.clave][tenor]);
       const arc = b.arcangel;
+      const nombreTemas = b.temas.map(t => t.tema.toLowerCase()).join(" y ");
+      let texto;
+      if (resultado.fuerte) {
+        texto = this.elegirDe(this.voces[b.clave].fuerte);
+      } else if (tenor === "sombra") {
+        const cs = b.temas.map(t => t.carta);
+        texto = this.elegirDe([
+          `${arc.nombre} revisa ${nombreTemas} y encuentra tus cartas contra la pared: ${cs.map(c => `${c.nombre} invertida ${this.esencia[c.nombre] ? "moldea el mensaje de " + this.esencia[c.nombre].sombra : "no quiere ser mirada"}`).join("; ")}. Atiende ese lugar hoy: la sombra se disipa cuando la nombras.`,
+          `${arc.nombre} te habla firme en ${nombreTemas}: todas las cartas de este rincón te muestran su envés, y cada una señala la misma puerta. ${cs.length === 1 ? "Mira la carta que se opone: no es un no, es un desvío que corregir." : "No es un no: es el patrón que repites en este terreno."} Devuélveles la luz desde su ${arc.regencia.toLowerCase()}.`
+        ]);
+      } else {
+        texto = this.elegirDe(this.voces[b.clave][tenor]);
+      }
       return {
         icono: arc.emoji,
         area: b.clave,
@@ -454,6 +702,9 @@ const TIRADAS = {
         regano: resultado.fuerte || tenor === "sombra",
         presencia: this.fraseArea(arc, b.clave),
         texto,
+        cartasHtml: (tenor === "sombra" || tenor === "mixto")
+          ? this.reganoCartaHtml(b.temas.filter(t => t.carta.invertido).map(t => t.carta))
+          : "",
         combinacion: this.combinacionDe(b)
       };
     }).concat([{
@@ -468,72 +719,35 @@ const TIRADAS = {
   },
 
   /* la combinación de las cartas de cada arcángel: normal (luz), espejada
-     (mezcla de derecha e invertida) o en sombra; el arcángel la nombra con
-     sus propias palabras y según su contexto */
+     (mezcla de derecha e invertida) o en sombra; cada arcángel combina las
+     cartas de SUS áreas, muestra sus imágenes y entrega el significado en
+     conjunto con sus propias palabras */
   combinacionDe(bloque) {
     const inv = bloque.temas.filter(t => t.carta.invertido).length;
-    const temas = bloque.temas.map(t => t.tema.toLowerCase()).join(" y ");
     const tipo = inv === 0 ? "luz" : (bloque.temas.length === inv ? "sombra" : "mixto");
     const arc = bloque.arcangel;
-    const A = this.nombreCorto(arc.nombre);
-    const R = arc.regencia.toLowerCase();
-    const textos = {
-      luz: [
-        `La combinación de mis cartas en ${temas} es normal y luminosa: todas apuntan en la misma dirección y su energía se multiplica a tu favor. Yo, ${A}, te aseguro que esta unión te respalda con mi ${R}: actúa con calma y confianza, porque lo que se alinea contigo no se deshace fácilmente.`,
-        `Mis cartas en ${temas} no discuten entre sí: cantan la misma melodía y su fuerza se une para sostenerte. Yo, ${A}, desde mi ${R} te confirmo que este respaldo es real: camina sin miedo, el cielo ya armó tu retaguardia.`
-      ],
-      mixto: [
-        `La combinación de mis cartas en ${temas} es espejada: unas te muestran su luz y otras te devuelven tu propia sombra, hablándote con honestidad. Yo, ${A}, te digo que este espejo no es un castigo: es un aviso a tiempo para que equilibres lo que hoy está a medias. Atiende ambas caras y la balanza volverá a tu favor desde mi ${R}.`,
-        `En ${temas} hay un pie en la luz y otro en la sombra: mis cartas se miran y te señalan la costura que debes revisar. Yo, ${A}, no vengo a asustarte, vengo a equilibrarte: desde mi ${R}, atiende lo que brilla y lo que duele, y la balanza se inclina sola.`
-      ],
-      sombra: [
-        `La combinación de mis cartas en ${temas} es en sombra: todas se presentan invertidas, y eso raramente significa no; significa que debes voltear el enfoque. Yo, ${A}, te hablo con serenidad y firmeza: la oscuridad solo te muestra lo que no has querido mirar. Devuelve la luz a estos asuntos desde mi ${R} y lo que parecía bloqueado empezará a moverse.`,
-        `Todas mis cartas en ${temas} miran al suelo, y no es mala noticia: es una llamada a voltear la mirada. Yo, ${A}, te lo digo con la seguridad de mi ${R}: la sombra no es tu destino, es tu señal de alerta. Devuelve la luz a lo que hoy está boca abajo y verás cómo se levanta.`
-      ]
-    };
-    return { tipo: tipo === "mixto" ? "espejada" : tipo, texto: this.elegirDe(textos[tipo]) };
+    const grupo = bloque.temas.map(t => t.carta);
+    const cartas = grupo.map(c => ({ nombre: c.nombre, img: c.img, emoji: c.emoji, invertido: c.invertido, palabras: c.palabras }));
+    const texto = this.significadoConjunto(grupo, arc);
+    return { tipo: tipo === "mixto" ? "espejada" : tipo, texto, cartas };
   },
 
   /* bloque de combinación global de las lecturas cortas (1, 3, 5, 10 cartas):
-     el arcángel regente resume cómo se combina toda la lectura */
+     el arcángel regente resume cómo se combina toda la lectura mostrando las
+     cartas protagonistas (2 o más del mismo contexto si las hay) con su
+     significado en conjunto */
   bloqueCombinacionGlobal(resultado) {
     const total = resultado.cartas.length;
     const inv = resultado.cartas.filter(c => c.invertido).length;
-    const arc = this.arcangelRegente(resultado);
-    const A = this.nombreCorto(arc.nombre);
-    const R = arc.regencia.toLowerCase();
-    const posiciones = (resultado.tirada.posiciones || []).map(p => p[0]);
+    const arc = this.arcangelDeMensaje(resultado);
 
-    // las protagonistas de la lectura, nombradas con su posición y esencia
-    const protagonistas = resultado.cartas.slice(0, 3).map((c, i) => {
-      const tema = posiciones[i] ? ` (${posiciones[i]})` : "";
-      return `${c.emoji} ${c.nombre}${tema}`;
-    }).join(", ");
-    const eje = resultado.cartas[0].palabras || [];
-    const tonoEje = eje.length ? eje.slice(0, 2).join(" y ") : (resultado.cartas[0].invertido ? "lo que pide ser soltado" : "el camino que pide seguir");
+    let tipo;
+    if (inv === 0) tipo = "normal";
+    else if (inv === total) tipo = "sombra";
+    else tipo = "espejada";
 
-    let tipo, texto;
-    if (inv === 0) {
-      tipo = "normal";
-      texto = this.elegirDe([
-        `Tus cartas en conjunto cuentan una sola historia: ${protagonistas}. Todas brillan del derecho y empujan en la misma dirección, con ${resultado.cartas[0].nombre} marcando el paso desde ${tonoEje}. Yo, ${A}, te lo confirmo desde mi ${R}: lo que se combina a tu favor ya está en movimiento. Avanza con el corazón abierto.`,
-        `${protagonistas}: aquí no hay contradicción, hay plan. Tus cartas se alinearon para no dejarte dudas: ${resultado.cartas[0].nombre} abre el camino desde ${tonoEje} y el resto lo acompaña. Yo, ${A}, te respaldo con mi ${R}: esto que se mueve ya va hacia ti. Solo falta que camines con fe.`
-      ]);
-    } else if (inv === total) {
-      tipo = "sombra";
-      texto = this.elegirDe([
-        `Tus cartas en conjunto hablan en sombra: ${protagonistas}. Como todas se presentan invertidas, la jugada no es esperar sino voltear el enfoque: ${resultado.cartas[0].nombre} invertida te pide soltar ${tonoEje}. Yo, ${A}, te lo digo desde mi ${R}: nada de esto es un no, es un aviso a tiempo para dar la vuelta.`,
-        `Tus cartas decidieron mostrarte el envés: ${protagonistas}. Ninguna está de espaldas por casualidad: todas te señalan lo mismo, que ${tonoEje} está esperando que tomes la decisión. Yo, ${A}, te hablo con mi ${R}: la sombra se disipa cuando la enfrentas. Voltéalas hoy.`
-      ]);
-    } else {
-      tipo = "espejada";
-      const luz = resultado.cartas.filter(c => !c.invertido)[0];
-      const sombra = resultado.cartas.find(c => c.invertido);
-      texto = this.elegirDe([
-        `Tus cartas en conjunto se miran de frente: ${protagonistas}. Mientras ${luz.emoji} ${luz.nombre} te muestra lo que ya avanza, ${sombra.emoji} ${sombra.nombre} invertida te devuelve lo que aún pide atención; la lección pasa por ${tonoEje}. Yo, ${A}, te digo desde mi ${R} que este espejo es un regalo: escucha las dos caras, equilibra y la balanza se inclinará a tu favor.`,
-        `Esta lectura es un espejo en el que te reconoces: la luz de ${luz.nombre} ya está de tu lado, mientras ${sombra.nombre} invertida te recuerda lo que aún no has querido ver de ${tonoEje}. Yo, ${A}, desde mi ${R} te acompañaré a sostener las dos: sin negar la sombra ni dudar de la luz, el camino se despeja solo.`
-      ]);
-    }
+    const grupo = this.elegirGrupoCombinacion(resultado.cartas);
+    const cartas = grupo.map(c => ({ nombre: c.nombre, img: c.img, emoji: c.emoji, invertido: c.invertido, palabras: c.palabras }));
     return {
       icono: "🔗",
       area: "combinacion",
@@ -541,7 +755,7 @@ const TIRADAS = {
       arcangel: arc,
       regano: tipo === "sombra",
       presencia: "",
-      combinacion: { tipo, texto },
+      combinacion: { tipo, texto: this.significadoConjunto(grupo, arc), cartas },
       texto: ""
     };
   },
@@ -722,7 +936,8 @@ const TIRADAS = {
           </h4>
           ${b.presencia ? `<p class="presencia-arc">${b.presencia}</p>` : ""}
           ${b.texto ? `<p>${b.texto}</p>` : ""}
-          ${b.combinacion ? `<p class="combinacion-texto">${b.combinacion.texto}</p>` : ""}
+          ${b.cartasHtml ? `<div class="regano-cartas">${b.cartasHtml}</div>` : ""}
+          ${b.combinacion ? `${b.combinacion.cartas && b.combinacion.cartas.length ? `<div class="combo-visual"><div class="combo-lado">${b.combinacion.cartas.map(c => this.miniCarta(c)).join('<span class="combo-mas">+</span>')}</div><span class="combo-mas combo-igual">=</span></div>` : ""}<p class="combinacion-texto">${b.combinacion.texto}</p>` : ""}
         </div>`;
       }
     });

@@ -1090,6 +1090,64 @@ h3 { font-size: 1.25rem; }
 }
 .bloque-categoria.regano .combinacion-texto { border-left-color: #c0507a; background: rgba(192, 80, 122, 0.08); }
 
+/* combinación visual: carta + carta = significado en conjunto */
+.combo-visual {
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px; flex-wrap: wrap; margin: 16px 0 6px;
+}
+.combo-lado {
+  display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;
+}
+.combo-mas {
+  font-family: var(--fuente-deco);
+  font-size: 1.7rem; font-weight: 700; color: var(--dorado);
+  text-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
+  line-height: 1;
+}
+.combo-igual { margin-left: 2px; }
+.combo-mini {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  max-width: 96px; padding: 7px 6px 5px; border-radius: 12px;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  background: rgba(20, 14, 44, 0.6);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+.combo-mini-art {
+  width: 56px; height: 92px;
+  display: flex; align-items: center; justify-content: center;
+}
+.combo-mini-art img {
+  width: 100%; height: 100%; object-fit: contain; border-radius: 6px;
+}
+.combo-mini.inv img { filter: brightness(0.72) saturate(0.85); }
+.combo-mini.inv .combo-mini-art .c-nm { opacity: 0.55; transform: rotate(180deg); }
+.combo-mini span {
+  font-size: 0.7rem; color: var(--lavanda-suave); text-align: center;
+  line-height: 1.2; max-width: 88px;
+}
+.combo-mini span i {
+  display: block; font-style: normal; font-size: 0.6rem; color: #ffd0dd;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+/* regaños con las propias cartas: miniatura + su mensaje */
+.regano-cartas {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px; margin-top: 14px;
+}
+.reg-carta {
+  display: flex; flex-direction: column;
+  border: 1px solid rgba(192, 80, 122, 0.4);
+  border-radius: 12px; padding: 8px 10px;
+  background: rgba(192, 80, 122, 0.07);
+}
+.reg-carta .combo-mini { border: none; background: transparent; box-shadow: none; max-width: none; padding: 0; }
+.reg-carta .combo-mini-art { width: 48px; height: 80px; }
+.reg-carta p {
+  margin-top: 6px; font-size: 0.84rem; line-height: 1.35;
+  font-family: var(--fuente-serif); color: var(--blanco-humo);
+}
+
 /* ----------------------- LECTURA FUERTE -------------------------------- */
 .titulo-interp-final.titulo-fuerte {
   color: #ffb37a;
