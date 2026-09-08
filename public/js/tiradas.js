@@ -903,18 +903,6 @@ const TIRADAS = {
      el arcángel elegido por analizarPregunta responde solo el tema de la
      pregunta: su mensaje directo, la combinación de las tres cartas como
      respuesta y un cierre breve con su señal */
-  aperturaPregunta(analisis, resultado) {
-    const arc = this.arcangeles[analisis.clave];
-    const A = this.nombreCorto(arc.nombre);
-    const R = arc.regencia.toLowerCase();
-    const q = `«${this.escapar(String(resultado.pregunta || "").trim())}»`;
-    return this.elegirDe([
-      `Yo, ${A}, respondo desde mi ${R} directamente a tu pregunta ${q}:`,
-      `He leído en el silencio del cielo tu pregunta ${q} y, ${A}, te respondo desde mi ${R}:`,
-      `${A}, el arcángel que cuida la ${R}, ha escuchado tu pregunta ${q}. Escucha su respuesta:`
-    ]);
-  },
-
   cierrePregunta(resultado) {
     const an = resultado.__analisis;
     const arc = this.arcangeles[an.clave];
@@ -1086,7 +1074,6 @@ const TIRADAS = {
     const e = this.esencia[principal.nombre];
     const faceta = principal.invertido ? (e ? e.sombra : "una lección que te pide mirar hacia dentro") : (e ? e.luz : "un mensaje de luz y confianza");
     const lista = cartas.map(c => `${c.nombre}${c.invertido ? " invertida" : ""}`).join(", ");
-    const apertura = this.aperturaPregunta(an, resultado);
     const anTema = an.titulo.toLowerCase();
 
     if (tipo === "fallecido") {
@@ -1110,7 +1097,7 @@ const TIRADAS = {
           `sobre ${ref}, tu lectura muestra el peso que guardas: ${lista}. ${A} te dice que no necesitas soltar a esa persona, solo soltar la culpa y la pena. Ella quiere verte entero: honrarla es vivir bien tu propia vida.`
         ]);
       }
-      return `${apertura} ${nucleo}`;
+      return this.capitalizarPrimera(nucleo);
     }
 
     if (tipo === "espiritus") {
@@ -1131,7 +1118,7 @@ const TIRADAS = {
           `tu lectura advierte con cartas en sombra: ${lista}. ${A} te dice que intentemos siempre la luz primero: respira hondo, enciende una vela cuando lo sientas y recupera tu centro. La claridad nunca nace del miedo.`
         ]);
       }
-      return `${apertura} ${nucleo}`;
+      return this.capitalizarPrimera(nucleo);
     }
 
     if (tipo === "energias") {
@@ -1152,7 +1139,7 @@ const TIRADAS = {
           `las cartas señalan una energía densa a tu alrededor: ${lista}. ${A} no quiere que lo tomes como miedo, sino como tarea: una limpieza del espacio (orden, sal, luz, incienso) y del ánimo (descanso, música buena, lindas compañías). Vuelves a respirar.`
         ]);
       }
-      return `${apertura} ${nucleo}`;
+      return this.capitalizarPrimera(nucleo);
     }
 
     if (tipo === "salud") {
@@ -1162,7 +1149,7 @@ const TIRADAS = {
         const veredicto = sombras === 0 ? "SÍ, con la energía a tu favor" : (derechas > sombras ? "sí, pero el proceso pide tiempo y cuidado" : "todavía no está de cara");
         nucleo = this.elegirDe([
           `sobre tu salud, la lectura responde ${veredicto}: ${lista}. ${A} ve tu cuerpo y tu ánimo hablando el mismo idioma: atiende hoy lo que ya sabes que te pide (descanso, chequeo, alimento) y la señal mejora con tu acción, no con tu miedo.`,
-          `${lista} responden a tu consulta de salud con la luz de ${A}: ${veredicto}. No es una sentencia, es un mapa: el cuerpo se acompaña, no se asusta. Da un paso concreto y humano hoy.`
+          `${lista}. Tu lectura de salud responde ${veredicto}. No es una sentencia, es un mapa: el cuerpo se acompaña, no se asusta. Da un paso concreto y humano hoy.`
         ]);
       } else if (sombras === 0) {
         nucleo = this.elegirDe([
@@ -1172,7 +1159,7 @@ const TIRADAS = {
       } else if (sombras < derechas) {
         nucleo = this.elegirDe([
           `hay una mejora real, pero hay algo que sigues descuidando: ${lista}. ${A} te lo señala con suavidad: el cansancio que normalizas, la revisión que pospones, el sueño que recortas. Tu cuerpo te habla: dale la cita que merece.`,
-          `tus cartas mezclan luz y avisos en tu salud: ${lista}. ${A} ve avance con un nudo pendiente. Atiende primero lo que más se repite en tu mente: ese es el tema que tu cuerpo te pide mirar.`
+          `${lista}: tu salud avanza con luz y una sombra que te avisa. ${A} ve mejora real con algo que sigues sin atender. Ese tema que vuelve una y otra vez a tu mente es el que tu cuerpo te pide mirar primero.`
         ]);
       } else {
         nucleo = this.elegirDe([
@@ -1180,7 +1167,7 @@ const TIRADAS = {
           `las cartas te muestran la parte de tu salud que evitas: ${lista}. ${A} te dice que el cuerpo no se persigue con miedo, se sostiene con constancia. Empieza por una cita o un descanso real: ese es el primer paso de la sanación.`
         ]);
       }
-      return `${apertura} ${nucleo}`;
+      return this.capitalizarPrimera(nucleo);
     }
 
     if (tipo === "consejo") {
@@ -1201,7 +1188,7 @@ const TIRADAS = {
           `el consejo es equilibrar: sostén lo bueno y suelta lo que pesa. ${lista} te lo muestran. ${A} te acompaña a dar un paso a la vez: las decisiones más sabias no apuran, ordenan.`
         ]);
       }
-      return `${apertura} ${nucleo}`;
+      return this.capitalizarPrimera(nucleo);
     }
 
     if (tipo === "si-no") {
@@ -1212,7 +1199,7 @@ const TIRADAS = {
           : (derechas === 0
             ? `la lectura te responde NO por ahora, y no es castigo: es un “aún no” del cielo. ${lista} te muestran el revés de este tiempo. ${A} te pide frenar, soltar y cambiar el rumbo: cuando lo hagas, la puerta se abre.`
             : `la lectura es un NO por ahora: ${lista}. ${A} ve que insistes donde la energía todavía no te acompaña. No es rechazo, es orden de pasos: atiende la señal y vuelve a preguntar con el corazón liviano.`));
-      return `${apertura} ${nucleo}`;
+      return this.capitalizarPrimera(nucleo);
     }
 
     if (tipo === "persona") {
@@ -1234,7 +1221,7 @@ const TIRADAS = {
         } else if (sombras < derechas) {
           nucleo = this.elegirDe([
             `hay algo que ${ref} todavía no te dice: ${lista}. ${A} ve una reserva que no nace de mala intención: nace del miedo o de la prudencia. No la acorrales a preguntas, acércate con confianza: lo que guarda saldrá solo cuando se sienta segura.`,
-            `sobre ${ref}, tus cartas mezclan luz y señales de silencio: ${lista}. ${A} percibe que sí hay algo que no cuenta, pero no es lo que temes: es algo que está decidiendo en voz baja. No fuerces: dale una puerta abierta y escucha cuando llegue.`
+            `${lista}: la lectura sobre ${ref} mezcla luz y señales de silencio. ${A} percibe que sí hay algo que no cuenta, pero no es lo que temes: es algo que está decidiendo en voz baja. No fuerces: dale una puerta abierta y escucha cuando llegue.`
           ]);
         } else if (sombras === derechas) {
           nucleo = this.elegirDe([
@@ -1245,7 +1232,7 @@ const TIRADAS = {
             `${ref} llega en sombras a tu consulta: ${lista}. ${A} te dice que sí hay algo que se calla, y tiene nombre, pero no es la amenaza que imaginas: es algo que ${ref} prefiere no mirar todavía. No es una acusación, es una señal: dale espacio, deja que la verdad respire y no intentes arrebatársela con presión.`
           ]);
         }
-        return `${apertura} ${nucleo}`;
+        return this.capitalizarPrimera(nucleo);
       }
 
       if (sombras === 0) {
@@ -1274,14 +1261,14 @@ const TIRADAS = {
         const veredicto = sombras === 0 ? "SÍ, sin condiciones" : (sombras < derechas ? "SÍ, con una condición" : "NO por ahora");
         nucleo = `La respuesta es ${veredicto}: ${nucleo}`;
       }
-      return `${apertura} ${nucleo}`;
+      return this.capitalizarPrimera(nucleo);
     }
 
     const nucleo = this.elegirDe([
-      `tu lectura dice así: ${lista}. ${principal.nombre} ${principal.invertido ? "está de cabeza" : "brilla del derecho"} y anuncia ${faceta}. ${A} te guía en ${anTema}: mira las señales repetidas, porque tu respuesta no llega por una sola puerta.`,
-      `las cartas responden al corazón de tu consulta: ${lista}. ${principal.nombre} ${principal.invertido ? "te pide voltear la mirada" : "se pone de tu lado"} con su mensaje: ${faceta}. ${A} lo confirma en ${anTema}: lo que preguntas ya está en movimiento, solo fíjate hacia dónde.`
+      `${principal.nombre} ${principal.invertido ? "está de cabeza y te pide frenar" : "brilla del derecho"} y anuncia ${faceta}. En el contexto de ${anTema}, ${lista} dibujan tu momento. ${A} te guía: mira las señales repetidas, porque tu respuesta no llega por una sola puerta.`,
+      `${principal.nombre} ${principal.invertido ? "te pide voltear la mirada" : "se pone de tu lado"} con su mensaje: ${faceta}. ${A} lo confirma en ${anTema}: lo que preguntas ya está en movimiento y ${lista} te marcan hacia dónde fijarte.`
     ]);
-    return `${apertura} ${nucleo}`;
+    return this.capitalizarPrimera(nucleo);
   },
 
   /* pide a la IA del servidor la respuesta afinada a la pregunta (si la hay).
@@ -1549,6 +1536,8 @@ const TIRADAS = {
 
   /* -------------------------- métodos de ayuda arcángel ------------------- */
   nombreCorto(nombre) { return nombre.replace("Arcángel ", ""); },
+
+  capitalizarPrimera(t) { return t.charAt(0).toUpperCase() + t.slice(1); },
 
   nombresArcangeles(lista) {
     if (lista.length <= 1) return lista[0].nombre;
