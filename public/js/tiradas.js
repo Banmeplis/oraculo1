@@ -1876,31 +1876,32 @@ const TIRADAS = {
     const sombra = tono === "sombra" || c.invertido;
     const res = sombra ? s.resS : s.resL;
     const cl = sombra ? s.sombra : s.clave;
+    const Res = this.cap(res);
     const frases = {
       inicio: sombra
-        ? [`En ${pos} algo nuevo empieza torcido: ${cl}. ${res}.`,
-           `En ${pos} el impulso se descontrola: ${cl}. ${res}.`]
-        : [`En ${pos} ${s.accion}: ${cl}. ${res}.`,
-           `En ${pos} comienza ${cl}, y aquí ${s.accion}. ${res}.`],
+        ? [`En ${pos} algo nuevo empieza torcido: ${cl}. ${Res}.`,
+           `En ${pos} el impulso se descontrola: ${cl}. ${Res}.`]
+        : [`En ${pos} ${s.accion}: ${cl}. ${Res}.`,
+           `En ${pos} comienza ${cl}, y aquí ${s.accion}. ${Res}.`],
       decision: sombra
-        ? [`En ${pos} la decisión se enreda: ${cl}. ${res}.`,
-           `En ${pos} elegir pesa: ${cl}. ${res}.`]
-        : [`En ${pos} te toca decidir con ${cl}: ${s.accion}. ${res}.`,
-           `En ${pos} la lectura se detiene en ${cl}: ${s.accion}. ${res}.`],
+        ? [`En ${pos} la decisión se enreda: ${cl}. ${Res}.`,
+           `En ${pos} elegir pesa: ${cl}. ${Res}.`]
+        : [`En ${pos} te toca decidir con ${cl}: ${s.accion}. ${Res}.`,
+           `En ${pos} la lectura se detiene en ${cl}: ${s.accion}. ${Res}.`],
       desafio: sombra
         ? [`En ${pos} la prueba se convierte en ${cl}: ${res}.`,
-           `En ${pos} el desafío aprieta: ${cl}. ${res}.`]
-        : [`En ${pos} se levanta ${cl}: ${s.accion}. ${res}.`,
-           `En ${pos} hay ${cl}, y aquí ${s.accion}. ${res}.`],
+           `En ${pos} el desafío aprieta: ${cl}. ${Res}.`]
+        : [`En ${pos} se levanta ${cl}: ${s.accion}. ${Res}.`,
+           `En ${pos} hay ${cl}, y aquí ${s.accion}. ${Res}.`],
       proceso: sombra
-        ? [`En ${pos} el cambio se atraganta: ${cl}. ${res}.`,
-           `En ${pos} todo se estanca: ${cl}. ${res}.`]
-        : [`En ${pos} corre ${cl}: ${s.accion}. ${res}.`,
-           `En ${pos} todo se transforma: ${cl}; ${s.accion}. ${res}.`],
+        ? [`En ${pos} el cambio se atraganta: ${cl}. ${Res}.`,
+           `En ${pos} todo se estanca: ${cl}. ${Res}.`]
+        : [`En ${pos} corre ${cl}: ${s.accion}. ${Res}.`,
+           `En ${pos} todo se transforma: ${cl}; ${s.accion}. ${Res}.`],
       desenlace: sombra
-        ? [`En ${pos} el final se tuerce: ${cl}. ${res}.`,
+        ? [`En ${pos} el final se tuerce: ${cl}. ${Res}.`,
            `En ${pos} ${cl} no termina de cerrarse: ${res}.`]
-        : [`En ${pos} se anuncia ${cl}: ${s.accion}. ${res}.`,
+        : [`En ${pos} se anuncia ${cl}: ${s.accion}. ${Res}.`,
            `En ${pos} el desenlace es ${cl}, y ${res}.`]
     };
     return this.elegirDe(frases[s.f]);
