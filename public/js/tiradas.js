@@ -334,6 +334,346 @@ const TIRADAS = {
     "Rey de Bastos":      { grupo: "persona", luz: "la experiencia que manda con carisma y templanza",         sombra: "las ambiciones que pesan y el fuego que agota" }
   },
 
+  /* ------------------------- capa semántica -------------------------
+     Cada mayor aporta: clave (la "nueva lectura" en forma de sustantivo),
+     accion (lo que invita a hacer), resL/resS (desenlace en luz/sombra),
+     sombra (su lado difícil) y puede (lo que puede anunciar). Se agrupan en
+     cinco funciones de lectura: inicio, decision, desafio, proceso, desenlace.
+     El motor combina estas piezas con plantillas para generar interpretaciones
+     y mensajes finales sin párrafos fijos por lectura */
+  ordenMayores: ["El Loco","El Mago","La Sacerdotisa","La Emperatriz","El Emperador","El Hierofante",
+                 "Los Enamorados","El Carro","La Justicia","El Ermitaño","La Rueda de la Fortuna",
+                 "El Colgado","La Muerte","La Templanza","El Diablo","La Torre","La Estrella",
+                 "La Luna","El Sol","El Juicio","El Mundo"],
+
+  funciones: {
+    inicio:       { etiqueta: "el comienzo",  conector: "se abre con",                       verbo: "da el primer paso",   cartas: ["El Loco","El Mago","La Emperatriz","El Carro"] },
+    decision:     { etiqueta: "la decisión",  conector: "exige",                             verbo: "elige y resuelve",    cartas: ["La Sacerdotisa","El Hierofante","Los Enamorados","La Justicia","El Ermitaño"] },
+    desafio:      { etiqueta: "el desafío",   conector: "choca contra",                      verbo: "se enfrenta",         cartas: ["El Emperador","La Fuerza","El Diablo","La Torre"] },
+    proceso:      { etiqueta: "el proceso",   conector: "atraviesa",                         verbo: "se transforma",       cartas: ["La Rueda de la Fortuna","El Colgado","La Muerte","La Templanza"] },
+    desenlace:    { etiqueta: "el desenlace", conector: "termina en",                        verbo: "revela",              cartas: ["La Estrella","La Luna","El Sol","El Juicio","El Mundo"] }
+  },
+
+  semantica: {
+    "El Loco": {
+      f: "inicio",
+      clave: "un comienzo que invita a saltar hacia lo desconocido",
+      accion: "te anima a dar el primer paso sin tener el mapa completo",
+      resL: "ese salto, dado con los ojos abiertos, se convierte en camino",
+      resS: "saltar sin mirar las consecuencias termina costándote caro",
+      sombra: "impulsividad e imprudencia, no medir las consecuencias",
+      puede: "un viaje inesperado, una mudanza, comenzar algo nuevo, abandonar una situación, una oportunidad que aparece de repente"
+    },
+    "El Mago": {
+      f: "inicio",
+      clave: "una idea nacida de tu talento",
+      accion: "pone a tu servicio todos tus recursos para volverla real",
+      resL: "tu capacidad transforma la intención en obra",
+      resS: "esa habilidad se usa en una dirección que no te conviene",
+      sombra: "manipulación, engaño, usar la inteligencia en beneficio propio",
+      puede: "un proyecto, un contrato, un documento, una creación que pide nacer"
+    },
+    "La Emperatriz": {
+      f: "inicio",
+      clave: "una energía fértil que ayuda a que algo crezca",
+      accion: "siembra, nutre y da de comer lo que merece florecer",
+      resL: "lo que cuidas se vuelve un fruto visible",
+      resS: "el descuido deja tu tierra sin nutrir",
+      sombra: "presencia que asfixia lo que intenta crecer",
+      puede: "una mujer creativa, una ayuda femenina, un proyecto que comienza a desarrollarse, prosperidad, atractivo personal"
+    },
+    "El Carro": {
+      f: "inicio",
+      clave: "algo que finalmente comienza a moverse",
+      accion: "toma las riendas y apunta en una sola dirección",
+      resL: "el avance se vuelve conquista",
+      resS: "avanzar deprisa y sin rumbo termina en un choque",
+      sombra: "dispersión, energía que se reparte hasta diluirse",
+      puede: "un viaje, un traslado, un avance profesional, una victoria, una decisión ejecutada"
+    },
+    "La Sacerdotisa": {
+      f: "decision",
+      clave: "una información que todavía no ha sido revelada",
+      accion: "te pide callar, observar y escuchar lo que aún no se dice",
+      resL: "la verdad aparece a su tiempo y en su lugar",
+      resS: "el silencio se vuelve confusión y el secreto pesa",
+      sombra: "silencio excesivo, ocultar información, misterio que confunde",
+      puede: "un secreto, información incompleta, una percepción intuitiva, una verdad que aparece más adelante"
+    },
+    "El Hierofante": {
+      f: "decision",
+      clave: "una enseñanza que viene de más alto",
+      accion: "te conecta con lo que ya tiene tradición y estructura",
+      resL: "la decisión se eleva y cobra un respaldo real",
+      resS: "las reglas de otros se vuelven una cárcel",
+      sombra: "dogma, institución que manda sin escuchar",
+      puede: "una institución, una tradición, un maestro, un aprendizaje, un compromiso formal o un matrimonio"
+    },
+    "Los Enamorados": {
+      f: "decision",
+      clave: "una elección que obliga a decidir entre dos caminos",
+      accion: "te enfrenta al cruce donde el deseo y la responsabilidad se miran",
+      resL: "la elección de corazón te devuelve la paz",
+      resS: "la duda se queda con las dos opciones y con tu paz",
+      sombra: "dualidad, indecisión, conflicto entre lo que se desea y lo que se debe",
+      puede: "un dilema, una pareja, una atracción, dos posibilidades"
+    },
+    "La Justicia": {
+      f: "decision",
+      clave: "la necesidad de demostrar con hechos lo que estaba oculto",
+      accion: "ordena, documenta y devuelve cada cosa a su lugar",
+      resL: "la verdad recibe el reconocimiento que merece",
+      resS: "lo que no se demuestra a tiempo se pierde",
+      sombra: "sentenciarte a ti mismo sin oír tus propios motivos",
+      puede: "un contrato, un documento, derechos, consecuencias, reconocimiento"
+    },
+    "El Ermitaño": {
+      f: "decision",
+      clave: "una respuesta que aparece cuando dejas de correr",
+      accion: "se retira, baja el ruido y mira hacia adentro",
+      resL: "la pausa deliberada devuelve la claridad",
+      resS: "el refugio se vuelve aislamiento",
+      sombra: "aislamiento por miedo y no por paz",
+      puede: "una persona mayor, un consejero, una investigación, el silencio, una espera necesaria"
+    },
+    "El Emperador": {
+      f: "desafio",
+      clave: "una autoridad que se conquista con estructura",
+      accion: "ordena, decide y sostiene los límites con firmeza",
+      resL: "el poder se consolida sobre bases sólidas",
+      resS: "el control rígido termina asfixiando",
+      sombra: "autoridad sin escucha, rigidez que no cede",
+      puede: "un ascenso, un liderazgo, una posición de mando, una base por ordenar"
+    },
+    "La Fuerza": {
+      f: "desafio",
+      clave: "una fortaleza serena que se gana sin agredir",
+      accion: "domina el impulso y responde desde la calma",
+      resL: "tu autocontrol desarma lo que te provoca",
+      resS: "la presión que no se gestiona estalla tarde o temprano",
+      sombra: "reprimirlo en vez de gobernarlo",
+      puede: "defenderte sin gritar, controlar una tentación, resistir firme en la crisis"
+    },
+    "El Diablo": {
+      f: "desafio",
+      clave: "una tentación que promete justo lo que puede atraparte",
+      accion: "te enseña a nombrar la cadena para desactivarla",
+      resL: "la verdad dicha corta la atadura",
+      resS: "el deseo se vuelve dependencia",
+      sombra: "deseo, dependencia, manipulación, exceso de poder material",
+      puede: "manipulación, fraude, obsesión, dinero, dependencia, seducción, abuso de confianza"
+    },
+    "La Torre": {
+      f: "desafio",
+      clave: "una verdad que rompe una ilusión",
+      accion: "deja caer lo que ya venía avisando su caída",
+      resL: "la crisis limpia y deja hueco para reconstruir",
+      resS: "el golpe llega sin avisar y sacude los cimientos",
+      sombra: "fracaso, traición, ruptura brusca",
+      puede: "un fracaso inesperado, una traición, una pérdida, una ruptura, una revelación dolorosa"
+    },
+    "La Rueda de la Fortuna": {
+      f: "proceso",
+      clave: "un giro que nadie puede controlar del todo",
+      accion: "giras con el cambio y sueltas lo que la rueda deja atrás",
+      resL: "el ciclo se cierra y deja paso al siguiente",
+      resS: "aferrarte a lo que ya pasó te deja a contramano",
+      sombra: "resistencia al cambio inevitable",
+      puede: "un cambio de trabajo, una mudanza, una oportunidad, un reencuentro, el cierre de un ciclo"
+    },
+    "El Colgado": {
+      f: "proceso",
+      clave: "una pausa que dice: todavía no debes actuar",
+      accion: "suspende la prisa, cambia el punto de vista y espera",
+      resL: "lo que se detiene a tiempo se resuelve mejor",
+      resS: "la espera se convierte en sacrificio vacío",
+      sombra: "quedarse colgado del miedo y de la duda",
+      puede: "una espera, un retraso, una situación bloqueada, no intervenir todavía"
+    },
+    "La Muerte": {
+      f: "proceso",
+      clave: "un final que limpia el terreno para algo nuevo",
+      accion: "suelta lo que ya cumplió su ciclo",
+      resL: "lo que termina libera el espacio de lo que nace",
+      resS: "aferrarte al pasado ocupa el lugar de lo nuevo",
+      sombra: "miedo a soltar, resistencia a terminar",
+      puede: "una separación, un cambio de trabajo, una mudanza, el fin de una costumbre, una transformación profunda"
+    },
+    "La Templanza": {
+      f: "proceso",
+      clave: "la mezcla justa que vuelve al centro",
+      accion: "combina con calma los opuestos y regula el ritmo",
+      resL: "las cosas se resuelven gradualmente y se sostienen",
+      resS: "los extremos te desbordan por un lado y por otro",
+      sombra: "excesos, prisa que rompe el equilibrio",
+      puede: "una reconciliación, una recuperación, moderación, esperar el momento correcto"
+    },
+    "La Estrella": {
+      f: "desenlace",
+      clave: "una esperanza con nombre y dirección",
+      accion: "siembra un deseo concreto y le pone fecha",
+      resL: "lo que soñaste empieza a tomar forma",
+      resS: "la fe se apaga porque no se le da de comer",
+      sombra: "desesperanza, olvido de los propios sueños",
+      puede: "un sueño, una persona que inspira, un futuro favorable, protección, recuperación"
+    },
+    "La Luna": {
+      f: "desenlace",
+      clave: "un miedo que todavía no tiene forma clara",
+      accion: "te invita a bajar el miedo y convertir el presentimiento en pregunta",
+      resL: "la claridad llega cuando baja la marea",
+      resS: "la inquietud nocturna termina decidiendo por ti",
+      sombra: "confusión, fobia, inseguridad, información incompleta",
+      puede: "un miedo, una sospecha, una intuición, una confusión emocional, un secreto"
+    },
+    "El Sol": {
+      f: "desenlace",
+      clave: "lo que estaba oculto se vuelve evidente y favorable",
+      accion: "brilla, celebra y muestra lo que lograste",
+      resL: "el éxito se vuelve visible y te corona",
+      resS: "tener el sol delante y andar mirando nubes",
+      sombra: "exceso de confianza, no disfrutar lo conquistado",
+      puede: "éxito, una buena noticia, reconocimiento, claridad, triunfo"
+    },
+    "El Juicio": {
+      f: "desenlace",
+      clave: "una llamada que despierta algo de tu pasado",
+      accion: "responde, elige y preséntate de nuevo",
+      resL: "lo viejo se comprende de otra manera y te renueva",
+      resS: "el regreso que no se atiende vuelve a llamar a la puerta",
+      sombra: "dudar de tu valor, no responder a la llamada",
+      puede: "un reencuentro, un mensaje, una persona del pasado, una segunda oportunidad, una noticia importante"
+    },
+    "El Mundo": {
+      f: "desenlace",
+      clave: "una experiencia que completa lo que estaba incompleto",
+      accion: "cierra el ciclo y recibe el reconocimiento",
+      resL: "lo logrado se expande y abre puertas nuevas",
+      resS: "quedarte a un paso de la meta",
+      sombra: "vértigo de terminar y no saber qué sigue",
+      puede: "un logro, un viaje, una mudanza, expansión, el cierre de un ciclo"
+    }
+  },
+
+  /* combinaciones de pares curadas: se detectan cuando dos cartas de la lectura
+     coinciden, y aportan una lectura específica a la interpretación conjunta */
+  parCombinaciones: [
+    ["El Loco", "El Carro", "viaje o desplazamiento, una aventura que exige acción"],
+    ["El Loco", "La Rueda de la Fortuna", "un cambio inesperado"],
+    ["El Loco", "La Muerte", "cerrar una etapa y comenzar otra completamente diferente"],
+    ["El Loco", "La Justicia", "revisar bien las consecuencias antes de dar el salto"],
+    ["El Loco", "El Diablo", "una aventura que puede convertirse en mala decisión"],
+    ["El Mago", "La Torre", "una creación o proyecto que fracasa inesperadamente"],
+    ["El Mago", "La Justicia", "derechos intelectuales, contratos, documentos, la propiedad de una creación"],
+    ["El Mago", "El Diablo", "una persona inteligente que usa sus capacidades para manipular"],
+    ["El Mago", "La Emperatriz", "crear algo juntos"],
+    ["El Mago", "El Sol", "éxito obtenido mediante talento propio"],
+    ["El Mago", "El Mundo", "una capacidad que puede alcanzar un reconocimiento amplio"],
+    ["La Sacerdotisa", "La Luna", "intuición mezclada con incertidumbre"],
+    ["La Sacerdotisa", "La Justicia", "información escondida relacionada con documentos o asuntos legales"],
+    ["La Sacerdotisa", "El Juicio", "un secreto que finalmente sale a la luz"],
+    ["La Sacerdotisa", "El Ermitaño", "buscar una respuesta dentro de uno mismo"],
+    ["La Emperatriz", "El Mago", "crear algo juntos"],
+    ["La Emperatriz", "La Estrella", "una mujer que inspira o ayuda a cumplir un deseo"],
+    ["La Emperatriz", "El Diablo", "magnetismo, seducción o atracción intensa"],
+    ["La Emperatriz", "El Emperador", "una pareja o alianza entre fuerzas complementarias"],
+    ["La Emperatriz", "El Mundo", "creatividad que alcanza reconocimiento"],
+    ["El Emperador", "El Carro", "un ascenso mediante esfuerzo"],
+    ["El Emperador", "La Justicia", "autoridad legítima"],
+    ["El Emperador", "El Mago", "capacidad profesional reconocida"],
+    ["El Emperador", "La Torre", "una pérdida o cambio brusco de autoridad"],
+    ["El Emperador", "El Mundo", "una posición de liderazgo consolidada"],
+    ["El Hierofante", "Los Enamorados", "elegir un compromiso"],
+    ["El Hierofante", "La Justicia", "un compromiso formal o legal"],
+    ["El Hierofante", "El Juicio", "una renovación espiritual"],
+    ["El Hierofante", "La Estrella", "una fe renovada"],
+    ["Los Enamorados", "El Diablo", "una atracción muy intensa que puede complicar la situación"],
+    ["Los Enamorados", "La Justicia", "elegir correctamente"],
+    ["Los Enamorados", "La Luna", "no tener claro qué se siente"],
+    ["Los Enamorados", "La Muerte", "una relación que cambia de forma"],
+    ["Los Enamorados", "La Estrella", "una esperanza amorosa"],
+    ["El Carro", "El Mundo", "un viaje lejano o internacional"],
+    ["El Carro", "La Torre", "un viaje o proyecto alterado inesperadamente"],
+    ["La Justicia", "El Diablo", "fraude o manipulación contractual"],
+    ["La Justicia", "El Sol", "victoria y reconocimiento"],
+    ["La Justicia", "La Torre", "una injusticia que provoca una ruptura"],
+    ["El Ermitaño", "La Justicia", "consultar a un experto"],
+    ["El Ermitaño", "La Templanza", "recuperación mediante calma"],
+    ["El Ermitaño", "Los Enamorados", "pensar antes de elegir"],
+    ["La Rueda de la Fortuna", "El Carro", "un cambio que produce movimiento"],
+    ["La Rueda de la Fortuna", "La Muerte", "un cambio definitivo"],
+    ["La Rueda de la Fortuna", "El Sol", "un giro favorable"],
+    ["La Rueda de la Fortuna", "La Torre", "un cambio inesperado y difícil"],
+    ["La Rueda de la Fortuna", "El Mundo", "un cambio que abre una etapa completamente nueva"],
+    ["La Fuerza", "La Justicia", "defenderse correctamente"],
+    ["La Fuerza", "El Diablo", "controlar una tentación"],
+    ["La Fuerza", "La Torre", "mantenerse firme durante una crisis"],
+    ["La Muerte", "La Estrella", "un final que conduce a la esperanza"],
+    ["La Muerte", "El Mundo", "el cierre completo de un ciclo"],
+    ["La Templanza", "Los Enamorados", "una relación que se desarrolla lentamente"],
+    ["La Templanza", "La Muerte", "adaptación a un cambio"],
+    ["La Templanza", "El Mundo", "integración y estabilidad"],
+    ["El Diablo", "La Luna", "un miedo que domina"],
+    ["La Torre", "El Diablo", "un engaño que termina causando daño"],
+    ["La Torre", "La Luna", "miedo provocado por una situación incierta"],
+    ["La Torre", "La Estrella", "después de la crisis aparece una nueva esperanza"],
+    ["La Estrella", "El Carro", "un viaje hacia una oportunidad"],
+    ["La Estrella", "El Mundo", "un sueño que alcanza su realización"],
+    ["La Estrella", "El Juicio", "un llamado espiritual"],
+    ["El Sol", "El Mundo", "un reconocimiento amplio"],
+    ["El Sol", "El Carro", "éxito después del esfuerzo"],
+    ["El Sol", "El Juicio", "una noticia importante y favorable"]
+  ],
+
+  /* situaciones especiales curadas: cuando una lectura coincide con el conjunto
+     exacto de cartas, aparece una interpretación específica y muy concreta */
+  especiales: [
+    { cartas: ["El Mago", "La Torre", "La Justicia", "El Colgado"], titulo: "Traición a una persona creativa", mensaje: "Una persona talentosa ve interrumpido un proyecto porque alguien abusa de su confianza o de sus derechos. La situación genera impotencia, pero requiere reclamar lo que legítimamente le corresponde." },
+    { cartas: ["La Luna", "El Diablo", "La Fuerza", "El Carro"], titulo: "Superar un miedo", mensaje: "Un miedo limita el movimiento, pero puede ser enfrentado mediante disciplina y voluntad hasta recuperar la libertad. El miedo domina, la fuerza interior domina, y el carro devuelve el movimiento." },
+    { cartas: ["La Luna", "La Estrella", "El Sol", "El Mundo"], titulo: "Invitación y síndrome del impostor", mensaje: "La inseguridad hace creer que uno no pertenece, pero una oportunidad social demuestra que tu presencia es valorada y abre nuevas conexiones." },
+    { cartas: ["El Hierofante", "Los Enamorados", "La Justicia", "La Sacerdotisa"], titulo: "Decisión espiritual o tradicional", mensaje: "Una decisión vinculada con una tradición o un compromiso profundo debe tomarse escuchando tu propia conciencia y no las opiniones externas." },
+    { cartas: ["La Emperatriz", "El Mago", "La Estrella", "El Carro"], titulo: "Mujer que ayuda a cumplir un deseo", mensaje: "Una persona creativa y generosa entra en el proceso y proporciona el impulso necesario para convertir un deseo en realidad." },
+    { cartas: ["Los Enamorados", "El Colgado", "La Estrella"], titulo: "Espera paciente", mensaje: "Existe un vínculo afectivo que no puede desarrollarse todavía, pero la esperanza permanece mientras las circunstancias cambian." },
+    { cartas: ["La Emperatriz", "El Diablo", "Los Enamorados", "La Torre"], titulo: "Magnetismo que provoca problemas de pareja", mensaje: "El magnetismo y la búsqueda de atención generan una tentación que termina debilitando una relación cuyos valores ya estaban en conflicto." },
+    { cartas: ["La Sacerdotisa", "El Ermitaño", "La Justicia"], titulo: "Información que falta para resolver un problema", mensaje: "La solución existe, pero falta revelar información importante y consultar a una persona con experiencia." },
+    { cartas: ["La Estrella", "La Muerte", "La Templanza", "Los Enamorados"], titulo: "Fin y vínculo nuevo", mensaje: "Después del final de una relación dañina aparece una conexión nueva que se desarrolla lentamente hasta convertirse en un vínculo profundo." },
+    { cartas: ["El Hierofante", "La Estrella", "El Juicio", "La Justicia"], titulo: "Recompensa espiritual", mensaje: "Un compromiso espiritual sostenido durante mucho tiempo comienza a producir reconocimiento y exige ahora una renovación consciente." },
+    { cartas: ["La Sacerdotisa", "La Luna", "El Juicio", "La Estrella"], titulo: "Percepción espiritual", mensaje: "Sensibilidad hacia aquello que normalmente permanece oculto, acompañada de la necesidad de desarrollar discernimiento antes de interpretar lo percibido." },
+    { cartas: ["Los Enamorados", "La Luna", "El Diablo", "La Justicia"], titulo: "Dilema sentimental", mensaje: "Una atracción intensa provoca dudas y tentaciones, pero la decisión final debe considerar las consecuencias reales y los límites existentes." },
+    { cartas: ["El Emperador", "El Carro", "El Mago", "El Sol"], titulo: "Ascenso profesional", mensaje: "La competencia demostrada convierte gradualmente a una persona subordinada en alguien con autoridad, visibilidad y capacidad de decisión." },
+    { cartas: ["El Ermitaño", "El Colgado", "La Templanza"], titulo: "Agotamiento y necesidad de parar", mensaje: "La acción inmediata no resuelve el problema. Es necesario detenerse, recuperar el equilibrio y permitir que la mente vuelva a organizarse." },
+    { cartas: ["La Rueda de la Fortuna", "La Muerte", "La Estrella", "El Mundo"], titulo: "Cambio que mejora la vida", mensaje: "Un cambio inicialmente incómodo elimina una estructura antigua y abre una etapa más favorable y completa." },
+    { cartas: ["El Diablo", "El Mago", "La Luna", "La Justicia"], titulo: "Posible engaño", mensaje: "Una persona utiliza inteligencia y persuasión para presentar una propuesta atractiva mientras oculta consecuencias perjudiciales. La protección está en revisar hechos y documentos." },
+    { cartas: ["La Emperatriz", "La Fuerza", "La Estrella", "La Templanza"], titulo: "Acompañar el dolor", mensaje: "La ayuda no consiste en solucionar el problema, sino en ofrecer presencia, estabilidad y esperanza mientras la persona recupera su equilibrio." },
+    { cartas: ["El Mundo", "La Emperatriz", "El Mago", "Los Enamorados"], titulo: "Mujer de otro entorno", mensaje: "Una persona procedente de otro entorno entra en tu vida y combina atractivo, talento y capacidad material, creando una posibilidad de alianza que puede evolucionar hacia algo más personal." },
+    { cartas: ["La Torre", "La Rueda de la Fortuna", "El Carro", "La Templanza"], titulo: "Proyecto detenido por dinero", mensaje: "Un obstáculo económico obliga a modificar un plan, pero no destruye el proyecto. La clave está en adaptar el camino." },
+    { cartas: ["La Luna", "La Torre", "El Diablo", "El Juicio", "La Justicia"], titulo: "Herida antigua", mensaje: "Una experiencia antigua dejó una marca profunda. La recuperación comienza cuando aquello que permaneció oculto puede ser reconocido y colocado en su verdadero contexto, sin atribuir culpa a quien sufrió el daño." },
+    { cartas: ["El Diablo", "Los Enamorados", "La Justicia", "La Torre"], titulo: "Palabras que no demuestran", mensaje: "Existe un vínculo donde las palabras prometen más de lo que las acciones entregan. La realidad termina obligando a evaluar la relación por hechos." },
+    { cartas: ["El Carro", "El Mundo", "La Muerte", "La Estrella"], titulo: "Amiga que se muda", mensaje: "Una persona cercana abandona su entorno habitual para comenzar una etapa nueva. La distancia modifica la relación, pero no necesariamente la destruye." },
+    { cartas: ["La Justicia", "La Rueda de la Fortuna", "El Sol", "El Juicio"], titulo: "La buena acción que regresa", mensaje: "Una acción positiva del pasado vuelve al presente en forma de reconocimiento, ayuda o gratitud." },
+    { cartas: ["La Fuerza", "La Estrella", "La Luna", "La Templanza"], titulo: "Compañía silenciosa", mensaje: "Una presencia silenciosa proporciona estabilidad emocional y ayuda a recuperar el equilibrio durante momentos de incertidumbre." },
+    { cartas: ["El Carro", "El Loco", "El Mundo", "La Rueda de la Fortuna", "Los Enamorados"], titulo: "Viaje que cambia la vida", mensaje: "Un viaje inesperado abre una nueva etapa y puede producir un encuentro o una decisión que modifica el rumbo personal." },
+    { cartas: ["El Sol", "La Justicia", "El Emperador", "El Mundo"], titulo: "Éxito profesional", mensaje: "El esfuerzo obtiene un reconocimiento concreto y coloca a la persona en una posición más fuerte." },
+    { cartas: ["El Diablo", "Los Enamorados", "La Luna"], titulo: "Atracción física intensa", mensaje: "Una atracción poderosa altera temporalmente la claridad emocional y puede llevar a actuar por impulso." },
+    { cartas: ["Los Enamorados", "El Diablo", "La Justicia", "El Colgado"], titulo: "Deseo complicado", mensaje: "Existe deseo, pero las circunstancias actuales impiden convertirlo en una relación sana. La espera o el límite son necesarios." },
+    { cartas: ["El Carro", "El Loco", "El Mundo", "La Estrella"], titulo: "Amigo que se marcha", mensaje: "Una persona abandona su entorno para seguir un camino propio. La separación física no implica necesariamente pérdida del vínculo." },
+    { cartas: ["Los Enamorados", "La Templanza", "La Emperatriz", "El Sol"], titulo: "Amistad que se vuelve amor", mensaje: "Un vínculo que creció lentamente entre dos personas alcanza una expresión afectiva más clara." },
+    { cartas: ["El Juicio", "La Luna", "La Justicia"], titulo: "Mensaje inesperado", mensaje: "Llega una comunicación que contiene información emocional o importante y obliga a reconsiderar una situación." },
+    { cartas: ["El Emperador", "El Sol", "El Mundo", "El Mago"], titulo: "Crecimiento y liderazgo", mensaje: "Las capacidades personales, combinadas con experiencia y buenas alianzas, llevan finalmente a una posición de influencia." },
+    { cartas: ["El Diablo", "El Mago", "La Justicia", "La Luna", "La Torre"], titulo: "Operación inmobiliaria sospechosa", mensaje: "Una propuesta aparentemente lógica oculta una estructura desfavorable. La presión y la persuasión intentan impedir que examines las consecuencias." },
+    { cartas: ["Los Enamorados", "El Diablo", "La Luna", "La Justicia"], titulo: "Confesión sentimental complicada", mensaje: "Una declaración revela una atracción real, pero existe un contexto que impide que el deseo se convierta fácilmente en una relación estable." },
+    { cartas: ["El Mago", "La Justicia", "El Emperador", "El Mundo"], titulo: "Proteger un proyecto", mensaje: "El talento puede producir éxito, pero necesita estructura legal, límites claros y protección de los derechos propios." },
+    { cartas: ["La Estrella", "El Mundo", "La Emperatriz", "La Rueda de la Fortuna"], titulo: "Un lugar que se convierte en hogar", mensaje: "Un lugar asociado con paz y pertenencia comienza a convertirse en una posibilidad material real." },
+    { cartas: ["La Sacerdotisa", "El Colgado", "La Templanza"], titulo: "Revelación que debe esperar", mensaje: "La verdad puede decirse, pero todavía no. El momento correcto es parte de la solución." },
+    { cartas: ["La Rueda de la Fortuna", "El Emperador", "El Mago", "El Carro"], titulo: "Cambio en el equipo", mensaje: "Una reorganización modifica las funciones del equipo y te coloca en una posición de conocimiento y responsabilidad." },
+    { cartas: ["El Juicio", "La Rueda de la Fortuna", "El Mundo", "Los Enamorados"], titulo: "Reencuentro", mensaje: "Una persona que salió de tu vida vuelve cuando las circunstancias han cambiado, permitiendo recuperar o transformar el vínculo." },
+    { cartas: ["La Fuerza", "La Justicia", "Los Enamorados", "La Torre"], titulo: "Intervenir con prudencia", mensaje: "La solidaridad puede llevarte a intervenir, pero debes controlar la reacción emocional para no convertirte en parte del conflicto." },
+    { cartas: ["La Torre", "Los Enamorados", "La Luna", "La Templanza"], titulo: "Mujer herida por una infidelidad", mensaje: "Una ruptura de confianza provoca un fuerte desequilibrio emocional y requiere tiempo, escucha y recuperación antes de buscar soluciones." },
+    { cartas: ["El Emperador", "La Fuerza", "La Torre"], titulo: "La arrogancia no intimida", mensaje: "Una estructura de poder aparente pierde fuerza cuando encuentra a alguien que no responde con miedo. No entres en su juego." },
+    { cartas: ["El Carro", "El Mundo", "La Luna", "Los Enamorados", "La Templanza"], titulo: "Viaje marítimo con componente sentimental", mensaje: "Un desplazamiento asociado al agua produce una experiencia emocional profunda y puede transformar un vínculo existente." },
+    { cartas: ["El Ermitaño", "El Juicio", "La Rueda de la Fortuna"], titulo: "Regreso anunciado", mensaje: "Una persona con conocimiento del pasado proporciona información que te prepara para un regreso o un acontecimiento pendiente." }
+  ],
+
   /* agrupa cartas por su contexto (alegría, tristeza, personas, decisiones...) */
   agruparContexto(cartas) {
     const grupos = {};
@@ -1433,14 +1773,207 @@ const TIRADAS = {
     return { c: cartas[idx], pos: posiciones[idx] || "" };
   },
 
-  /* relato de una carta en su posición real: sustituye {Pos} por la frase */
+  /* relato de una carta en su posición real: los arcanos mayores narran desde
+     la capa semántica (para cada una se compone el texto según su fase de
+     lectura y el tono luz/sombra) y los menores siguen usando su corpus propio;
+     sustituye {Pos} por la frase real de la posición */
   relatoDe(c, posLabel, tono) {
+    if (this.semantica[c.nombre]) return this.relatoSemantico(c, posLabel, tono);
     const def = this.relatos[c.nombre];
     const frags = def ? def[tono] : null;
     const base = frags && frags.length
       ? this.elegirDe(frags)
       : ((this.esencia[c.nombre] || {})[tono] || "una carta que pide ser leída");
     return base.split("{Pos}").join(this.fraseDePos(posLabel) || "tu historia");
+  },
+
+  /* ----------------------- motor semántico ----------------------- */
+
+  /* ¿esta lectura trae algún arcano mayor? */
+  haySemantica(cartas) {
+    return cartas.some(c => this.semantica[c.nombre]);
+  },
+
+  /* fase (función de lectura) de una carta mayor */
+  faseDe(c) {
+    const s = this.semantica[c.nombre];
+    return s ? s.f : null;
+  },
+
+  /* fases presentes en la lectura, en orden canónico de la historia:
+     inicio → decision → desafio → proceso → desenlace */
+  fasesDe(cartas) {
+    const orden = ["inicio", "decision", "desafio", "proceso", "desenlace"];
+    const mapa = {};
+    cartas.forEach(c => {
+      const f = this.faseDe(c);
+      if (f && !mapa[f]) mapa[f] = c;
+    });
+    return orden.filter(f => mapa[f]).map(f => ({ f, c: mapa[f] }));
+  },
+
+  /* clave canónica de un conjunto de cartas según el orden de los mayores */
+  claveCanonica(nombres) {
+    const idx = nombres.map(n => {
+      const i = this.ordenMayores.indexOf(n);
+      return i === -1 ? 999 : i;
+    });
+    return nombres.map((n, j) => ({ nombre: n, i: idx[j] }))
+      .sort((a, b) => a.i - b.i)
+      .map(x => x.nombre)
+      .join(" + ");
+  },
+
+  /* detecta una pareja curada o una situación especial de conjunto exacto */
+  buscarCombinacion(cartas) {
+    const nombres = cartas.map(c => c.nombre);
+    const canon = this.claveCanonica(nombres);
+    const especial = this.especiales.find(e => this.claveCanonica(e.cartas) === canon) || null;
+    const pares = [];
+    for (let i = 0; i < nombres.length; i++) {
+      for (let j = i + 1; j < nombres.length; j++) {
+        const par = this.parCombinaciones.find(p =>
+          (p[0] === nombres[i] && p[1] === nombres[j]) ||
+          (p[0] === nombres[j] && p[1] === nombres[i]));
+        if (par) pares.push(par[2]);
+      }
+    }
+    return {
+      especial: especial ? { titulo: especial.titulo, mensaje: especial.mensaje } : null,
+      pares
+    };
+  },
+
+  /* matiz curado que se añade a una combinación cuando hay coincidencia */
+  matizCurado(cartas) {
+    const c = this.buscarCombinacion(cartas);
+    if (!c.especial && !c.pares.length) return "";
+    const partes = [];
+    if (c.especial) partes.push(`${c.especial.titulo}: ${c.especial.mensaje}`);
+    if (c.pares.length) partes.push(c.pares.slice(0, 2).map(p => `tus cartas también señalan ${p}`).join(" A la vez, "));
+    return partes.join(" ");
+  },
+
+  /* combinación con matiz curado: significado en conjunto + el detalle exacto
+     cuando el grupo coincide con una pareja o una situación especial */
+  textoCombinacion(grupo, arc) {
+    const matiz = this.matizCurado(grupo);
+    const base = this.significadoConjunto(grupo, arc);
+    return matiz ? `${base} ${matiz}` : base;
+  },
+
+  /* capitaliza la primera letra de una frase */
+  cap(s) {
+    s = String(s || "");
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  },
+
+  /* relato semántico de un arcano mayor en su posición: plantillas por fase,
+     con desenlace según el tono (luz/sombra) de la carta */
+  relatoSemantico(c, posLabel, tono) {
+    const s = this.semantica[c.nombre];
+    const pos = this.fraseDePos(posLabel) || "tu historia";
+    const sombra = tono === "sombra" || c.invertido;
+    const res = sombra ? s.resS : s.resL;
+    const cl = sombra ? s.sombra : s.clave;
+    const frases = {
+      inicio: sombra
+        ? [`En ${pos} algo nuevo empieza torcido: ${cl}. ${res}.`,
+           `En ${pos} el impulso se descontrola: ${cl}. ${res}.`]
+        : [`En ${pos} ${s.accion}: ${cl}. ${res}.`,
+           `En ${pos} comienza ${cl}, y aquí ${s.accion}. ${res}.`],
+      decision: sombra
+        ? [`En ${pos} la decisión se enreda: ${cl}. ${res}.`,
+           `En ${pos} elegir pesa: ${cl}. ${res}.`]
+        : [`En ${pos} te toca decidir con ${cl}: ${s.accion}. ${res}.`,
+           `En ${pos} la lectura se detiene en ${cl}: ${s.accion}. ${res}.`],
+      desafio: sombra
+        ? [`En ${pos} la prueba se convierte en ${cl}: ${res}.`,
+           `En ${pos} el desafío aprieta: ${cl}. ${res}.`]
+        : [`En ${pos} se levanta ${cl}: ${s.accion}. ${res}.`,
+           `En ${pos} hay ${cl}, y aquí ${s.accion}. ${res}.`],
+      proceso: sombra
+        ? [`En ${pos} el cambio se atraganta: ${cl}. ${res}.`,
+           `En ${pos} todo se estanca: ${cl}. ${res}.`]
+        : [`En ${pos} corre ${cl}: ${s.accion}. ${res}.`,
+           `En ${pos} todo se transforma: ${cl}; ${s.accion}. ${res}.`],
+      desenlace: sombra
+        ? [`En ${pos} el final se tuerce: ${cl}. ${res}.`,
+           `En ${pos} ${cl} no termina de cerrarse: ${res}.`]
+        : [`En ${pos} se anuncia ${cl}: ${s.accion}. ${res}.`,
+           `En ${pos} el desenlace es ${cl}, y ${res}.`]
+    };
+    return this.elegirDe(frases[s.f]);
+  },
+
+  /* historia que arma el mensaje final encadenando las fases de la lectura */
+  armarHistoria(fases, tenor) {
+    const resDe = sem => (tenor === "sombra" ? sem.resS : sem.resL);
+    if (!fases.length) return "";
+    if (fases.length === 1) {
+      const c = fases[0].c, sem = this.semantica[c.nombre];
+      return this.elegirDe([
+        `${c.nombre} preside esta lectura: ${sem.clave}. ${this.cap(sem.accion)}. ${this.cap(resDe(sem))}.`,
+        `${this.cap(sem.clave)} es el corazón de lo que te traen hoy: ${sem.accion}. De tu mano, ${resDe(sem)}.`
+      ]);
+    }
+    const slot = {
+      inicio: sem => `Se abre con ${sem.clave}: ${sem.accion}.`,
+      decision: sem => `${this.cap(sem.clave)} exige que pares y decidas: ${sem.accion}.`,
+      desafio: sem => `${this.cap(sem.clave)} se interpone como prueba: ${sem.accion}.`,
+      proceso: sem => `${this.cap(sem.clave)} mueve el terreno bajo tus pies: ${sem.accion}.`,
+      desenlace: sem => `${this.cap(sem.clave)} comienza a asomar su fruto: ${sem.accion}.`
+    };
+    const frases = fases.map((f, i) => {
+      const sem = this.semantica[f.c.nombre];
+      if (i === fases.length - 1) {
+        return this.elegirDe([
+          `Al cierre, ${sem.clave} se impone: ${resDe(sem)}.`,
+          `Y el final lo dibuja ${sem.clave}: ${resDe(sem)}.`
+        ]);
+      }
+      return slot[f.f](sem);
+    });
+    return frases.join(" ");
+  },
+
+  /* mensaje final de la capa semántica, compartido por las lecturas cortas, la
+     gran tirada y la pregunta: historia por fases + matiz curado + cierre que
+     acompaña el tenor de la mesa */
+  mensajeFinalSemantico(resultado) {
+    const cartas = resultado.cartas;
+    const fuerte = !!resultado.fuerte;
+    const combo = this.buscarCombinacion(cartas);
+    const fases = this.fasesDe(cartas);
+    const sombras = cartas.filter(c => c.invertido).length;
+    const tenor = (fuerte || sombras * 2 >= cartas.length) ? "sombra" : (sombras ? "mixto" : "luz");
+
+    if (combo.especial) return `${combo.especial.titulo}: ${combo.especial.mensaje}`;
+
+    const cuerpo = this.armarHistoria(fases, tenor)
+      + (combo.pares.length
+        ? " " + this.elegirDe([
+            `Tus cartas, además, marcan un matiz: ${combo.pares[0]}.`,
+            `Y hay un detalle que este oráculo subraya: ${combo.pares[0]}.`
+          ])
+        : "");
+
+    const cierre = tenor === "luz"
+      ? this.elegirDe([
+          "El camino está claro y el cielo lo sostiene: entra en él sin pedir permiso.",
+          "Este es un sí de tu lectura: elige el paso, dálo hoy y deja que la luz te confirme el resto."
+        ])
+      : (tenor === "sombra"
+        ? this.elegirDe([
+            "No es castigo, es un mapa: pon nombre a lo que duele y empieza a soltarlo hoy.",
+            "La sombra no viene a asustarte, viene a nombrar lo que ya estás listo para cambiar."
+          ])
+        : this.elegirDe([
+            "Tienes luz y sombra en la misma mesa: afianza lo que brilla y corrige una sola cosa de lo que pesa.",
+            "Ni todo gana ni todo pierde: elige hoy el paso que haga subir el lado luminoso de tu balanza."
+          ]));
+
+    return `${this.cap(cuerpo)} ${cierre}`;
   },
 
 /* interpretación final: la lectura se cuenta como una historia propia, un
@@ -1498,17 +2031,19 @@ const TIRADAS = {
       });
     }
 
-    const cierrePoderoso = propor >= 0.5
-      ? this.elegirDe([
-          "Este es el final, y es un llamado a tu grandeza: deja de mirar tu vida desde afuera y entra en ella con todo. Lo que hoy es semilla se vuelve fruto, lo que hoy es herida se vuelve fuerza. Confía, actúa y deja que este mensaje te sostenga cada día.",
-          "Este es el final, y es un sí del cielo: lo que has cuidado en silencio pronto será visible para todos. Los ángeles ya no solo te protegen: te acompañan. Sigue caminando con la confianza de quien no está solo y verás tu cosecha.",
-          "Llévate esto de la lectura: tu momento está maduro y el cielo lo sabe. No esperes permiso para brillar ni para pedir. Actúa, agradece y avanza: cada paso iluminado que des hoy te acerca a lo que has pedido con el corazón."
-        ])
-      : this.elegirDe([
-          "No hay más vueltas que dar: este es el despertar que pediste. Las cartas no vinieron a castigarte, vinieron a mostrarte lo que no querías ver para que al fin te liberes. Deja de posponer tu verdad, suelta lo que te pesa, perdona lo que te ata, y hoy mismo da el paso que tu corazón viene pidiéndote. Eres más fuerte que tu miedo: demuéstralo.",
-          "El mensaje de hoy no te entristece: te despierta. Lo que apareció en sombra es la lista de lo que estás listo para soltar. Nada de esto fue castigo: fue puntada de amor para que dejes de sangrar. Perdona, suelta y vuelve a caminar: el cielo ya puso tu siguiente puerta.",
-          "No ignores esta lectura como las anteriores: por algo llega fuerte. El cambio que evitas es pequeño frente al peso que cargas. Decide hoy una cosa, solo una, y hazla: ese primer paso desata lo demás. Estás más cerca de la salida de lo que crees."
-        ]);
+    const cierrePoderoso = this.haySemantica(cartas)
+      ? this.mensajeFinalSemantico(resultado)
+      : (propor >= 0.5
+        ? this.elegirDe([
+            "Este es el final, y es un llamado a tu grandeza: deja de mirar tu vida desde afuera y entra en ella con todo. Lo que hoy es semilla se vuelve fruto, lo que hoy es herida se vuelve fuerza. Confía, actúa y deja que este mensaje te sostenga cada día.",
+            "Este es el final, y es un sí del cielo: lo que has cuidado en silencio pronto será visible para todos. Los ángeles ya no solo te protegen: te acompañan. Sigue caminando con la confianza de quien no está solo y verás tu cosecha.",
+            "Llévate esto de la lectura: tu momento está maduro y el cielo lo sabe. No esperes permiso para brillar ni para pedir. Actúa, agradece y avanza: cada paso iluminado que des hoy te acerca a lo que has pedido con el corazón."
+          ])
+        : this.elegirDe([
+            "No hay más vueltas que dar: este es el despertar que pediste. Las cartas no vinieron a castigarte, vinieron a mostrarte lo que no querías ver para que al fin te liberes. Deja de posponer tu verdad, suelta lo que te pesa, perdona lo que te ata, y hoy mismo da el paso que tu corazón viene pidiéndote. Eres más fuerte que tu miedo: demuéstralo.",
+            "El mensaje de hoy no te entristece: te despierta. Lo que apareció en sombra es la lista de lo que estás listo para soltar. Nada de esto fue castigo: fue puntada de amor para que dejes de sangrar. Perdona, suelta y vuelve a caminar: el cielo ya puso tu siguiente puerta.",
+            "No ignores esta lectura como las anteriores: por algo llega fuerte. El cambio que evitas es pequeño frente al peso que cargas. Decide hoy una cosa, solo una, y hazla: ese primer paso desata lo demás. Estás más cerca de la salida de lo que crees."
+          ]));
 
     finalBloques.push({ cierre: true, texto: cierrePoderoso, cita });
     return finalBloques;
@@ -1572,15 +2107,21 @@ const TIRADAS = {
           : "",
         combinacion: this.combinacionDe(b)
       };
-    }).concat([{
-      cierre: true,
-      texto: this.elegirDe([
-        "Los siete arcángeles han hablado, cada uno desde su don, y yo he escuchado cada palabra. Te voy a decir la verdad sin vueltas: no estás sola, nunca lo has estado, pero eso no quita que tengas que actuar. Lo que las cartas te mostraron hoy no es para asustarte: es para recordarte quién eres. La fuerza que buscas no está afuera, ya vive en ti. Deja el miedo, toma el consejo que más te dolió escuchar y ponlo en práctica: ese es el camino que todas las voces te señalan.",
-        "Siete voces han hablado y todas dicen lo mismo de maneras distintas: tu momento es ahora y la respuesta está en tus manos. No vinieron a adivinar tu futuro, vinieron a devolverte el mando de tu presente. Agradece lo que floreció, suelta lo que terminó y camina con la certeza de que llevas la guía dentro.",
-        "Cada arcángel colocó una piedra sobre tu camino, y juntas forman el puente que estabas esperando. La protección de Miguel, el amor de Chamuel, la sanación de Rafael, la voz de Gabriel, la claridad de Uriel, la liberación de Zadkiel y la luz de Jofiel ahora son tuyas. No desprecies el puente por miedo a cruzar: ya está firme. Da el paso."
-      ]),
-      cita
-    }]);
+    }).concat(this.haySemantica(resultado.cartas)
+      ? [{
+          cierre: true,
+          texto: this.mensajeFinalSemantico(resultado),
+          cita
+        }]
+      : [{
+          cierre: true,
+          texto: this.elegirDe([
+            "Los siete arcángeles han hablado, cada uno desde su don, y yo he escuchado cada palabra. Te voy a decir la verdad sin vueltas: no estás sola, nunca lo has estado, pero eso no quita que tengas que actuar. Lo que las cartas te mostraron hoy no es para asustarte: es para recordarte quién eres. La fuerza que buscas no está afuera, ya vive en ti. Deja el miedo, toma el consejo que más te dolió escuchar y ponlo en práctica: ese es el camino que todas las voces te señalan.",
+            "Siete voces han hablado y todas dicen lo mismo de maneras distintas: tu momento es ahora y la respuesta está en tus manos. No vinieron a adivinar tu futuro, vinieron a devolverte el mando de tu presente. Agradece lo que floreció, suelta lo que terminó y camina con la certeza de que llevas la guía dentro.",
+            "Cada arcángel colocó una piedra sobre tu camino, y juntas forman el puente que estabas esperando. La protección de Miguel, el amor de Chamuel, la sanación de Rafael, la voz de Gabriel, la claridad de Uriel, la liberación de Zadkiel y la luz de Jofiel ahora son tuyas. No desprecies el puente por miedo a cruzar: ya está firme. Da el paso."
+          ]),
+          cita
+        }]);
   },
 
   /* ------------------- interpretación de la pregunta ---------------------
@@ -1591,6 +2132,13 @@ const TIRADAS = {
     const an = resultado.__analisis;
     const arc = this.arcangeles[an.clave];
     const A = this.nombreCorto(arc.nombre);
+    if (this.haySemantica(resultado.cartas)) {
+      const msg = this.mensajeFinalSemantico(resultado);
+      return this.elegirDe([
+        `${msg} Así responde ${A}: elige una sola acción de este mensaje y ponla en práctica hoy.`,
+        `${A} ha respondido con tu propia lectura: ${msg} No busques más señales: la respuesta que ya tienes es suficiente para tu siguiente paso.`
+      ]);
+    }
     return this.elegirDe([
       `Así responde ${A}. Las cartas son la señal que pediste: elige una sola acción de este consejo y ponla en práctica hoy.`,
       `${A} ha respondido. No busques más señales: la respuesta que ya tienes es suficiente para dar tu siguiente paso.`,
@@ -2005,7 +2553,7 @@ const TIRADAS = {
     const arc = bloque.arcangel;
     const grupo = bloque.temas.map(t => t.carta);
     const cartas = grupo.map(c => ({ nombre: c.nombre, img: c.img, emoji: c.emoji, invertido: c.invertido, palabras: c.palabras }));
-    const texto = this.significadoConjunto(grupo, arc);
+    const texto = this.textoCombinacion(grupo, arc);
     return {
       tipo: tipo === "mixto" ? "espejada" : tipo,
       texto,
@@ -2080,6 +2628,12 @@ const TIRADAS = {
       texto = `La combinación de tus cartas responde a «${q}» con ${veredicto}: ${texto}`;
     }
 
+    const matiz = this.matizCurado(resultado.cartas);
+    if (matiz) texto += " " + this.elegirDe([
+      `Sobre esto, tus cartas traen un dato adicional: ${matiz}`,
+      `Además, ${matiz}`
+    ]);
+
     let consejo = tipo === "normal"
       ? this.elegirDe([
           `Da el paso que ya sientes correcto y no pidas más señales: esta lectura acaba de darte la que buscabas, y volver a preguntar sería desconfiar de lo que ya tienes. Hoy, con calma, actúala: un gesto pequeño y real vale más que mil confirmaciones.`,
@@ -2140,7 +2694,7 @@ const TIRADAS = {
         ? this.combinacionDePregunta(resultado)
         : {
             tipo,
-            texto: this.significadoConjunto(grupo, arc),
+            texto: this.textoCombinacion(grupo, arc),
             cartas,
             consejo: this.consejoDeCombinacion(grupo, arc),
             regano: this.reganoDeCombinacion(grupo, arc)
