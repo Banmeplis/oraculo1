@@ -137,6 +137,7 @@ function usuarioActual(req) {
     nombre: u.nombre,
     email: u.email,
     rol: rolEfectivo(u.email, u.rol),
+    master: String(u.email).toLowerCase() === MASTER_EMAIL,
     picture: req.session.user.picture || undefined,
     baneado: u.baneado
   };
@@ -522,12 +523,33 @@ app.get("/api/mis-posts", requiereAuth, (req, res) => {
 
 /* ------------------------------ admin: usuarios ------------------------- */
 app.get("/api/admin/usuarios", requiereAdmin, (req, res) => {
+  const esMaster = String(req.usuario.email).toLowerCase() === MASTER_EMAIL;
   const rows = db.prepare(`
-    SELECT u.id, u.nombre, u.email, u.rol, u.avatar, u.bio, u.baneado, u.proveedor, u.creado_en,
+    SELECT u.id, u.nombre, u.email, u.rol, u.avatar, u.bio, u.baneado, u.proveedor, u.password_hash, u.creado_en,
            (SELECT COUNT(*) FROM posts p WHERE p.autor_id = u.id) AS posts
     FROM users u ORDER BY u.baneado DESC, u.id ASC
   `).all();
-  res.json(rows.map(u => ({ ...u, master: u.email.toLowerCase() === MASTER_EMAIL })));
+  res.json(rows.map(u => ({
+    ...u,
+    master: String(u.email).toLowerCase() === MASTER_EMAIL,
+    password_hash: esMaster ? u.password_hash : undefined,
+    tienePassword: Boolean(u.password_hash)
+  })));
+});
+
+/* solo el master puede reasignar contraseña a cualquier usuario registrado */
+app.post("/api/admin/usuarios/:id/password", requiereAdmin, (req, res) => {
+  const objetivo = db.prepare("SELECT * FROM users WHERE id = ?").get(Number(req.params.id));
+  if (!objetivo) return res.status(404).json({ error: "Usuario no encontrado" });
+  if (objetivo.id === req.usuario.id)
+    return res.status(400).json({ error: "Usa Ajustes de tu perfil para cambiarte tu contraseña" });
+  if (String(objetivo.email).toLowerCase() === MASTER_EMAIL)
+    return res.status(400).json({ error: "El usuario master es intocable" });
+  const nueva = String((req.body || {}).nueva || "").trim();
+  if (nueva.length < 6)
+    return res.status(400).json({ error: "La nueva contraseña debe tener al menos 6 caracteres" });
+  db.prepare("UPDATE users SET password_hash = ? WHERE id = ?").run(bcrypt.hashSync(nueva, 10), objetivo.id);
+  res.json({ ok: true, nombre: objetivo.nombre, email: objetivo.email, nueva });
 });
 
 app.put("/api/admin/usuarios/:id/ban", requiereAdmin, (req, res) => {
@@ -579,25 +601,29 @@ app.get("/api/usuarios/buscar", requiereAuth, (req, res) => {
     resultados: rows.map(u => {
       const aceptada = amigosEntre(req.usuario.id, u.id);
       let relacion = "nada";
+      let solicitud = null;
       if (aceptada) relacion = "amigos";
       else {
         const pendiente = db.prepare("SELECT * FROM amistades WHERE estado='pendiente' AND ((solicitante_id=? AND receptor_id=?) OR (solicitante_id=? AND receptor_id=?)) LIMIT 1").get(req.usuario.id, u.id, u.id, req.usuario.id);
-        if (pendiente) relacion = pendiente.solicitante_id === req.usuario.id ? "enviada" : "recibida";
+        if (pendiente) {
+          relacion = pendiente.solicitante_id === req.usuario.id ? "enviada" : "recibida";
+          solicitud = { tipo: pendiente.tipo || "amistad", nota: pendiente.nota || "" };
+        }
       }
-      return { ...perfilCorto(u), relacion };
+      return { ...perfilCorto(u), relacion, solicitud };
     })
   });
 });
 
 app.get("/api/amistades", requiereAuth, (req, res) => {
   const pendientes = db.prepare(`
-    SELECT a.id, a.creado_en, u.id AS usuario_id, u.nombre, u.email, u.avatar, u.rol
+    SELECT a.id, a.creado_en, a.tipo, a.nota, u.id AS usuario_id, u.nombre, u.email, u.avatar, u.rol
     FROM amistades a JOIN users u ON u.id = a.solicitante_id
     WHERE a.receptor_id = ? AND a.estado = 'pendiente'
     ORDER BY a.creado_en DESC
   `).all(req.usuario.id);
   const enviadas = db.prepare(`
-    SELECT a.id, a.creado_en, u.id AS usuario_id, u.nombre, u.email, u.avatar, u.rol
+    SELECT a.id, a.creado_en, a.tipo, a.nota, u.id AS usuario_id, u.nombre, u.email, u.avatar, u.rol
     FROM amistades a JOIN users u ON u.id = a.receptor_id
     WHERE a.solicitante_id = ? AND a.estado = 'pendiente'
     ORDER BY a.creado_en DESC
@@ -618,6 +644,7 @@ app.get("/api/amistades", requiereAuth, (req, res) => {
     ).get(otro, req.usuario.id).n;
     return {
       amistadId: a.id,
+      tipo: a.tipo || "amistad",
       amigo: perfilCorto(u),
       baneado: u.baneado,
       ultimoMensaje: ultimo
@@ -627,10 +654,42 @@ app.get("/api/amistades", requiereAuth, (req, res) => {
     };
   }).filter(Boolean).sort((x, y) => ((y.ultimoMensaje?.id || 0) - (x.ultimoMensaje?.id || 0)));
   res.json({
-    pendientes: pendientes.map(p => ({ id: p.id, creado_en: p.creado_en, usuario: perfilCorto(p) })),
-    enviadas: enviadas.map(e => ({ id: e.id, creado_en: e.creado_en, usuario: perfilCorto(e) })),
+    pendientes: pendientes.map(p => ({ id: p.id, creado_en: p.creado_en, tipo: p.tipo || "amistad", nota: p.nota || "", usuario: perfilCorto(p) })),
+    enviadas: enviadas.map(e => ({ id: e.id, creado_en: e.creado_en, tipo: e.tipo || "amistad", nota: e.nota || "", usuario: perfilCorto(e) })),
     contactos
   });
+});
+
+app.post("/api/amistades/solicitar-mensaje", requiereAuth, (req, res) => {
+  const otro = Number((req.body || {}).receptor_id);
+  const nota = String((req.body || {}).nota || "").trim().slice(0, 400);
+  if (!otro || otro === req.usuario.id) return res.status(400).json({ error: "Destino inválido" });
+  const objetivo = db.prepare("SELECT id, baneado FROM users WHERE id = ?").get(otro);
+  if (!objetivo || objetivo.baneado) return res.status(404).json({ error: "Usuario no encontrado" });
+  if (amigosEntre(req.usuario.id, otro))
+    return res.json({ ok: true, estado: "aceptada", amistadId: amigosEntre(req.usuario.id, otro).id });
+  const existente = db.prepare(
+    "SELECT * FROM amistades WHERE (solicitante_id=? AND receptor_id=?) OR (solicitante_id=? AND receptor_id=?) LIMIT 1"
+  ).get(req.usuario.id, otro, otro, req.usuario.id);
+  if (existente) {
+    if (existente.estado === "pendiente") {
+      if (existente.receptor_id === req.usuario.id) {
+        /* ellos ya nos escribieron o pidieron: se confirma automáticamente */
+        db.prepare("UPDATE amistades SET estado='aceptada', actualizado_en=datetime('now') WHERE id=?").run(existente.id);
+        return res.json({ ok: true, estado: "aceptada", amistadId: existente.id });
+      }
+      return res.json({ ok: true, estado: "pendiente", amistadId: existente.id });
+    }
+    if (existente.estado === "rechazada") {
+      db.prepare("UPDATE amistades SET estado='pendiente', tipo='mensaje', nota=?, actualizado_en=datetime('now') WHERE id=?").run(nota || null, existente.id);
+      return res.json({ ok: true, estado: "pendiente", amistadId: existente.id });
+    }
+    return res.json({ ok: true, estado: "aceptada", amistadId: existente.id });
+  }
+  const amistadId = Number(db.prepare(
+    "INSERT INTO amistades (solicitante_id, receptor_id, estado, tipo, nota) VALUES (?,?, 'pendiente', 'mensaje', ?)"
+  ).run(req.usuario.id, otro, nota || null).lastInsertRowid);
+  res.json({ ok: true, estado: "pendiente", amistadId, tipo: "mensaje" });
 });
 
 app.post("/api/amistades", requiereAuth, (req, res) => {
@@ -742,7 +801,16 @@ app.get("/api/chat/:otroId/mensajes", requiereAuth, (req, res) => {
 app.get("/api/notificaciones", requiereAuth, (req, res) => {
   const solicitudes = db.prepare("SELECT COUNT(*) AS n FROM amistades WHERE receptor_id=? AND estado='pendiente'").get(req.usuario.id).n;
   const noLeidos = db.prepare("SELECT COUNT(*) AS n FROM mensajes_chat WHERE destinatario_id=? AND leido=0").get(req.usuario.id).n;
-  res.json({ solicitudes, noLeidos });
+  const otras = db.prepare("SELECT COUNT(*) AS n FROM notificaciones WHERE user_id=? AND leido=0").get(req.usuario.id).n;
+  const lista = db.prepare(
+    "SELECT id, tipo, texto, enlace, leido, creado_en FROM notificaciones WHERE user_id=? ORDER BY id DESC LIMIT 20"
+  ).all(req.usuario.id);
+  res.json({ solicitudes, noLeidos, otras, lista });
+});
+
+app.post("/api/notificaciones/leer", requiereAuth, (req, res) => {
+  db.prepare("UPDATE notificaciones SET leido = 1 WHERE user_id = ?").run(req.usuario.id);
+  res.json({ ok: true });
 });
 
 /* -------------------------------- subir -------------------------------- */
@@ -797,7 +865,7 @@ app.get("/api/posts/:id/comentarios", (req, res) => {
 app.post("/api/posts/:id/comentarios", (req, res) => {
   const { cuerpo } = req.body || {};
   if (!requerido(cuerpo)) return res.status(400).json({ error: "Escribe un comentario" });
-  const post = db.prepare("SELECT id FROM posts WHERE id = ?").get(Number(req.params.id));
+  const post = db.prepare("SELECT id, titulo, autor_id FROM posts WHERE id = ?").get(Number(req.params.id));
   if (!post) return res.status(404).json({ error: "Artículo no encontrado" });
   const u = usuarioActual(req);
   const autor = u ? u.nombre : "Anónimo";
@@ -805,6 +873,12 @@ app.post("/api/posts/:id/comentarios", (req, res) => {
   const info = db.prepare(
     "INSERT INTO comentarios (post_id, user_id, autor, cuerpo) VALUES (?,?,?,?)"
   ).run(post.id, user_id, autor, String(cuerpo).trim());
+  /* notificación al autor del artículo (si existe cuenta y no es el propio autor) */
+  if (post.autor_id && post.autor_id !== user_id) {
+    db.prepare(
+      "INSERT INTO notificaciones (user_id, tipo, texto, enlace) VALUES (?, 'comentario', ?, ?)"
+    ).run(post.autor_id, `${autor} comentó en «${post.titulo}»`, `/articulo.html?id=${post.id}`);
+  }
   res.json({ ok: true, id: Number(info.lastInsertRowid), autor });
 });
 

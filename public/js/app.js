@@ -201,7 +201,9 @@ async function actualizarNotificaciones() {
   if (!SESION.usuario) return;
   try {
     const d = await fetchJSON("/api/notificaciones");
-    const total = (d.solicitudes || 0) + (d.noLeidos || 0);
+    const total = (d.solicitudes || 0) + (d.noLeidos || 0) + (d.otras || 0);
+    window.ESTADO_NOTIF = d;
+    document.dispatchEvent(new CustomEvent("oraculo:notif", { detail: d }));
     badges.forEach(b => {
       if (total > 0) { b.textContent = total; b.classList.remove("oculto"); }
     });

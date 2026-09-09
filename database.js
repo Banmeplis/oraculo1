@@ -82,6 +82,8 @@ db.exec(`
     solicitante_id INTEGER NOT NULL REFERENCES users(id),
     receptor_id    INTEGER NOT NULL REFERENCES users(id),
     estado         TEXT NOT NULL DEFAULT 'pendiente',
+    tipo           TEXT NOT NULL DEFAULT 'amistad',
+    nota           TEXT,
     creado_en      TEXT NOT NULL DEFAULT (datetime('now')),
     actualizado_en TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE (solicitante_id, receptor_id)
@@ -99,6 +101,17 @@ db.exec(`
   );
   CREATE INDEX IF NOT EXISTS idx_mensajes_par ON mensajes_chat(remitente_id, destinatario_id, id);
 
+  CREATE TABLE IF NOT EXISTS notificaciones (
+    id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id   INTEGER NOT NULL REFERENCES users(id),
+    tipo      TEXT NOT NULL DEFAULT 'comentario',
+    texto     TEXT NOT NULL,
+    enlace    TEXT,
+    leido     INTEGER NOT NULL DEFAULT 0,
+    creado_en TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_notif_user ON notificaciones(user_id, leido);
+
   INSERT OR IGNORE INTO visitas (id, total) VALUES (1, 0);
 `);
 
@@ -110,6 +123,10 @@ try { db.exec("ALTER TABLE users ADD COLUMN baneado INTEGER NOT NULL DEFAULT 0")
 /* normaliza el estado de amistad: el sistema usa 'aceptada' (pueden existir filas
    históricas o sembradas como 'aceptado') */
 try { db.exec("UPDATE amistades SET estado = 'aceptada' WHERE estado IN ('aceptado', 'aceptadas', 'aceptados')"); } catch {}
+/* solicitudes de mensaje: tipo distingue 'amistad' de 'mensaje'; nota guarda el
+   primer mensaje que quien solicita quiere enviar */
+try { db.exec("ALTER TABLE amistades ADD COLUMN tipo TEXT NOT NULL DEFAULT 'amistad'"); } catch {}
+try { db.exec("ALTER TABLE amistades ADD COLUMN nota TEXT"); } catch {}
 try {
   db.exec(`
     CREATE TABLE IF NOT EXISTS comentarios (

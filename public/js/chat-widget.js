@@ -21,6 +21,8 @@
   let yo = null;
   let contactos = [];
   let pendientes = 0;
+  let notifOtras = 0;
+  let notifVistas = 0;
   let chatId = null;
   let chatNombre = "";
   let maxId = 0;
@@ -191,7 +193,7 @@
 
   function actualizarFab() {
     const c = contactoDestacado();
-    const total = pendientes + contactos.reduce((s, x) => s + (x.noLeidos || 0), 0);
+    const total = pendientes + notifOtras + contactos.reduce((s, x) => s + (x.noLeidos || 0), 0);
     if (c) {
       ui.fabAvatar.innerHTML = avatar(c.amigo, 40);
       ui.fabNombre.textContent = c.amigo.nombre;
@@ -371,7 +373,32 @@
     }
   }
 
-  /* -------------------------------- datos --------------------------------- */
+  /* ------------------------------ datos --------------------------------- */
+  function avisoFlotante(texto) {
+    const t = document.createElement("div");
+    t.className = "chat-toast";
+    t.innerHTML = "🔮 " + texto;
+    document.body.appendChild(t);
+    setTimeout(() => t.classList.add("visible"), 30);
+    setTimeout(() => {
+      t.classList.remove("visible");
+      setTimeout(() => t.remove(), 500);
+    }, 5200);
+  }
+
+  /* notificaciones globales (comentarios en tus artículos, etc.) emitidas por app.js */
+  document.addEventListener("oraculo:notif", (ev) => {
+    const d = ev.detail || {};
+    notifOtras = d.otras || 0;
+    if (notifOtras > notifVistas) {
+      notifVistas = notifOtras;
+      const primeras = (d.lista || []).slice(0, 2).map(n => n.texto).join(" · ");
+      avisoFlotante(primeras || (notifOtras + " notificación" + (notifOtras === 1 ? "" : "es") + " nueva" + (notifOtras === 1 ? "" : "s")));
+    }
+    if (notifOtras === 0) notifVistas = 0;
+    actualizarFab();
+  });
+
   async function refrescarContactos() {
     try {
       const d = await fetchJSON("/api/amistades");

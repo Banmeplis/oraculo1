@@ -2539,3 +2539,100 @@ nav.menu a.btn-whatsapp:hover {
 /* lista de resultados de búsqueda */
 .resultado-busqueda { display: flex; align-items: center; gap: 11px; padding: 11px; border-radius: 16px; background: var(--vidrio); border: 1px solid var(--borde-vidrio); margin-bottom: 8px; }
 .resultado-busqueda .contacto-datos { flex: 1; min-width: 0; }
+
+/* notificaciones flotantes (comentarios en tus artículos, etc.) */
+.chat-toast {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-12px);
+  z-index: 99990;
+  max-width: min(92vw, 430px);
+  padding: 12px 18px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(34, 22, 66, .96), rgba(12, 10, 28, .98));
+  border: 1px solid rgba(212, 175, 55, .55);
+  box-shadow: 0 10px 34px rgba(0, 0, 0, .55), 0 0 18px rgba(185, 107, 255, .22);
+  color: var(--blanco-humo);
+  font-size: .9rem;
+  line-height: 1.45;
+  opacity: 0;
+  transition: opacity .45s ease, transform .45s ease;
+  pointer-events: none;
+}
+.chat-toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* etiquetas y avisos de solicitudes (amistad vs. mensaje) */
+.solicitud-tipo {
+  display: inline-block;
+  font-size: .68rem;
+  letter-spacing: .4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-left: 6px;
+  vertical-align: middle;
+  border: 1px solid rgba(185, 107, 255, .45);
+  color: #d9c2ff;
+}
+.solicitud-tipo.mensaje { border-color: rgba(255, 159, 95, .5); color: #ffc9a3; }
+.solicitud-nota {
+  margin-top: 3px;
+  font-style: italic;
+  font-size: .8rem;
+  color: var(--lavanda-suave);
+  padding: 5px 9px;
+  border-left: 2px solid var(--dorado);
+  background: rgba(212, 175, 55, .07);
+  border-radius: 0 10px 10px 0;
+}
+
+/* tabla de usuarios (solo master/admin) */
+.vista-usuarios { padding: 14px 0; }
+.tabla-usuarios {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+  font-size: .85rem;
+}
+.tabla-usuarios th, .tabla-usuarios td {
+  padding: 9px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--borde-vidrio);
+  vertical-align: middle;
+}
+.tabla-usuarios th {
+  color: var(--dorado);
+  letter-spacing: .5px;
+  font-size: .74rem;
+  text-transform: uppercase;
+}
+.tabla-usuarios tr:hover td { background: rgba(212, 175, 55, .05); }
+.hash-pass {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: .72rem;
+  color: var(--lavanda-suave);
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  vertical-align: middle;
+}
+.btn-micro {
+  font-size: .74rem;
+  padding: 4px 9px;
+  border-radius: 9px;
+  border: 1px solid var(--borde-vidrio);
+  background: var(--vidrio);
+  color: var(--blanco);
+  cursor: pointer;
+  transition: .2s;
+}
+.btn-micro:hover { border-color: var(--dorado); color: var(--dorado); }
+.etiqueta-ban { color: #ff8095; font-size: .76rem; font-weight: 600; }
+.usuarios-info {
+  font-size: .8rem;
+  color: var(--lavanda-suave);
+  margin: 10px 4px;
+  line-height: 1.5;
+}
