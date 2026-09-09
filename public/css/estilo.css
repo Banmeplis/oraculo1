@@ -2286,7 +2286,7 @@ nav.menu a.btn-whatsapp:hover {
   background: linear-gradient(135deg, var(--b-mia1, #6b3fa0), var(--b-mia2, #3a2a6d));
   color: var(--blanco);
   border-bottom-right-radius: 6px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, .25);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .25), 0 0 14px rgba(212, 175, 55, .16);
 }
 .burbuja.suya {
   align-self: flex-start;
@@ -2294,7 +2294,7 @@ nav.menu a.btn-whatsapp:hover {
   color: var(--blanco-humo);
   border-bottom-left-radius: 6px;
   border: 1px solid var(--borde-vidrio);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, .18);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .18), 0 0 12px rgba(147, 112, 219, .1);
 }
 .burbuja .autor { font-size: .72rem; opacity: .8; margin-bottom: 2px; letter-spacing: .4px; }
 .burbuja .hora { display: block; text-align: right; font-size: .68rem; opacity: .6; margin-top: 4px; }
@@ -2304,9 +2304,14 @@ nav.menu a.btn-whatsapp:hover {
 }
 .sep-nuevos {
   align-self: center; font-size: .72rem; color: var(--dorado);
-  background: var(--vidrio); border: 1px dashed rgba(212,175,55,.4);
+  background: linear-gradient(90deg, rgba(212,175,55,.1), rgba(212,175,55,.28), rgba(212,175,55,.1));
+  background-size: 200% 100%;
+  border: 1px dashed rgba(212,175,55,.45);
   padding: 4px 12px; border-radius: 999px; margin: 6px 0;
+  animation: sepBrillo 3s ease-in-out infinite;
+  box-shadow: 0 0 10px rgba(212,175,55,.18);
 }
+@keyframes sepBrillo { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 
 .chat-entrada { display: flex; gap: 10px; align-items: flex-end; padding: 14px; border-top: 1px solid var(--borde-vidrio); background: var(--vidrio); }
 .chat-entrada textarea {
@@ -2357,25 +2362,62 @@ nav.menu a.btn-whatsapp:hover {
   max-width: calc(100vw - 32px);
   padding: 8px 18px 8px 8px;
   border-radius: 40px;
-  background: linear-gradient(135deg, #d4af37, #8b5cf6);
-  color: #fff; border: 1px solid rgba(255, 255, 255, .35);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, .45);
+  background: linear-gradient(135deg, #d4af37, #8b5cf6, #ff9ad5, #d4af37);
+  background-size: 300% 300%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .5), 0 0 22px rgba(212, 175, 55, .35);
   cursor: pointer; z-index: 1201;
-  transition: transform .2s, box-shadow .2s;
+  overflow: hidden;
   font-family: var(--fuente-cuerpo);
+  animation: fabFlotar 5s ease-in-out infinite;
 }
-.chat-fab:hover { transform: translateY(-3px); box-shadow: 0 14px 34px rgba(212, 175, 55, .45); }
+.chat-fab::before {
+  content: "";
+  position: absolute; inset: -40%;
+  background: repeating-conic-gradient(from 0deg, transparent 0deg 22deg, rgba(255,255,255,.08) 22deg 34deg, transparent 34deg 60deg);
+  animation: fabEspiral 14s linear infinite;
+  pointer-events: none;
+}
+@keyframes fabEspiral { to { transform: rotate(360deg); } }
+.chat-fab::after {
+  content: "";
+  position: absolute; top: 0; left: -80%; width: 55%; height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, .55), transparent);
+  animation: fabBrillo 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes fabBrillo { 0% { left: -80%; } 55% { left: 130%; } 100% { left: 130%; } }
+@keyframes fabFlotar {
+  0%, 100% { transform: translateY(0); background-position: 0% 50%; }
+  50% { transform: translateY(-5px); background-position: 100% 50%; }
+}
+.chat-fab:hover { box-shadow: 0 14px 34px rgba(0, 0, 0, .55), 0 0 38px rgba(255, 130, 205, .5); }
+.chat-fab:hover::after { animation-duration: 1.5s; }
 .chat-fab-avatar {
   width: 42px; height: 42px; min-width: 42px; border-radius: 50%;
   display: grid; place-items: center;
   background: rgba(255, 255, 255, .22);
-  border: 2px solid rgba(255, 255, 255, .4);
+  border: 2px solid rgba(255, 255, 255, .45);
   font-size: 1.15rem; overflow: hidden; color: #fff;
+  transition: transform .3s;
+}
+.chat-fab:hover .chat-fab-avatar { transform: rotate(8deg) scale(1.08); }
+.chat-fab.tiene-nuevos { animation: fabFlotar 5s ease-in-out infinite, fabLatido 1.6s ease-in-out infinite; }
+@keyframes fabLatido {
+  0%, 100% { box-shadow: 0 10px 30px rgba(0, 0, 0, .5), 0 0 22px rgba(212, 175, 55, .4), 0 0 0 0 rgba(255, 76, 130, .5); }
+  50% { box-shadow: 0 10px 30px rgba(0, 0, 0, .5), 0 0 22px rgba(212, 175, 55, .4), 0 0 0 16px rgba(255, 76, 130, 0); }
 }
 .chat-fab-info { display: grid; text-align: left; max-width: 190px; }
-.chat-fab-nombre { font-weight: 800; font-size: .85rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.chat-fab-preview { font-size: .72rem; color: rgba(255, 255, 255, .88); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.chat-fab .amigo-badge { position: absolute; top: -6px; right: -6px; margin: 0; border: 2px solid #0e0926; }
+.chat-fab-nombre { font-weight: 800; font-size: .85rem; color: #fff; text-shadow: 0 1px 6px rgba(14, 9, 38, .6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chat-fab-preview { font-size: .72rem; color: rgba(255, 255, 255, .9); text-shadow: 0 1px 4px rgba(14, 9, 38, .5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chat-fab .amigo-badge {
+  position: absolute; top: -6px; right: -6px; margin: 0;
+  border: 2px solid #0e0926;
+  background: linear-gradient(135deg, #ff5c8a, #b83377);
+  animation: fabBadgePulso 1.4s ease-in-out infinite;
+}
+@keyframes fabBadgePulso { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.18); } }
 
 .chat-panel {
   position: fixed; right: 18px; bottom: 82px;
@@ -2383,12 +2425,25 @@ nav.menu a.btn-whatsapp:hover {
   height: min(620px, 78vh);
   display: flex; flex-direction: column;
   border-radius: 22px; overflow: hidden;
-  background: var(--vidrio);
-  border: 1px solid var(--borde-vidrio);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, .6);
-  animation: entradaPanel .3s ease both;
+  border: 1px solid rgba(212, 175, 55, .5);
+  background: linear-gradient(160deg, rgba(34, 22, 66, .94), rgba(12, 8, 28, .97));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .65), 0 0 34px rgba(147, 112, 219, .2);
+  animation: entradaPanel .35s ease both, panelBorde 5s ease-in-out infinite;
   z-index: 1202;
   color-scheme: dark;
+}
+@keyframes panelBorde {
+  0%, 100% { border-color: rgba(212, 175, 55, .5); box-shadow: 0 20px 60px rgba(0, 0, 0, .65), 0 0 30px rgba(147, 112, 219, .22); }
+  50% { border-color: rgba(185, 107, 255, .65); box-shadow: 0 20px 60px rgba(0, 0, 0, .65), 0 0 44px rgba(255, 176, 93, .28); }
+}
+.chat-panel::before {
+  content: "";
+  position: absolute; top: 0; left: -80%; width: 45%; height: 100%;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, .07), transparent);
+  animation: fabBrillo 6s ease-in-out infinite;
+  pointer-events: none; z-index: 3;
 }
 @keyframes entradaPanel {
   from { opacity: 0; transform: translateY(16px) scale(.97); }

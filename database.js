@@ -107,6 +107,9 @@ try { db.exec("ALTER TABLE lecturas ADD COLUMN favorita INTEGER NOT NULL DEFAULT
 try { db.exec("ALTER TABLE users ADD COLUMN avatar TEXT"); } catch {}
 try { db.exec("ALTER TABLE users ADD COLUMN bio TEXT"); } catch {}
 try { db.exec("ALTER TABLE users ADD COLUMN baneado INTEGER NOT NULL DEFAULT 0"); } catch {}
+/* normaliza el estado de amistad: el sistema usa 'aceptada' (pueden existir filas
+   históricas o sembradas como 'aceptado') */
+try { db.exec("UPDATE amistades SET estado = 'aceptada' WHERE estado IN ('aceptado', 'aceptadas', 'aceptados')"); } catch {}
 try {
   db.exec(`
     CREATE TABLE IF NOT EXISTS comentarios (

@@ -205,6 +205,7 @@
     }
     if (total > 0) { ui.fabBadge.textContent = total; ui.fabBadge.classList.remove("oculto"); }
     else ui.fabBadge.classList.add("oculto");
+    ui.fab.classList.toggle("tiene-nuevos", total > 0);
   }
 
   function pintarLista() {
