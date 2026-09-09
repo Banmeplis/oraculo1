@@ -53,12 +53,36 @@ body::before {
   z-index: 0;
 }
 
+/* cielo de estrellas sin canvas (CSS puro, mucho más ligero que tsparticles) */
 #particles-js {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
   opacity: 0.95;
+  background-image:
+    radial-gradient(1.6px 1.6px at 12% 22%, rgba(220, 182, 255, 0.85), transparent 55%),
+    radial-gradient(1.2px 1.2px at 27% 68%, rgba(255, 255, 255, 0.8), transparent 55%),
+    radial-gradient(1.4px 1.4px at 41% 33%, rgba(243, 216, 140, 0.85), transparent 55%),
+    radial-gradient(1.1px 1.1px at 55% 82%, rgba(255, 255, 255, 0.7), transparent 55%),
+    radial-gradient(1.5px 1.5px at 66% 47%, rgba(220, 182, 255, 0.8), transparent 55%),
+    radial-gradient(1.2px 1.2px at 78% 15%, rgba(255, 255, 255, 0.85), transparent 55%),
+    radial-gradient(1.4px 1.4px at 90% 62%, rgba(243, 216, 140, 0.8), transparent 55%);
+  background-size:
+    620px 540px, 740px 700px, 680px 600px,
+    800px 560px, 700px 640px, 640px 520px, 720px 660px;
+  background-repeat: repeat;
+  animation:
+    estrellasDrift 140s linear infinite,
+    estrellasBrillo 7s ease-in-out infinite;
+}
+@keyframes estrellasDrift {
+  from { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0; }
+  to   { background-position: 620px 540px, 740px 700px, 680px 600px, 800px 560px, 700px 640px, 640px 520px, 720px 660px; }
+}
+@keyframes estrellasBrillo {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 0.95; }
 }
 
 ::selection { background: var(--dorado); color: var(--nocturno); }
@@ -1009,6 +1033,8 @@ h3 { font-size: 1.25rem; }
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 430px;
 }
 .post .portada {
   width: 100%;

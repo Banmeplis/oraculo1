@@ -2,6 +2,7 @@ const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
 const https = require("https");
+const zlib = require("zlib");
 
 const express = require("express");
 const session = require("express-session");
@@ -62,6 +63,63 @@ const ESTATICO = express.static(path.join(__dirname, "public"), {
     }
   }
 });
+
+/* ---- compresión anticipada (brotli/gzip) con caché en memoria ---- */
+const TEXTO_MIME = {
+  ".js": "application/javascript; charset=utf-8",
+  ".mjs": "application/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".html": "text/html; charset=utf-8",
+  ".svg": "image/svg+xml; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".txt": "text/plain; charset=utf-8",
+  ".xml": "application/xml; charset=utf-8",
+  ".webmanifest": "application/manifest+json"
+};
+const COMP_CACHE = new Map();
+function comprimirAlVuelo(req, res, next) {
+  if (req.method !== "GET" && req.method !== "HEAD") return next();
+  const tipo = TEXTO_MIME[path.extname(req.path).toLowerCase()];
+  if (!tipo) return next();
+  const acepta = String(req.headers["accept-encoding"] || "");
+  const br = acepta.includes("br");
+  if (!br && !acepta.includes("gzip")) return next();
+
+  let base;
+  try {
+    if (req.path.startsWith("/vendor/")) base = path.join(__dirname, "node_modules", req.path.slice(8));
+    else if (req.path.startsWith("/uploads/")) return next();
+    else base = path.join(__dirname, "public", req.path);
+  } catch { return next(); }
+  if (base.includes("..")) return next();
+  let stat;
+  try { stat = fs.statSync(base); } catch { return next(); }
+  if (!stat.isFile()) return next();
+
+  const clave = (br ? "br:" : "gz:") + req.path;
+  let buf = COMP_CACHE.get(clave);
+  if (!buf) {
+    try {
+      buf = br
+        ? zlib.brotliCompressSync(fs.readFileSync(base), { params: { [zlib.constants.BROTLI_PARAM_QUALITY]: 5 } })
+        : zlib.gzipSync(fs.readFileSync(base), { level: 6 });
+    } catch { return next(); }
+    if (COMP_CACHE.size > 400) COMP_CACHE.clear();
+    COMP_CACHE.set(clave, buf);
+  }
+  res.setHeader("Content-Type", tipo);
+  res.setHeader("Content-Encoding", br ? "br" : "gzip");
+  res.setHeader("Vary", "Accept-Encoding");
+  res.setHeader("Content-Length", String(buf.length));
+  res.setHeader("Cache-Control", extCache(req.path, tipo));
+  res.end(buf);
+}
+function extCache(p, tipo) {
+  if (tipo.includes("text/html")) return "no-cache";
+  if (p.startsWith("/vendor/")) return "public, max-age=3600";
+  return "public, max-age=2592000, immutable";
+}
+app.use(comprimirAlVuelo);
 app.use("/vendor", express.static(path.join(__dirname, "node_modules")));
 app.use(ESTATICO);
 app.use("/uploads", express.static(UPLOADS));

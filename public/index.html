@@ -62,11 +62,10 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://unpkg.com/aos@2.4.1/dist/aos.css" rel="stylesheet">
-  <!-- >>> ZONA GOOGLE TAG / ADSENSE <<< -->
-  <!-- gtag.js (Google Tag) cuando tengas el código: -->
-  <!--   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script> -->
-  <link rel="stylesheet" href="/css/estilo.css?v=41">
+  <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
+  <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
+  <link rel="dns-prefetch" href="https://images.unsplash.com">
+  <link rel="stylesheet" href="/css/estilo.css?v=42">
 </head>
 <body>
   <div id="particles-js" aria-hidden="true"></div>
@@ -202,53 +201,10 @@
     <p>Hecho con luz y estrellas · <a class="enlace" href="/registro.html">Únete a la comunidad</a></p>
   </footer>
 
-  <script src="/vendor/aos/dist/aos.js"></script>
-  <script src="/vendor/gsap/dist/gsap.js"></script>
-  <script src="/vendor/tsparticles/umd/tsparticles.min.js"></script>
-  <script src="/js/app.js?v=14"></script>
+  <script src="/js/app.js?v=15"></script>
   <script src="/js/chat-widget.js?v=2"></script>
-  <script src="/js/inicio.js?v=14"></script>
+  <script src="/js/inicio.js?v=15"></script>
   <script>
-    if (window.tsParticles) {
-      tsParticles.load('particles-js', {
-        fullScreen: { enable: false },
-        background: {
-          color: 'transparent'
-        },
-        particles: {
-          number: { value: 60, density: { enable: true, area: 800 } },
-          color: { value: ['#f3d88c', '#dcb6ff', '#ffffff'] },
-          opacity: { value: 0.7 },
-          size: { value: 2.5, random: true },
-          move: {
-            enable: true,
-            speed: 0.6,
-            direction: 'none',
-            random: true,
-            straight: false,
-            outModes: 'out'
-          },
-          links: { enable: false },
-          shape: { type: 'circle' }
-        },
-        interactivity: {
-          events: {
-            onhover: { enable: true, mode: 'repulse' },
-            onclick: { enable: true, mode: 'push' }
-          },
-          modes: {
-            repulse: { distance: 80, duration: 0.4 },
-            push: { quantity: 2 }
-          }
-        }
-      });
-    }
-    AOS.init({
-      duration: 900,
-      once: true,
-      easing: 'ease-out-cubic'
-    });
-
     document.addEventListener('DOMContentLoaded', () => {
       const hero = document.querySelector('.hero');
       if (hero) {
@@ -282,13 +238,6 @@
       }
     });
 
-    if (window.gsap) {
-      gsap.from('.hero .estrella', { duration: 2.2, opacity: 0, y: -20, scale: 0.8, ease: 'power2.out' });
-      gsap.from('.hero-kicker', { duration: 1.2, opacity: 0, y: 24, delay: 0.2, ease: 'power2.out' });
-      gsap.from('.hero-name', { duration: 1.4, opacity: 0, y: 30, delay: 0.35, ease: 'power3.out' });
-      gsap.from('.hero-subtitle', { duration: 1.2, opacity: 0, y: 24, delay: 0.6, ease: 'power2.out' });
-      gsap.from('.hero .btn', { duration: 1, opacity: 0, y: 18, stagger: 0.15, delay: 0.9, ease: 'power2.out' });
-    }
     fetch("/api/posts")
       .then(r => r.json())
       .then(posts => {
@@ -296,7 +245,7 @@
         const recientes = posts.slice(0, 3);
         c.innerHTML = recientes.map(p => `
           <article class="tarjeta post">
-            ${p.portada ? `<img class="portada" src="${p.portada}" alt="${"Portada del artículo: " + p.titulo}" loading="lazy">` : `<div class="portada" style="display:grid;place-items:center;font-size:2.4rem">✧</div>`}
+            ${portadaImg(p)}
             <div class="cuerpo-post">
               <h3><a href="/articulo.html?id=${p.id}">${p.titulo}</a></h3>
               <div class="meta">✧ ${p.autor} · ${fechaLegible(p.creado_en)}</div>

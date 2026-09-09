@@ -10,7 +10,11 @@
   <!--   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script> -->
   <!-- Y el script de Google AdSense: -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6331831674832770" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="/css/estilo.css?v=41">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
+  <link rel="dns-prefetch" href="https://images.unsplash.com">
+  <link rel="stylesheet" href="/css/estilo.css?v=42">
 </head>
 <body>
 
@@ -40,7 +44,7 @@
     <p>¿Quieres escribir? <a class="enlace" href="/panel.html">Entra a tu panel</a></p>
   </footer>
 
-  <script src="/js/app.js?v=14"></script>
+  <script src="/js/app.js?v=15"></script>
   <script src="/js/chat-widget.js?v=2"></script>
   <script>
     fetch("/api/posts")
@@ -50,7 +54,7 @@
         if (!posts.length) { c.innerHTML = '<p class="centrado" style="grid-column:1/-1;color:var(--lavanda-suave)">Aún no hay publicaciones. Sé la primera en iluminar el rincón. ✨</p>'; return; }
         c.innerHTML = posts.map(p => `
           <article class="tarjeta post">
-            ${p.portada ? `<img class="portada" src="${p.portada}" alt="${p.titulo}">` : `<div class="portada" style="display:grid;place-items:center;font-size:2.4rem">✧</div>`}
+            ${portadaImg(p)}
             <div class="cuerpo-post">
               <h3><a href="/articulo.html?id=${p.id}">${p.titulo}</a></h3>
               <div class="meta">✧ ${p.autor} · ${fechaLegible(p.creado_en)}</div>

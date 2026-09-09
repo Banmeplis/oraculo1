@@ -22,6 +22,23 @@ function escapHtml(valor) {
   }[caracter]));
 }
 
+/* Portadas de Unsplash: entrega srcset webp a 400/800/1200 px para que el
+   móvil baje la versión justa (mucho menos tráfico y render más rápido). */
+function portadaVaria(url, ancho) {
+  return String(url)
+    .replace(/(w=)\d+/, "$1" + ancho)
+    .replace(/(q=)\d+/, "$1" + (ancho >= 1000 ? 60 : 75))
+    .replace(/(auto=format)(?!&fm=)/, "$1&fm=webp");
+}
+function portadaImg(post, clases) {
+  const u = post && post.portada;
+  if (!u) return '<div class="portada" style="display:grid;place-items:center;font-size:2.4rem">✧</div>';
+  const srcset = [400, 800, 1200].map(w => escapHtml(portadaVaria(u, w)) + " " + w + "w").join(", ");
+  const sizes = "(max-width:640px) 94vw, (max-width:920px) 46vw, 32rem";
+  const alt = escapHtml("Portada del artículo: " + (post.titulo || ""));
+  return `<img class="portada ${clases || ""}" src="${escapHtml(u)}" srcset="${srcset}" sizes="${sizes}" alt="${alt}" loading="lazy" decoding="async">`;
+}
+
 function marcarComoHTML(texto) {
   const lineas = escapHtml(texto).replace(/\r/g, "").split("\n");
   const salida = [];
