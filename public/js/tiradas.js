@@ -2026,8 +2026,7 @@ const TIRADAS = {
           `${regente.nombre} te mira fijo y no te deja apartar la vista:`,
           `${regente.nombre} levanta la voz para que la escuches, y lo dice con amor de fuego:`
         ]),
-        texto: `${sombraRelato} ${this.elegirDe(this.empujes)}`,
-        cartasHtml: this.reganoCartaHtml(sombras.slice(0, 5))
+        texto: `${sombraRelato} ${this.elegirDe(this.empujes)}`
       });
     }
 
