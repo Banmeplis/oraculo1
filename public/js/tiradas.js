@@ -2903,7 +2903,6 @@ const TIRADAS = {
         htmlFinal += `<div class="mensaje-poderoso vidrio" style="--arc-color:${aUnido.color};animation-delay:${(1.2 + i * 0.25).toFixed(2)}s">
           <span class="arc-part" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
           <h3 style="color:var(--dorado)">El mensaje final</h3>
-          <p class="presencia-arc">${this.fraseArea(aUnido, "cierre")}</p>
           <p>${b.texto}</p>
           <p class="cita">"${b.cita}"</p>
         </div>`;
