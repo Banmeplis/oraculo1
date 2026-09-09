@@ -20,10 +20,11 @@ const TIRADAS = {
     { id: "lectura-fuerte", nombre: "Lectura Fuerte", icono: "🔥", corto: "Los siete arcángeles hablan sin rodeos y con amor severo: verdad firme para tu momento.", n: 3, posiciones: [["Tu verdad", "Lo que necesitas escuchar"], ["Lo que evitas", "El bloqueo que escondes"], ["Tu fuerza", "El paso firme que sigue"] ] },
     { id: "cruz-celta", nombre: "Cruz Celta", icono: "🕊️", corto: "La lectura clásica y profunda de diez cartas.", n: 10, posiciones: [["Corazón del asunto", "El centro de la consulta"], ["Lo que cruza", "Las influencias que la atraviesan"], ["Lo que está por encima", "Consciente o metas"], ["Lo que está por debajo", "Inconsciente o raíces"], ["Lo que pasó", "Pasado reciente"], ["Lo que viene", "Futuro cercano"], ["Tu actitud", "Cómo te enfrentas a ello"], ["El entorno", "Influencias externas"], ["Esperanzas y miedos", "Lo que anhelas y temes"], ["Resultado", "La síntesis final"] ] },
     { id: "si-no",     nombre: "Sí o No directo", icono: "🎯", corto: "Una carta, una respuesta clara para tu pregunta.", n: 1, posiciones: [["Tu respuesta", "El veredicto del oráculo"]] },
-    { id: "pregunta",  nombre: "Pregunta al Oráculo", icono: "🃏", corto: "Escribe tu pregunta y el arcángel idóneo responderá solo ese tema con tres cartas.", n: 3, pregunta: true, posiciones: [["Tu pregunta", "Lo que consultas al cielo"], ["La lección", "Lo que debes mirar"], ["La respuesta", "La señal del oráculo"]] }
+    { id: "pregunta",  nombre: "Pregunta al Oráculo", icono: "🃏", corto: "Escribe tu pregunta y el arcángel idóneo responderá solo ese tema con tres cartas.", n: 3, pregunta: true, posiciones: [["Tu pregunta", "Lo que consultas al cielo"], ["La lección", "Lo que debes mirar"], ["La respuesta", "La señal del oráculo"]] },
+    { id: "carta-astral", nombre: "Carta Astral", icono: "🪐", corto: "Perfil astrológico de tu nacimiento: signo solar, elemento, fase lunar y arcángel regente.", n: 0, astral: true, posiciones: [] }
   ],
 
-  elegantIcono: { "1-carta": "🕯️", "3-cartas": "💫", "5-cartas": "🌟", "gran-tirada": "🛡️", "lectura-fuerte": "🔥", "cruz-celta": "🕊️", "si-no": "🎯", "pregunta": "🃏" },
+  elegantIcono: { "1-carta": "🕯️", "3-cartas": "💫", "5-cartas": "🌟", "gran-tirada": "🛡️", "lectura-fuerte": "🔥", "cruz-celta": "🕊️", "si-no": "🎯", "pregunta": "🃏", "carta-astral": "🪐" },
   estrellas: ["✦", "✧", "⋆", "✩", "·"],
 
   /* ------------------------------ utilidades ------------------------------ */
@@ -41,7 +42,7 @@ const TIRADAS = {
     if (!t) return null;
     this.definirMazo();
     const mazo = this.barajar(this.mazo);
-    return { tirada: t, cartas: [], mazo, fuerte: tipo === "lectura-fuerte" ? true : (t.pregunta ? false : Math.random() < 0.3) };
+    return { tirada: t, cartas: [], mazo, fuerte: tipo === "lectura-fuerte" ? true : (t.pregunta || t.astral ? false : Math.random() < 0.3) };
   },
 
   /* construye la carta a partir del arcano, decidiendo sentido al azar */
@@ -2938,6 +2939,158 @@ const TIRADAS = {
     return html;
   },
 
+  /* ============================ carta astral ============================== */
+  signosAstrales: [
+    { signo: "Aries",      emoji: "♈", mesIni: 3,  diaIni: 21, mesFin: 4,  diaFin: 19, elemento: "Fuego", modalidad: "Cardinal", planeta: "Marte",  arcangel: "miguel",
+      rasgos: ["Toma la iniciativa sin esperar permiso", "Valor para defender tu espacio", "Entusiasmo que contagia"],
+      luz: "una chispa que enciende caminos, valor de sobra y la capacidad de levantarte rápido cuando caes",
+      reto: "dosificar tu impulso: no todo lo urgente es importante, y respirar antes de decidir te ahorra batallas que no eran tuyas" },
+    { signo: "Tauro",      emoji: "♉", mesIni: 4,  diaIni: 20, mesFin: 5,  diaFin: 20, elemento: "Tierra", modalidad: "Fijo", planeta: "Venus",  arcangel: "chamuel",
+      rasgos: ["Constancia que sostiene proyectos", "Disfrute sereno de lo concreto", "Lealtad inquebrantable"],
+      luz: "una calma que construye, lealtad profunda y el arte de saborear la vida sin prisa",
+      reto: "soltar lo que ya cumplió su tiempo: tu constancia es un regalo cuando no se vuelve rigidez" },
+    { signo: "Géminis",    emoji: "♊", mesIni: 5,  diaIni: 21, mesFin: 6,  diaFin: 20, elemento: "Aire", modalidad: "Mutable", planeta: "Mercurio", arcangel: "gabriel",
+      rasgos: ["Curiosidad insaciable", "Facilidad para comunicar", "Adaptación rápida"],
+      luz: "una mente curiosa que conecta ideas y personas, y la palabra justa para comunicarlo todo",
+      reto: "profundizar antes de pasar a lo siguiente: la variedad está bien, la dispersión también se cansa" },
+    { signo: "Cáncer",     emoji: "♋", mesIni: 6,  diaIni: 21, mesFin: 7,  diaFin: 22, elemento: "Agua", modalidad: "Cardinal", planeta: "la Luna", arcangel: "rafael",
+      rasgos: ["Intuición emocional muy afinada", "Cuidado de los vínculos", "Hogar y protección"],
+      luz: "una sensibilidad que cuida, una intuición fina y un corazón que protege a los suyos",
+      reto: "cuidarte tanto como cuidas a otros: tus emociones también piden brazos que las abracen" },
+    { signo: "Leo",        emoji: "♌", mesIni: 7,  diaIni: 23, mesFin: 8,  diaFin: 22, elemento: "Fuego", modalidad: "Fijo", planeta: "el Sol",   arcangel: "jofiel",
+      rasgos: ["Presencia que ilumina", "Generosidad creativa", "Lealtad y calidez"],
+      luz: "una luz propia que ilumina donde llega, generosidad auténtica y el don de inspirar",
+      reto: "brillar sin que se vuelva necesidad de aplauso: tu luz vale aunque nadie la nombre" },
+    { signo: "Virgo",      emoji: "♍", mesIni: 8,  diaIni: 23, mesFin: 9,  diaFin: 22, elemento: "Tierra", modalidad: "Mutable", planeta: "Mercurio", arcangel: "uriel",
+      rasgos: ["Análisis fino del detalle", "Sentido práctico y orden", "Servicio desde la humildad"],
+      luz: "una mente analítica que ordena, perfecciona y sirve con un detalle que pocos ven",
+      reto: "soltar la exigencia de lo perfecto: el orden es tu talento, no tu cárcel" },
+    { signo: "Libra",      emoji: "♎", mesIni: 9,  diaIni: 23, mesFin: 10, diaFin: 22, elemento: "Aire", modalidad: "Cardinal", planeta: "Venus",  arcangel: "chamuel",
+      rasgos: ["Busca y crea equilibrio", "Diplomacia y encanto", "Sentido estético afinado"],
+      luz: "un sentido de la armonía que equilibra, une y embellece todo lo que tocas",
+      reto: "decidir sin depender de aprobar a todos: la paz también se elige con firmeza" },
+    { signo: "Escorpio",   emoji: "♏", mesIni: 10, diaIni: 23, mesFin: 11, diaFin: 21, elemento: "Agua", modalidad: "Fijo", planeta: "Plutón",  arcangel: "zadkiel",
+      rasgos: ["Intensidad transformadora", "Percepción profunda", "Voluntad enorme"],
+      luz: "una profundidad que transforma, una verdad que convierte y una pasión que siempre renueva",
+      reto: "soltar el control de los procesos: tu poder crece cuando confías en el cambio" },
+    { signo: "Sagitario",  emoji: "♐", mesIni: 11, diaIni: 22, mesFin: 12, diaFin: 21, elemento: "Fuego", modalidad: "Mutable", planeta: "Júpiter", arcangel: "jofiel",
+      rasgos: ["Optimismo y fe", "Sed de conocimiento y viaje", "Honestidad directa"],
+      luz: "una fe expansiva, un horizonte infinito y la alegría de creer en lo posible",
+      reto: "concretar lo que sueñas: la flecha también necesita un arco bien anclado" },
+    { signo: "Capricornio", emoji: "♑", mesIni: 12, diaIni: 22, mesFin: 1,  diaFin: 19, elemento: "Tierra", modalidad: "Cardinal", planeta: "Saturno", arcangel: "miguel",
+      rasgos: ["Disciplina y constancia", "Sentido de la responsabilidad", "Visión a largo plazo"],
+      luz: "una estructura que edifica, una responsabilidad que sostiene y la meta alcanzada con tiempo",
+      reto: "permitirte disfrutar el proceso: el logro no es tu valor, es solo tu cosecha" },
+    { signo: "Acuario",    emoji: "♒", mesIni: 1,  diaIni: 20, mesFin: 2,  diaFin: 18, elemento: "Aire", modalidad: "Fijo", planeta: "Urano",   arcangel: "uriel",
+      rasgos: ["Originalidad y visión de futuro", "Deseo de renovar lo establecido", "Humanismo y comunidad"],
+      luz: "una mente original que mira el futuro, una libertad que respeta la ajena y un ideal de comunidad",
+      reto: "vincular tu cercanía: la libertad no se pierde por querer a alguien de verdad" },
+    { signo: "Piscis",     emoji: "♓", mesIni: 2,  diaIni: 19, mesFin: 3,  diaFin: 20, elemento: "Agua", modalidad: "Mutable", planeta: "Neptuno", arcangel: "rafael",
+      rasgos: ["Empatía profunda", "Imaginación creativa", "Espiritualidad natural"],
+      luz: "una compasión sin fronteras, una imaginación que crea mundos y un corazón que siente el clima de todos",
+      reto: "poner límites para no ahogarte en las emociones ajenas: tu sensibilidad es un don, no un sacrificio" }
+  ],
+
+  fasesLunares: [
+    { nombre: "Luna Nueva",       ico: "🌑", h: 1.84566,  texto: "Naciste en Luna Nueva: traes la semilla de comenzar ciclos y de reiniciar con fe cada vez que hace falta." },
+    { nombre: "Cuarto Creciente", ico: "🌒", h: 5.53699,  texto: "Naciste en Cuarto Creciente: tu fuerza crece con la acción constante, paso a paso." },
+    { nombre: "Creciente Gibosa", ico: "🌓", h: 9.22831,  texto: "Naciste en Creciente Gibosa: tu impulso madura cerca de la cima; no frenes a mitad del camino." },
+    { nombre: "Luna Llena",       ico: "🌕", h: 12.91963, texto: "Naciste en Luna Llena: vienes con luz intensa, emoción profunda y capacidad de cosechar." },
+    { nombre: "Gibosa Menguante", ico: "🌖", h: 16.61096, texto: "Naciste en Gibosa Menguante: sabes agradecer y soltar a tiempo, y eso te aligera el alma." },
+    { nombre: "Cuarto Menguante", ico: "🌗", h: 20.30229, texto: "Naciste en Cuarto Menguante: tu fuerza vive en depurar, ordenar y dejar ir con conciencia." },
+    { nombre: "Menguante",        ico: "🌘", h: 23.99362, texto: "Naciste en Luna Menguante: dominas el arte de cerrar ciclos y de guardar silencio fértil." }
+  ],
+
+  signoDe(fecha) {
+    const partes = String(fecha || "").split("-");
+    const mes = Number(partes[1]);
+    const dia = Number(partes[2] || 1);
+    if (!mes || !dia) return this.signosAstrales[0];
+    return this.signosAstrales.find(s => {
+      if (s.mesIni <= s.mesFin) return (mes === s.mesIni && dia >= s.diaIni) || (mes === s.mesFin && dia <= s.diaFin);
+      return (mes === s.mesIni && dia >= s.diaIni) || (mes === s.mesFin && dia <= s.diaFin);
+    }) || this.signosAstrales[0];
+  },
+
+  faseLunarDe(fecha) {
+    const partes = String(fecha || "").split("-");
+    const y = Number(partes[0]), m = Number(partes[1]), d = Number(partes[2] || 1);
+    if (!y || !m || !d) return this.fasesLunares[0];
+    const jd = Date.UTC(y, m - 1, d) / 86400000 + 2440587.5;
+    let edad = (jd - 2451550.1) % 29.530588853;
+    if (edad < 0) edad += 29.530588853;
+    for (let i = 0; i < this.fasesLunares.length; i++) if (edad < this.fasesLunares[i].h) return this.fasesLunares[i];
+    return this.fasesLunares[0];
+  },
+
+  armarCartaAstral(datos) {
+    const s = this.signoDe(datos.fecha);
+    const fase = this.faseLunarDe(datos.fecha);
+    const arc = this.arcangeles[s.arcangel];
+    const lugar = datos.lugar ? `<p style="margin-top:12px">Naciste en ${this.escapar(datos.lugar)}.</p>` : "";
+    const rasgos = s.rasgos.map(r => `<div class="tarjeta" style="padding:16px;text-align:center"><p style="color:var(--lavanda-suave)">${r}</p></div>`).join("");
+    let html = '<div class="resultado">';
+    html += '<div class="resultado-cabecera"><div class="deco">🪐</div><p>Tu carta astral · perfil personalizado</p></div>';
+    html += `<div class="contexto-tirada vidrio">
+      <h3 style="color:var(--dorado);margin-bottom:10px">Interpretación Angelical · Carta Astral</h3>
+      <p class="comparte"><small>✨ Galería de tu cielo al nacer, guiada por tu arcángel ✨</small></p>
+    </div>`;
+    html += `<div class="carta-grande vidrio" style="--arc-color:${arc.color};animation-delay:.25s">
+      <div class="carta-texto" style="flex:1">
+        <h4>Tu sol</h4>
+        <h3>${s.signo} <span style="font-size:1.4rem">${s.emoji}</span></h3>
+        <div class="palabras"><span>${s.elemento}</span><span>${s.modalidad}</span><span>Regente: ${s.planeta}</span></div>
+        <p class="interp">Tu esencia de ${s.elemento.toLowerCase()} te regala ${s.luz}. Tu reto de alma es ${s.reto}.</p>
+      </div>
+    </div>`;
+    html += `<div class="mensaje-final-seccion-nueva" style="margin-top:18px">
+      <h2 style="font-size:1.35rem">Tu fase lunar · ${fase.ico} ${fase.nombre}</h2>
+      <p>${fase.texto}</p>
+      ${lugar}
+    </div>`;
+    html += `<div class="arcangel-seccion-nueva" style="--arc-color:${arc.color};margin-top:18px">
+      <span class="etiqueta-seccion">Arcángel regente de ${s.signo}</span>
+      <h3>${arc.nombre}</h3>
+      <span>${arc.regencia}</span>
+      <p>${arc.mensaje}</p>
+    </div>`;
+    html += `<div class="rejilla rejilla-3" style="margin-top:18px">${rasgos}</div>`;
+    html += `<div class="mensaje-final-seccion-nueva" style="margin-top:18px">
+      <h2 style="font-size:1.35rem">El mensaje final de tu carta astral</h2>
+      <p>${s.signo}, ${this.nombreCorto(arc.nombre)} te deja esta palabra al oído:</p>
+      <p style="margin-top:10px"><em>“${arc.consejo}”</em></p>
+      <p style="margin-top:12px">Tu luz nace inteligente y tu reto es solo el maestro que la afina. Respira, confía y camina.</p>
+    </div>`;
+    html += `
+      <div class="centrado" style="margin-top:26px">
+        <button class="btn btn-dorado" id="btn-nueva-tirada">Nueva lectura</button>
+        <button class="btn btn-lavanda" id="btn-guardar">Guardar esta lectura</button>
+      </div>
+    </div>`;
+    return html;
+  },
+
+  guardarAstral(datos) {
+    const s = this.signoDe(datos.fecha);
+    const fase = this.faseLunarDe(datos.fecha);
+    const arc = this.arcangeles[s.arcangel];
+    const resumen = `Carta Astral · ${s.signo} (${s.elemento}) · ${fase.nombre} · Regente: ${this.nombreCorto(arc.nombre)}`;
+    const lectura = { tirada: "Carta Astral", cartas: [], resumen };
+    const historial = JSON.parse(localStorage.getItem("oraculoLecturas") || "[]");
+    historial.unshift({ fecha: new Date().toISOString(), tirada: "Carta Astral", cartas: [], resumen });
+    localStorage.setItem("oraculoLecturas", JSON.stringify(historial.slice(0, 30)));
+    if (SESION.usuario) {
+      fetchJSON("/api/lecturas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(lectura)
+      }).then(() => {
+        const b = document.getElementById("btn-guardar");
+        if (b) { b.textContent = "Guardado ✓"; b.disabled = true; }
+      }).catch(() => {});
+    }
+  },
+
   guardar(resultadoHTML) {
     const lectura = {
       tirada: resultadoHTML.tirada.nombre,
@@ -2963,6 +3116,52 @@ const TIRADAS = {
 
 /* ============================ interfaz de la tirada ====================== */
 
+/* Formulario de nacimiento para la Carta Astral */
+function mostrarFormularioAstral(d) {
+  const escena = document.getElementById("escena-tarot");
+  document.querySelectorAll(".opcion-palo").forEach(x => x.classList.add("oculto"));
+  escena.innerHTML = `
+    <div class="centrado astral-form">
+      <p style="margin-bottom:14px">Tu carta astral se arma con tu fecha de nacimiento. Si añades la hora y el lugar, tu lectura se afina: la luna y tu arcángel cambian con ellos. Llena lo que sepas:</p>
+      <form id="form-astral" class="astral-formulario">
+        <label class="astral-campo">Fecha de nacimiento *
+          <input type="date" id="astral-fecha" required aria-label="Fecha de nacimiento">
+        </label>
+        <label class="astral-campo">Hora (opcional)
+          <input type="time" id="astral-hora" aria-label="Hora de nacimiento">
+        </label>
+        <label class="astral-campo">Lugar (opcional)
+          <input type="text" id="astral-lugar" maxlength="90" placeholder="Ej.: Quito, Ecuador" aria-label="Lugar de nacimiento">
+        </label>
+        <button class="btn btn-dorado" type="submit" style="justify-self:center">Revelar mi carta astral</button>
+        <p class="oculto astral-aviso" id="aviso-astral">Elige primero tu fecha de nacimiento.</p>
+      </form>
+    </div>`;
+  const form = document.getElementById("form-astral");
+  const aviso = document.getElementById("aviso-astral");
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const fecha = document.getElementById("astral-fecha").value;
+    if (!fecha) { aviso.classList.remove("oculto"); return; }
+    aviso.classList.add("oculto");
+    const hora = document.getElementById("astral-hora").value;
+    const lugar = document.getElementById("astral-lugar").value.trim();
+    mostrarCartaAstral(d, { fecha, hora, lugar });
+  });
+}
+
+function mostrarCartaAstral(d, datos) {
+  const escena = document.getElementById("escena-tarot");
+  const caja = document.createElement("div");
+  caja.id = "contenido-resultado";
+  caja.innerHTML = TIRADAS.armarCartaAstral(datos);
+  escena.innerHTML = "";
+  escena.appendChild(caja);
+  document.getElementById("btn-nueva-tirada").addEventListener("click", () => location.reload());
+  document.getElementById("btn-guardar").addEventListener("click", () => TIRADAS.guardarAstral(datos));
+  caja.style.animation = "mensajeFinalEntrada .6s ease both";
+}
+
 function iniciarTirada(tipo) {
   const d = TIRADAS.elegir(tipo);
   if (!d) return;
@@ -2972,6 +3171,11 @@ function iniciarTirada(tipo) {
   document.getElementById("titulo-tirada").innerHTML =
     `<div class="deco">${TIRADAS.elegantIcono[tipo]}</div><h2>${d.tirada.nombre}</h2>
      <p>${d.tirada.corto}</p>`;
+
+  if (d.tirada.astral) {
+    mostrarFormularioAstral(d);
+    return;
+  }
 
   if (d.tirada.pregunta) {
     escena.innerHTML = `
@@ -3197,7 +3401,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const colorLectura = {
       "1-carta": "240, 190, 120", "3-cartas": "212, 175, 55", "5-cartas": "104, 140, 220",
       "gran-tirada": "160, 110, 240", "lectura-fuerte": "230, 120, 80", "cruz-celta": "90, 200, 160",
-      "si-no": "240, 120, 150", "pregunta": "212, 175, 55"
+      "si-no": "240, 120, 150", "pregunta": "212, 175, 55", "carta-astral": "180, 160, 220"
     };
     TIRADAS.catalogo.forEach((t, i) => {
       const b = document.createElement("a");

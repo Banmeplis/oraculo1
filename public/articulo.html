@@ -24,7 +24,7 @@
   <!--   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script> -->
   <!-- Y el script de Google AdSense: -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6331831674832770" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="/css/estilo.css?v=17">
+  <link rel="stylesheet" href="/css/estilo.css?v=39">
 </head>
 <body>
 
@@ -89,16 +89,19 @@
     <p>Que la luz te acompañe</p>
   </footer>
 
-  <script src="/js/app.js?v=13"></script>
+  <script src="/js/app.js?v=14"></script>
   <script>
     const id = new URLSearchParams(location.search).get("id");
 
     function optimizarSEO(post) {
       const grupos = [
-        { coincide: /vela|ritual/i, palabras: ["ritual con velas", "seguridad con velas", "vela blanca", "vela dorada", "limpieza energética"] },
-        { coincide: /arcángel/i, palabras: ["arcángeles", "Arcángel Miguel", "Arcángel Rafael", "Arcángel Gabriel", "guía espiritual"] },
-        { coincide: /portal/i, palabras: ["portales energéticos", "portal 11:11", "equinoccio", "solsticio", "intención espiritual"] },
         { coincide: /luna|cuarto creciente/i, palabras: ["fases de la luna", "luna nueva", "luna llena", "ciclo lunar", "ritual lunar"] },
+        { coincide: /astrolog|zodiaco|carta astral|carta natal|signo|ascendente|mercurio|venus|retrógrado|planeta|regente/i, palabras: ["carta astral", "astrología", "signos del zodiaco", "ascendente", "signo lunar", "mercurio retrógrado"] },
+        { coincide: /esoter|numerolog|chakra|karma|tercer ojo|amuletos|talismanes|sincron|proteger tu energía|símbolos/i, palabras: ["esoterismo", "energía espiritual", "chakras", "numerología", "ley del karma", "símbolos de protección"] },
+        { coincide: /invocar|invocación|orar a/i, palabras: ["invocar a un arcángel", "peligros de invocar a los ángeles", "oración a los arcángeles", "conexión angelical", "arcángeles"] },
+        { coincide: /arcángel|ángel de la guarda/i, palabras: ["arcángeles", "Arcángel Miguel", "Arcángel Rafael", "Arcángel Gabriel", "guía espiritual", "ángel de la guarda"] },
+        { coincide: /vela|ritual/i, palabras: ["ritual con velas", "seguridad con velas", "vela blanca", "vela verde", "interpretar la llama"] },
+        { coincide: /portal/i, palabras: ["portales energéticos", "portal 11:11", "equinoccio", "solsticio", "intención espiritual"] },
         { coincide: /sol|solar/i, palabras: ["energía solar", "Sol", "solsticio", "vitalidad", "observación segura del Sol"] }
       ];
       const grupo = grupos.find(item => item.coincide.test(post.titulo + " " + post.cuerpo)) || grupos[2];
