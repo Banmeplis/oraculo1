@@ -94,6 +94,7 @@ const SESION = {
       this._usuario = d.user || null;
     } catch { this._usuario = null; }
     this.renderizar();
+    if (this._usuario) actualizarNotificaciones();
   },
 
   get usuario() { return this._usuario; },
@@ -112,6 +113,7 @@ const SESION = {
             <div class="user-menu">
               ${avatar}
               <span class="user-name">${escapHtml(nombre)}</span>
+              <a href="/amigos.html" class="btn-amigos" title="Amigos y chat" aria-label="Amigos y chat">💬<span class="amigo-badge oculto" id="amigo-badge">0</span></a>
               <a href="https://wa.me/593978874821" target="_blank" rel="noopener" class="btn-whatsapp" title="Escríbenos por WhatsApp" aria-label="WhatsApp">
                 <svg class="wa-ico" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16.004 3.2c-7.06 0-12.8 5.741-12.8 12.8 0 2.258.59 4.468 1.697 6.42L3.2 28.8l6.438-1.683c1.872 1.029 4.109 1.683 6.366 1.683 7.06 0 12.8-5.74 12.8-12.8 0-7.06 5.74-12.8 12.8-12.8zm6.374 17.544c-.262.736-1.464 1.36-2.04 1.408-.543.048-1.2.066-1.936-.12-.423-.107-.966-.247-1.66-.485-2.91-1.003-4.806-3.354-4.95-3.508-.144-.154-1.182-1.571-1.182-2.998 0-1.426.748-2.127 1.014-2.418.266-.291.58-.364.773-.364.194 0 .388 0 .557.01.178.01.417-.067.653.5.242.582.82 2.003.894 2.148.073.145.122.315.024.509-.097.194-.145.315-.29.484-.145.17-.305.378-.436.507-.146.145-.297.302-.127.592.169.29.754 1.243 1.62 2.013 1.113.99 2.051 1.297 2.342 1.443.291.145.46.121.63-.073.17-.194.728-.85.921-1.142.194-.29.388-.242.654-.145.266.097 1.69.797 1.98.942.29.145.484.218.555.339.07.121.07.699-.192 1.435z"/></svg>
                 <span>WhatsApp</span>
@@ -149,6 +151,7 @@ const SESION = {
         <nav class="menu">
           <a href="/panel.html">Hola, ${this._usuario.nombre.split(" ")[0]} ✦</a>
           <a href="/perfil.html">Perfil</a>
+          <a href="/amigos.html">Amigos<span class="amigo-badge oculto" id="amigo-badge">0</span></a>
           <a href="#" id="btn-salir">Salir</a>
           <a href="https://wa.me/593978874821" target="_blank" rel="noopener" class="btn-whatsapp" title="Escríbenos por WhatsApp" aria-label="WhatsApp">
             <svg class="wa-ico" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16.004 3.2c-7.06 0-12.8 5.741-12.8 12.8 0 2.258.59 4.468 1.697 6.42L3.2 28.8l6.438-1.683c1.872 1.029 4.109 1.683 6.366 1.683 7.06 0 12.8-5.74 12.8-12.8 0-7.06 5.74-12.8 12.8-12.8zm6.374 17.544c-.262.736-1.464 1.36-2.04 1.408-.543.048-1.2.066-1.936-.12-.423-.107-.966-.247-1.66-.485-2.91-1.003-4.806-3.354-4.95-3.508-.144-.154-1.182-1.571-1.182-2.998 0-1.426.748-2.127 1.014-2.418.266-.291.58-.364.773-.364.194 0 .388 0 .557.01.178.01.417-.067.653.5.242.582.82 2.003.894 2.148.073.145.122.315.024.509-.097.194-.145.315-.29.484-.145.17-.305.378-.436.507-.146.145-.297.302-.127.592.169.29.754 1.243 1.62 2.013 1.113.99 2.051 1.297 2.342 1.443.291.145.46.121.63-.073.17-.194.728-.85.921-1.142.194-.29.388-.242.654-.145.266.097 1.69.797 1.98.942.29.145.484.218.555.339.07.121.07.699-.192 1.435z"/></svg>
@@ -174,10 +177,25 @@ const SESION = {
     }
   }
 };
+/* ----------------------------- notificaciones --------------------------- */
+async function actualizarNotificaciones() {
+  const badges = document.querySelectorAll(".amigo-badge");
+  badges.forEach(b => b.classList.add("oculto"));
+  if (!SESION.usuario) return;
+  try {
+    const d = await fetchJSON("/api/notificaciones");
+    const total = (d.solicitudes || 0) + (d.noLeidos || 0);
+    badges.forEach(b => {
+      if (total > 0) { b.textContent = total; b.classList.remove("oculto"); }
+    });
+  } catch {}
+}
+
 /* -------------------------------- fecha --------------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
   crearCielo(70);
   SESION.cargar();
   SESION.verificarAuth();
+  setInterval(actualizarNotificaciones, 20000);
   if (typeof precargarCartas === "function") precargarCartas();
 });

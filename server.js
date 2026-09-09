@@ -30,6 +30,15 @@ const GOOGLE = {
 };
 const SECRETO = process.env.SECRETO_SESION || CONFIG.secret || "oraculo-secreto-local-cambiar";
 
+/* Correo del usuario "master": siempre tiene rol admin y control total. */
+const MASTER_EMAIL = String(process.env.MASTER_EMAIL || "juanshinku@gmail.com").toLowerCase();
+
+/* Rol efectivo: el correo master jamás pierde el rol admin. */
+function rolEfectivo(email, rol) {
+  if (email && String(email).toLowerCase() === MASTER_EMAIL) return "admin";
+  return rol || "autor";
+}
+
 /* --------------------------------- server ------------------------------- */
 app.set("trust proxy", 1); /* Render/Heroku sirven tras proxy HTTPS */
 
@@ -59,11 +68,34 @@ app.use("/uploads", express.static(UPLOADS));
 
 /* ------------------------------ utilitarios ----------------------------- */
 function usuarioActual(req) {
-  return req.session.user || null;
+  if (!req.session.user) return null;
+  const u = db.prepare("SELECT id, nombre, email, rol, avatar, baneado FROM users WHERE id = ?").get(req.session.user.id);
+  if (!u || u.baneado) {
+    req.session.user = null; /* usuario bloqueado o eliminado: se cierra su sesión */
+    return null;
+  }
+  return {
+    id: u.id,
+    nombre: u.nombre,
+    email: u.email,
+    rol: rolEfectivo(u.email, u.rol),
+    picture: req.session.user.picture || undefined,
+    baneado: u.baneado
+  };
 }
 
 function requiereAuth(req, res, next) {
-  if (!req.session.user) return res.status(401).json({ error: "No has iniciado sesión" });
+  const u = usuarioActual(req);
+  if (!u) return res.status(401).json({ error: "No has iniciado sesión" });
+  req.usuario = u;
+  next();
+}
+
+function requiereAdmin(req, res, next) {
+  const u = usuarioActual(req);
+  if (!u) return res.status(401).json({ error: "No has iniciado sesión" });
+  if (u.rol !== "admin") return res.status(403).json({ error: "Necesitas permisos de administrador" });
+  req.usuario = u;
   next();
 }
 
@@ -105,11 +137,13 @@ app.post("/api/registro", (req, res) => {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo))
     return res.status(400).json({ error: "Correo no válido" });
 
-  const existe = db.prepare("SELECT id FROM users WHERE email = ?").get(correo);
+  const existe = db.prepare("SELECT id, baneado FROM users WHERE email = ?").get(correo);
   if (existe) return res.status(409).json({ error: "Ese correo ya está registrado" });
 
   const hash = bcrypt.hashSync(String(password), 10);
-  const rol = db.prepare("SELECT COUNT(*) AS n FROM users").get().n === 0 ? "admin" : "autor";
+  const rol = db.prepare("SELECT COUNT(*) AS n FROM users").get().n === 0
+    ? "admin"
+    : rolEfectivo(correo, "autor");
   const info = db.prepare(
     "INSERT INTO users (nombre, email, password_hash, proveedor, rol) VALUES (?, ?, ?, 'local', ?)"
   ).run(String(nombre).trim(), correo, hash, rol);
@@ -126,8 +160,10 @@ app.post("/api/login", (req, res) => {
   const u = db.prepare("SELECT * FROM users WHERE email = ?").get(correo);
   if (!u || !u.password_hash || !bcrypt.compareSync(String(password), u.password_hash))
     return res.status(401).json({ error: "Correo o contraseña incorrectos" });
+  if (u.baneado)
+    return res.status(403).json({ error: "Tu cuenta ha sido suspendida. Escribe a @juanshinku si crees que es un error." });
 
-  req.session.user = { id: u.id, nombre: u.nombre, email: u.email, rol: u.rol };
+  req.session.user = { id: u.id, nombre: u.nombre, email: u.email, rol: rolEfectivo(u.email, u.rol) };
   res.json({ ok: true, user: req.session.user });
 });
 
@@ -343,15 +379,18 @@ app.get("/auth/google/callback", async (req, res) => {
     const correo = String(info.email).toLowerCase();
     let u = db.prepare("SELECT * FROM users WHERE email = ?").get(correo);
     let rol = "autor";
+    if (u && u.baneado)
+      return res.redirect("/login.html?err=cuenta-suspendida");
     if (!u) {
-      rol = db.prepare("SELECT COUNT(*) AS n FROM users").get().n === 0 ? "admin" : "autor";
+      const n = db.prepare("SELECT COUNT(*) AS n FROM users").get().n;
+      rol = n === 0 ? "admin" : rolEfectivo(correo, "autor");
       u = {
         id: Number(db.prepare(
           "INSERT INTO users (nombre, email, proveedor, rol) VALUES (?, ?, 'google', ?)"
         ).run(info.name || info.email.split("@")[0], correo, rol).lastInsertRowid)
       };
     }
-    req.session.user = { id: u.id, nombre: u.nombre || info.name || "Oráculo", email: correo, rol: u.rol || rol, picture: info.picture };
+    req.session.user = { id: u.id, nombre: u.nombre || info.name || "Oráculo", email: correo, rol: rolEfectivo(u.email, u.rol || rol), picture: info.picture };
     res.redirect("/tarot.html?bienvenid@s=google");
   } catch (e) {
     res.redirect("/login.html?err=google-error");
@@ -364,7 +403,7 @@ app.get("/api/posts", (req, res) => {
     SELECT p.id, p.titulo, p.resumen, p.portada, p.video, p.creado_en,
            u.nombre AS autor, u.id AS autor_id
     FROM posts p JOIN users u ON u.id = p.autor_id
-    WHERE p.publicado = 1
+    WHERE p.publicado = 1 AND u.baneado = 0
     ORDER BY p.creado_en DESC
   `).all();
   res.json(rows);
@@ -391,7 +430,7 @@ app.post("/api/posts", requiereAuth, (req, res) => {
 app.put("/api/posts/:id", requiereAuth, (req, res) => {
   const p = db.prepare("SELECT * FROM posts WHERE id = ?").get(Number(req.params.id));
   if (!p) return res.status(404).json({ error: "No existe" });
-  if (p.autor_id !== req.session.user.id && req.session.user.rol !== "admin")
+  if (p.autor_id !== req.usuario.id && req.usuario.rol !== "admin")
     return res.status(403).json({ error: "No puedes editar esta publicación" });
   const { titulo, resumen, cuerpo, portada, video, publicado } = req.body || {};
   db.prepare(
@@ -407,7 +446,7 @@ app.put("/api/posts/:id", requiereAuth, (req, res) => {
 app.delete("/api/posts/:id", requiereAuth, (req, res) => {
   const p = db.prepare("SELECT * FROM posts WHERE id = ?").get(Number(req.params.id));
   if (!p) return res.status(404).json({ error: "No existe" });
-  if (p.autor_id !== req.session.user.id && req.session.user.rol !== "admin")
+  if (p.autor_id !== req.usuario.id && req.usuario.rol !== "admin")
     return res.status(403).json({ error: "No puedes eliminar esta publicación" });
   db.prepare("DELETE FROM posts WHERE id = ?").run(p.id);
   res.json({ ok: true });
@@ -415,11 +454,237 @@ app.delete("/api/posts/:id", requiereAuth, (req, res) => {
 
 /* ------------------------------ admin: todos ---------------------------- */
 app.get("/api/mis-posts", requiereAuth, (req, res) => {
-  const sql = req.session.user.rol === "admin"
-    ? `SELECT id, titulo, publicado, creado_en, autor_id FROM posts ORDER BY creado_en DESC`
+  const sql = req.usuario.rol === "admin"
+    ? `SELECT p.id, p.titulo, p.publicado, p.creado_en, p.autor_id, u.nombre AS autor
+       FROM posts p JOIN users u ON u.id = p.autor_id ORDER BY p.creado_en DESC`
     : `SELECT id, titulo, publicado, creado_en, autor_id FROM posts WHERE autor_id = ? ORDER BY creado_en DESC`;
-  const rows = req.session.user.rol === "admin" ? db.prepare(sql).all() : db.prepare(sql).all(req.session.user.id);
+  const rows = req.usuario.rol === "admin" ? db.prepare(sql).all() : db.prepare(sql).all(req.usuario.id);
   res.json(rows);
+});
+
+/* ------------------------------ admin: usuarios ------------------------- */
+app.get("/api/admin/usuarios", requiereAdmin, (req, res) => {
+  const rows = db.prepare(`
+    SELECT u.id, u.nombre, u.email, u.rol, u.avatar, u.bio, u.baneado, u.proveedor, u.creado_en,
+           (SELECT COUNT(*) FROM posts p WHERE p.autor_id = u.id) AS posts
+    FROM users u ORDER BY u.baneado DESC, u.id ASC
+  `).all();
+  res.json(rows.map(u => ({ ...u, master: u.email.toLowerCase() === MASTER_EMAIL })));
+});
+
+app.put("/api/admin/usuarios/:id/ban", requiereAdmin, (req, res) => {
+  const objetivo = db.prepare("SELECT * FROM users WHERE id = ?").get(Number(req.params.id));
+  if (!objetivo) return res.status(404).json({ error: "Usuario no encontrado" });
+  if (objetivo.id === req.usuario.id)
+    return res.status(400).json({ error: "No puedes banearte a ti mismo" });
+  if (String(objetivo.email).toLowerCase() === MASTER_EMAIL)
+    return res.status(400).json({ error: "El usuario master no puede ser baneado" });
+  const { baneado } = req.body || {};
+  db.prepare("UPDATE users SET baneado = ? WHERE id = ?").run(baneado ? 1 : 0, objetivo.id);
+  res.json({ ok: true, baneado: baneado ? 1 : 0, nombre: objetivo.nombre });
+});
+
+app.put("/api/admin/usuarios/:id/rol", requiereAdmin, (req, res) => {
+  const objetivo = db.prepare("SELECT * FROM users WHERE id = ?").get(Number(req.params.id));
+  if (!objetivo) return res.status(404).json({ error: "Usuario no encontrado" });
+  if (objetivo.id === req.usuario.id)
+    return res.status(400).json({ error: "No puedes cambiarte el rol a ti mismo" });
+  if (String(objetivo.email).toLowerCase() === MASTER_EMAIL)
+    return res.status(400).json({ error: "El rol del usuario master es intocable" });
+  const { rol } = req.body || {};
+  if (!["autor", "admin"].includes(rol)) return res.status(400).json({ error: "Rol no válido" });
+  db.prepare("UPDATE users SET rol = ? WHERE id = ?").run(rol, objetivo.id);
+  res.json({ ok: true, rol, nombre: objetivo.nombre });
+});
+
+/* ------------------------------ amistades ------------------------------- */
+/* Amistad aceptada entre dos usuarios (en cualquier dirección) */
+function amigosEntre(a, b) {
+  return db.prepare(
+    "SELECT * FROM amistades WHERE estado='aceptada' AND ((solicitante_id=? AND receptor_id=?) OR (solicitante_id=? AND receptor_id=?)) LIMIT 1"
+  ).get(a, b, b, a) || null;
+}
+
+function perfilCorto(u) {
+  if (!u) return null;
+  return { id: u.id, nombre: u.nombre, email: u.email, avatar: u.avatar || undefined, rol: u.rol, master: String(u.email).toLowerCase() === MASTER_EMAIL };
+}
+
+app.get("/api/usuarios/buscar", requiereAuth, (req, res) => {
+  const q = String(req.query.q || "").trim().slice(0, 60);
+  if (!q) return res.json({ resultados: [] });
+  const filtro = `%${q.replace(/[%_]/g, " ")}%`;
+  const rows = db.prepare(
+    "SELECT id, nombre, email, avatar, rol FROM users WHERE id != ? AND baneado = 0 AND (nombre LIKE ? OR email LIKE ?) ORDER BY nombre LIMIT 20"
+  ).all(req.usuario.id, filtro, filtro);
+  res.json({
+    resultados: rows.map(u => {
+      const aceptada = amigosEntre(req.usuario.id, u.id);
+      let relacion = "nada";
+      if (aceptada) relacion = "amigos";
+      else {
+        const pendiente = db.prepare("SELECT * FROM amistades WHERE estado='pendiente' AND ((solicitante_id=? AND receptor_id=?) OR (solicitante_id=? AND receptor_id=?)) LIMIT 1").get(req.usuario.id, u.id, u.id, req.usuario.id);
+        if (pendiente) relacion = pendiente.solicitante_id === req.usuario.id ? "enviada" : "recibida";
+      }
+      return { ...perfilCorto(u), relacion };
+    })
+  });
+});
+
+app.get("/api/amistades", requiereAuth, (req, res) => {
+  const pendientes = db.prepare(`
+    SELECT a.id, a.creado_en, u.id AS usuario_id, u.nombre, u.email, u.avatar, u.rol
+    FROM amistades a JOIN users u ON u.id = a.solicitante_id
+    WHERE a.receptor_id = ? AND a.estado = 'pendiente'
+    ORDER BY a.creado_en DESC
+  `).all(req.usuario.id);
+  const enviadas = db.prepare(`
+    SELECT a.id, a.creado_en, u.id AS usuario_id, u.nombre, u.email, u.avatar, u.rol
+    FROM amistades a JOIN users u ON u.id = a.receptor_id
+    WHERE a.solicitante_id = ? AND a.estado = 'pendiente'
+    ORDER BY a.creado_en DESC
+  `).all(req.usuario.id);
+  const filas = db.prepare(`
+    SELECT * FROM amistades WHERE estado = 'aceptada'
+    AND (solicitante_id = ? OR receptor_id = ?) ORDER BY actualizado_en DESC
+  `).all(req.usuario.id, req.usuario.id);
+  const contactos = filas.map(a => {
+    const otro = a.solicitante_id === req.usuario.id ? a.receptor_id : a.solicitante_id;
+    const u = db.prepare("SELECT id, nombre, email, avatar, rol, baneado FROM users WHERE id = ?").get(otro);
+    if (!u) return null;
+    const ultimo = db.prepare(
+      "SELECT id, remitente_id, contenido, creado_en FROM mensajes_chat WHERE (remitente_id=? AND destinatario_id=?) OR (remitente_id=? AND destinatario_id=?) ORDER BY id DESC LIMIT 1"
+    ).get(req.usuario.id, otro, otro, req.usuario.id);
+    const noLeidos = db.prepare(
+      "SELECT COUNT(*) AS n FROM mensajes_chat WHERE remitente_id=? AND destinatario_id=? AND leido=0"
+    ).get(otro, req.usuario.id).n;
+    return {
+      amistadId: a.id,
+      amigo: perfilCorto(u),
+      baneado: u.baneado,
+      ultimoMensaje: ultimo
+        ? { ...ultimo, esMio: ultimo.remitente_id === req.usuario.id }
+        : null,
+      noLeidos
+    };
+  }).filter(Boolean).sort((x, y) => ((y.ultimoMensaje?.id || 0) - (x.ultimoMensaje?.id || 0)));
+  res.json({
+    pendientes: pendientes.map(p => ({ id: p.id, creado_en: p.creado_en, usuario: perfilCorto(p) })),
+    enviadas: enviadas.map(e => ({ id: e.id, creado_en: e.creado_en, usuario: perfilCorto(e) })),
+    contactos
+  });
+});
+
+app.post("/api/amistades", requiereAuth, (req, res) => {
+  const { usuario_id } = req.body || {};
+  const otro = Number(usuario_id);
+  if (!otro || otro === req.usuario.id) return res.status(400).json({ error: "Destino inválido" });
+  const objetivo = db.prepare("SELECT id, baneado FROM users WHERE id = ?").get(otro);
+  if (!objetivo || objetivo.baneado) return res.status(404).json({ error: "Usuario no encontrado" });
+  if (amigosEntre(req.usuario.id, otro)) return res.json({ ok: true, estado: "aceptada", amistadId: amigosEntre(req.usuario.id, otro).id });
+  const existente = db.prepare(
+    "SELECT * FROM amistades WHERE (solicitante_id=? AND receptor_id=?) OR (solicitante_id=? AND receptor_id=?) LIMIT 1"
+  ).get(req.usuario.id, otro, otro, req.usuario.id);
+  let amistadId;
+  if (existente) {
+    amistadId = existente.id;
+    if (existente.receptor_id === req.usuario.id && existente.estado === "pendiente") {
+      /* ellos nos pidieron: al pedirles nosotros se acepta automáticamente */
+      db.prepare("UPDATE amistades SET estado='aceptada', actualizado_en=datetime('now') WHERE id=?").run(existente.id);
+      return res.json({ ok: true, estado: "aceptada", amistadId });
+    }
+    if (existente.estado === "rechazada") {
+      db.prepare("UPDATE amistades SET estado='pendiente', actualizado_en=datetime('now') WHERE id=?").run(existente.id);
+    }
+  } else {
+    amistadId = Number(db.prepare(
+      "INSERT INTO amistades (solicitante_id, receptor_id, estado) VALUES (?,?, 'pendiente')"
+    ).run(req.usuario.id, otro).lastInsertRowid);
+  }
+  res.json({ ok: true, estado: "pendiente", amistadId });
+});
+
+app.post("/api/amistades/:id/responder", requiereAuth, (req, res) => {
+  const a = db.prepare("SELECT * FROM amistades WHERE id = ?").get(Number(req.params.id));
+  if (!a || a.receptor_id !== req.usuario.id)
+    return res.status(404).json({ error: "Solicitud no encontrada" });
+  const { aceptar } = req.body || {};
+  if (aceptar) {
+    db.prepare("UPDATE amistades SET estado='aceptada', actualizado_en=datetime('now') WHERE id=?").run(a.id);
+    res.json({ ok: true, estado: "aceptada" });
+  } else {
+    db.prepare("DELETE FROM amistades WHERE id = ?").run(a.id);
+    res.json({ ok: true, estado: "rechazada" });
+  }
+});
+
+app.delete("/api/amistades/:id", requiereAuth, (req, res) => {
+  const a = db.prepare("SELECT * FROM amistades WHERE id = ?").get(Number(req.params.id));
+  if (!a || (a.solicitante_id !== req.usuario.id && a.receptor_id !== req.usuario.id))
+    return res.status(404).json({ error: "Amistad no encontrada" });
+  db.prepare("DELETE FROM amistades WHERE id = ?").run(a.id);
+  db.prepare("DELETE FROM amistades WHERE solicitante_id = ? AND receptor_id = ?").run(a.receptor_id, a.solicitante_id);
+  res.json({ ok: true });
+});
+
+/* --------------------------------- chat --------------------------------- */
+app.post("/api/chat/mensajes", requiereAuth, (req, res) => {
+  const { destinatario_id, contenido } = req.body || {};
+  const otro = Number(destinatario_id);
+  const texto = String(contenido || "").trim();
+  if (!otro || !texto) return res.status(400).json({ error: "Mensaje vacío" });
+  if (texto.length > 2000) return res.status(400).json({ error: "Mensaje demasiado largo" });
+  const objetivo = db.prepare("SELECT id, baneado FROM users WHERE id = ?").get(otro);
+  if (!objetivo || objetivo.baneado) return res.status(404).json({ error: "Usuario no encontrado" });
+  if (!amigosEntre(req.usuario.id, otro))
+    return res.status(403).json({ error: "Solo puedes escribir a tus amistades" });
+  const info = db.prepare(
+    "INSERT INTO mensajes_chat (remitente_id, destinatario_id, contenido) VALUES (?,?,?)"
+  ).run(req.usuario.id, otro, texto);
+  const m = db.prepare("SELECT * FROM mensajes_chat WHERE id = ?").get(info.lastInsertRowid);
+  res.json({ ok: true, mensaje: m });
+});
+
+app.get("/api/chat/:otroId/mensajes", requiereAuth, (req, res) => {
+  const otro = Number(req.params.otroId);
+  const u = db.prepare("SELECT id, nombre, email, avatar, rol, baneado FROM users WHERE id = ?").get(otro);
+  if (!u) return res.status(404).json({ error: "Usuario no encontrado" });
+  if (!amigosEntre(req.usuario.id, otro))
+    return res.status(403).json({ error: "No sois amistades" });
+  const desde = Math.max(0, Number(req.query.desde) || 0);
+  let filas;
+  if (desde > 0) {
+    filas = db.prepare(`
+      SELECT * FROM mensajes_chat
+      WHERE ((remitente_id=? AND destinatario_id=?) OR (remitente_id=? AND destinatario_id=?)) AND id > ?
+      ORDER BY id ASC
+    `).all(req.usuario.id, otro, otro, req.usuario.id, desde);
+  } else {
+    const ultimo = db.prepare(`
+      SELECT id FROM mensajes_chat
+      WHERE (remitente_id=? AND destinatario_id=?) OR (remitente_id=? AND destinatario_id=?)
+      ORDER BY id DESC LIMIT 1
+    `).get(req.usuario.id, otro, otro, req.usuario.id);
+    const base = ultimo ? Math.max(0, ultimo.id - 149) : 0;
+    filas = db.prepare(`
+      SELECT * FROM mensajes_chat
+      WHERE ((remitente_id=? AND destinatario_id=?) OR (remitente_id=? AND destinatario_id=?)) AND id > ?
+      ORDER BY id ASC
+    `).all(req.usuario.id, otro, otro, req.usuario.id, base);
+  }
+  db.prepare("UPDATE mensajes_chat SET leido = 1 WHERE remitente_id = ? AND destinatario_id = ? AND leido = 0")
+    .run(otro, req.usuario.id);
+  res.json({
+    otro: perfilCorto(u),
+    mensajes: filas,
+    maxId: filas.length ? filas[filas.length - 1].id : desde
+  });
+});
+
+app.get("/api/notificaciones", requiereAuth, (req, res) => {
+  const solicitudes = db.prepare("SELECT COUNT(*) AS n FROM amistades WHERE receptor_id=? AND estado='pendiente'").get(req.usuario.id).n;
+  const noLeidos = db.prepare("SELECT COUNT(*) AS n FROM mensajes_chat WHERE destinatario_id=? AND leido=0").get(req.usuario.id).n;
+  res.json({ solicitudes, noLeidos });
 });
 
 /* -------------------------------- subir -------------------------------- */
@@ -488,7 +753,7 @@ app.post("/api/posts/:id/comentarios", (req, res) => {
 app.delete("/api/comentarios/:id", requiereAuth, (req, res) => {
   const c = db.prepare("SELECT * FROM comentarios WHERE id = ?").get(Number(req.params.id));
   if (!c) return res.status(404).json({ error: "No encontrado" });
-  if (c.user_id !== req.session.user.id && req.session.user.rol !== "admin")
+  if (c.user_id !== req.usuario.id && req.usuario.rol !== "admin")
     return res.status(403).json({ error: "No tienes permiso" });
   db.prepare("DELETE FROM comentarios WHERE id = ?").run(c.id);
   res.json({ ok: true });

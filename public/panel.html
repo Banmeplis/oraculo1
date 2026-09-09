@@ -10,7 +10,7 @@
   <!--   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script> -->
   <!-- Y el script de Google AdSense: -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6331831674832770" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="/css/estilo.css?v=17">
+  <link rel="stylesheet" href="/css/estilo.css?v=39">
 </head>
 <body>
 
@@ -37,6 +37,7 @@
         <a href="#" data-vista="nueva" class="activo">✍️ Nueva publicación</a>
         <a href="#" data-vista="posts">📚 Mis publicaciones</a>
         <a href="#" data-vista="lecturas">🔮 Mis lecturas</a>
+        <a href="#" data-vista="usuarios" id="link-usuarios" class="oculto">👥 Usuarios</a>
       </aside>
 
       <div>
@@ -87,6 +88,15 @@
           <h3>Mis lecturas guardadas</h3>
           <div id="lista-lecturas"></div>
         </section>
+
+        <!-- USUARIOS (solo admin) -->
+        <section id="vista-usuarios" class="oculto">
+          <h3>Gestión de usuarios</h3>
+          <p style="color:var(--lavanda-suave);font-size:.92rem;margin-bottom:16px">
+            Administra el círculo: suspende (banea), restaura o cambia el rol de los miembros.
+          </p>
+          <div id="lista-usuarios"></div>
+        </section>
       </div>
     </div>
   </main>
@@ -95,7 +105,7 @@
     <div class="logo"><span>☾</span> EL CENDERO DE LOS AR🌙ANGELES</div>
   </footer>
 
-  <script src="/js/app.js?v=13"></script>
+  <script src="/js/app.js?v=14"></script>
   <script>
     let archivoPortada = null, archivoVideo = null;
     const aviso = document.getElementById("aviso-nueva");
@@ -113,6 +123,9 @@
         if (!d.user) { location.href = "/login.html?redir=panel"; return; }
         SESION._usuario = d.user;
         SESION.renderizar();
+        if (d.user.rol === "admin") {
+          document.getElementById("link-usuarios").classList.remove("oculto");
+        }
       } catch { location.href = "/login.html?redir=panel"; }
       cargarPostsPanel();
       cargarLecturas();
@@ -124,10 +137,12 @@
         e.preventDefault();
         document.querySelectorAll(".panel-nav a").forEach(x => x.classList.remove("activo"));
         a.classList.add("activo");
-        ["nueva", "posts", "lecturas"].forEach(v =>
-          document.getElementById("vista-" + v).classList.toggle("oculto", v !== a.dataset.vista));
+        document.querySelectorAll(".panel-layout [id^='vista-']").forEach(v => v.classList.add("oculto"));
+        const vista = document.getElementById("vista-" + a.dataset.vista);
+        if (vista) vista.classList.remove("oculto");
         if (a.dataset.vista === "posts") cargarPostsPanel();
         if (a.dataset.vista === "lecturas") cargarLecturas();
+        if (a.dataset.vista === "usuarios") cargarUsuarios();
       });
     });
 
@@ -191,7 +206,7 @@
           <div class="tarjeta miniatura-post">
             <div class="datos">
               <strong>${p.titulo}</strong>
-              <span style="font-size:.85rem;color:var(--lavanda-suave)">${fechaLegible(p.creado_en)} · ${p.publicado ? "publicado ✓" : "borrador"}</span>
+              <span style="font-size:.85rem;color:var(--lavanda-suave)">${p.autor ? p.autor + " · " : ""}${fechaLegible(p.creado_en)} · ${p.publicado ? "publicado ✓" : "borrador"}</span>
             </div>
             <div style="display:flex;gap:8px;flex-wrap:wrap">
               <a class="btn btn-suave" style="padding:8px 16px" href="/articulo.html?id=${p.id}">Ver</a>
@@ -277,6 +292,51 @@
           cargarLecturas();
         } catch {}
       }));
+    }
+
+    /* usuarios (solo admin) */
+    async function cargarUsuarios() {
+      const c = document.getElementById("lista-usuarios");
+      try {
+        const usuarios = await fetchJSON("/api/admin/usuarios");
+        c.innerHTML = usuarios.map(u => `
+          <div class="tarjeta miniatura-post">
+            <div class="datos">
+              <strong>${escapHtml(u.nombre)} ${u.master ? '<span style="color:var(--dorado)">★ Master</span>' : ""}</strong>
+              <span style="font-size:.85rem;color:var(--lavanda-suave)">${escapHtml(u.email)} · ${u.proveedor} · ${u.posts} publicaciones ${u.baneado ? '· <span style="color:#ff8095">SUSPENDIDO</span>' : ""}</span>
+              <span style="font-size:.85rem;color:var(--lavanda-suave)">Rol: ${u.rol} · desde ${fechaLegible(u.creado_en)}</span>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+              ${u.master ? "" : `
+                <button class="btn btn-suave" style="padding:8px 14px" data-rol="${u.id}" data-rol-actual="${u.rol}">${u.rol === "admin" ? "Quitar admin" : "Hacer admin"}</button>
+                <button class="btn ${u.baneado ? "btn-dorado" : "btn-suave"}" style="padding:8px 14px;${u.baneado ? "" : "color:#ff8095"}" data-ban="${u.id}" data-est="${u.baneado ? 1 : 0}">${u.baneado ? "Restaurar" : "Suspender"}</button>
+              `}
+            </div>
+          </div>`).join("") || '<p class="centrado" style="color:var(--lavanda-suave)">Sin usuarios.</p>';
+
+        c.querySelectorAll("[data-ban]").forEach(b => b.addEventListener("click", async () => {
+          const baneado = b.dataset.est === "0";
+          const texto = baneado ? "¿Suspender (banear) a este usuario? Perderá el acceso." : "¿Restaurar a este usuario?";
+          if (!confirm(texto)) return;
+          try {
+            await fetchJSON("/api/admin/usuarios/" + b.dataset.ban + "/ban", {
+              method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ baneado })
+            });
+            cargarUsuarios();
+          } catch (e) { mostrar(e.message, "error"); }
+        }));
+        c.querySelectorAll("[data-rol]").forEach(b => b.addEventListener("click", async () => {
+          const rol = b.dataset.rolActual === "admin" ? "autor" : "admin";
+          const texto = rol === "admin" ? "¿Ascender a administrador?" : "¿Quitar el rol de administrador?";
+          if (!confirm(texto)) return;
+          try {
+            await fetchJSON("/api/admin/usuarios/" + b.dataset.rol + "/rol", {
+              method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ rol })
+            });
+            cargarUsuarios();
+          } catch (e) { mostrar(e.message, "error"); }
+        }));
+      } catch (e) { c.innerHTML = '<div class="aviso error">' + e.message + '</div>'; }
     }
   </script>
 </body>
