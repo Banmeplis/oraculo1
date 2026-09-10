@@ -1364,6 +1364,23 @@ h3 { font-size: 1.25rem; }
 .pregunta-arc-texto strong { color: rgba(var(--color-arc), 1); font-family: var(--fuente-deco); font-size: 1.15rem; }
 .pregunta-arc-texto small { color: var(--lavanda-suave); font-size: 0.78rem; }
 
+.pregunta-senales {
+  margin: 0 0 6px;
+  padding: 14px 18px;
+  text-align: center;
+  border: 1px dashed rgba(212, 175, 55, 0.35);
+}
+.pregunta-senales .pregunta-etiqueta {
+  display: inline-block;
+  font-family: var(--fuente-titulo);
+  font-size: 0.68rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--lavanda-suave);
+  margin-bottom: 10px;
+}
+.pregunta-senales .palabras { justify-content: center; }
+
 /* ----------------------- combinación de cartas --------------------------- */
 .combo-tag {
   display: inline-block;
@@ -1424,6 +1441,11 @@ h3 { font-size: 1.25rem; }
 .combo-carta.inv img { filter: brightness(0.7) saturate(0.85); }
 .combo-carta.inv .c-nm { opacity: 0.6; transform: rotate(180deg); }
 .combo-significado { flex: 1 1 100%; text-align: center; margin-top: 10px; font-size: 1.5rem; line-height: 1.6; font-family: var(--fuente-serif); color: var(--blanco-humo); max-width: 760px; margin-left: auto; margin-right: auto; }
+.combo-significado.sin-cartas {
+  border-top: 1px dashed rgba(212, 175, 55, 0.3);
+  padding-top: 14px;
+  margin-top: 14px;
+}
 .combo-significado b { color: var(--dorado); font-size: 1.5rem; }
 .combo-consejo, .combo-regano {
   flex: 1 1 100%; text-align: center; font-size: 1.5rem; line-height: 1.6;
@@ -2635,4 +2657,511 @@ nav.menu a.btn-whatsapp:hover {
   color: var(--lavanda-suave);
   margin: 10px 4px;
   line-height: 1.5;
+}
+
+/* ============================ zodíaco premium ============================ */
+.zodiaco-chip {
+  display: inline-grid;
+  place-items: center;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  font-size: .92rem;
+  line-height: 1;
+  color: #0e0926;
+  background: radial-gradient(circle at 32% 28%, #fff7e0, transparent 52%), linear-gradient(135deg, var(--zc-color, #d4af37), #ffd98a);
+  border: 1px solid rgba(255, 255, 255, .65);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--zc-color, #d4af37) 65%, transparent), inset 0 0 8px rgba(255,255,255,.35);
+  flex: none;
+  cursor: default;
+  animation: zodiacoRespiro 3.4s ease-in-out infinite;
+}
+@keyframes zodiacoRespiro {
+  0%, 100% { box-shadow: 0 0 10px color-mix(in srgb, var(--zc-color, #d4af37) 55%, transparent), inset 0 0 8px rgba(255,255,255,.3); }
+  50%     { box-shadow: 0 0 20px color-mix(in srgb, var(--zc-color, #d4af37) 90%, transparent), inset 0 0 8px rgba(255,255,255,.5); }
+}
+.user-menu .zodiaco-chip { margin-left: 8px; }
+.perfil-signo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 5px 12px 5px 6px;
+  border-radius: 999px;
+  background: var(--vidrio);
+  border: 1px solid rgba(212, 175, 55, .4);
+  color: var(--blanco-humo);
+  font-size: .85rem;
+}
+.perfil-signo .zodiaco-chip { width: 24px; height: 24px; font-size: .84rem; }
+
+/* ============================ presencia (chat) =========================== */
+.presencia-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  background: #5b6478;
+  border: 2px solid #14102b;
+  flex: none;
+}
+.presencia-dot.on {
+  background: #34d399;
+  box-shadow: 0 0 8px rgba(52, 211, 153, .85);
+}
+.contacto-presencia-av { position: relative; display: inline-flex; min-width: 42px; min-height: 42px; }
+.contacto-presencia-av .presencia-dot {
+  position: absolute; right: -2px; bottom: -2px;
+  width: 14px; height: 14px; border-width: 2px;
+}
+.chat-cabecera .presencia-dot { width: 9px; height: 9px; border-width: 1px; vertical-align: middle; margin-right: 5px; }
+.chat-cabecera .chat-estado {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 2px;
+}
+.chat-estado .esta-on { color: #6ee7a8; }
+.chat-estado .esta-off { color: var(--lavanda-suave); }
+.con-linea {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .78rem;
+  color: #6ee7a8;
+}
+.con-linea .presencia-dot { border-color: transparent; }
+
+/* =========================== pestañas del chat =========================== */
+.chat-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 9px 8px 4px;
+  overflow-x: auto;
+  flex: none;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--borde-vidrio);
+  background: rgba(255, 255, 255, .02);
+}
+.chat-tabs::-webkit-scrollbar { display: none; }
+.chat-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px 4px 5px;
+  border-radius: 999px;
+  background: var(--vidrio);
+  border: 1px solid var(--borde-vidrio);
+  cursor: pointer;
+  color: var(--blanco-humo);
+  font-size: .78rem;
+  white-space: nowrap;
+  transition: .2s;
+  font-family: var(--fuente-cuerpo);
+}
+.chat-tab .contacto-avatar,
+.chat-tab .contacto-presencia-av { width: 22px; height: 22px; min-width: 22px; min-height: 22px; font-size: .6rem; background: linear-gradient(135deg, rgba(255,255,255,.16), rgba(212,175,55,.4)); }
+.chat-tab .contacto-presencia-av .presencia-dot { display: none; }
+.chat-tab-nombre { max-width: 110px; overflow: hidden; text-overflow: ellipsis; }
+.chat-tab.activo {
+  border-color: var(--dorado);
+  background: linear-gradient(135deg, rgba(212, 175, 55, .22), rgba(185, 107, 255, .2));
+  box-shadow: 0 0 10px rgba(212, 175, 55, .25);
+}
+.chat-tab-x {
+  font-style: normal;
+  color: var(--lavanda-suave);
+  padding: 2px 4px;
+  border-radius: 50%;
+  font-size: .66rem;
+  transition: .2s;
+}
+.chat-tab-x:hover { color: #fff; background: rgba(255, 255, 255, .14); }
+.chat-tab-mas {
+  background: transparent;
+  border: 1px dashed var(--borde-vidrio);
+  color: var(--dorado);
+  font-weight: 800;
+  padding: 4px 10px;
+}
+
+/* ============================ Horóscopo Negro ============================ */
+.horoscopo-sec {
+  --hc: #d4af37;
+  position: relative;
+  border-radius: 24px;
+  padding: 26px;
+  overflow: hidden;
+  border: 1px solid rgba(212, 175, 55, .35);
+  background:
+    radial-gradient(circle at 10% 8%, color-mix(in srgb, var(--hc) 30%, transparent), transparent 46%),
+    radial-gradient(circle at 92% 92%, rgba(147, 112, 219, .18), transparent 48%),
+    linear-gradient(160deg, rgba(34, 22, 66, .88), rgba(12, 8, 28, .96));
+  box-shadow: var(--sombra);
+  color: var(--blanco-humo);
+}
+.horoscopo-sec::before {
+  content: "";
+  position: absolute;
+  top: -60%; left: -40%; width: 70%; height: 180%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, .05), transparent);
+  transform: rotate(18deg);
+  animation: fabBrillo 7s ease-in-out infinite;
+  pointer-events: none;
+}
+.horoscopo-cab {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.horoscopo-emoji {
+  width: 54px; height: 54px;
+  display: grid; place-items: center;
+  font-size: 1.7rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 28%, #fff4d8, transparent 55%), linear-gradient(135deg, var(--hc), #d49fff);
+  box-shadow: 0 0 22px color-mix(in srgb, var(--hc) 70%, transparent);
+  flex: none;
+}
+.horoscopo-titulo {
+  font-family: var(--fuente-deco);
+  font-size: 1.22rem;
+  color: var(--blanco);
+  letter-spacing: .5px;
+}
+.horoscopo-premium {
+  margin-left: auto;
+  color: #0e0926;
+  background: linear-gradient(135deg, #d4af37, #ffd98a);
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: .68rem;
+  letter-spacing: 1.5px;
+  box-shadow: 0 0 16px rgba(212, 175, 55, .45);
+}
+.horoscopo-dia, .horoscopo-semana {
+  position: relative;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .04);
+  border: 1px solid rgba(255, 255, 255, .08);
+  margin-top: 10px;
+}
+.horoscopo-dia b, .horoscopo-semana b {
+  display: block;
+  color: var(--dorado);
+  font-size: .8rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+.horoscopo-dia p, .horoscopo-semana p { margin: 0; line-height: 1.6; }
+.horoscopo-num {
+  display: block;
+  margin-top: 9px;
+  font-size: .78rem;
+  color: var(--lavanda-suave);
+  font-style: italic;
+}
+.horoscopo-vacio { text-align: center; padding: 34px 22px; }
+.horoscopo-vacio p { color: var(--lavanda-suave); margin: 10px 0 18px; }
+.horoscopo-cargando {
+  text-align: center;
+  color: var(--lavanda-suave);
+  padding: 18px;
+  font-size: .9rem;
+}
+.horoscopo-inicio { margin-top: 0; }
+#horoscopo-lectura { margin-top: 22px; }
+
+/* bloque dentro de una lectura de tarot */
+.bloque-horoscopo-lectura .horoscopo-sec { border-radius: 20px; padding: 22px; }
+
+@media (max-width: 640px) {
+  .horoscopo-sec { padding: 20px; }
+  .horoscopo-premium { margin-left: 0; }
+  .horoscopo-emoji { width: 46px; height: 46px; font-size: 1.4rem; }
+}
+
+/* ============ carta astral real: rueda y mediciones ============ */
+.astral-seccion {
+  position: relative;
+  overflow: hidden;
+  margin-top: 18px;
+  padding: 20px;
+  border-radius: 18px;
+  border: 1px solid rgba(233, 206, 143, 0.25);
+  background: linear-gradient(150deg, rgba(20, 18, 45, 0.55), rgba(12, 10, 28, 0.7));
+}
+.astral-seccion::before {
+  content: "";
+  position: absolute;
+  top: -70%;
+  left: -30%;
+  width: 45%;
+  height: 240%;
+  background: linear-gradient(115deg, transparent, rgba(233, 206, 143, 0.08), transparent);
+  transform: rotate(14deg);
+  animation: rayoAstral 10s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes rayoAstral {
+  0%, 100% { transform: translateX(-60%) rotate(14deg); opacity: 0.55; }
+  50% { transform: translateX(320%) rotate(14deg); opacity: 1; }
+}
+.rueda-escena { position: relative; max-width: 560px; margin: 10px auto 0; padding: 4px; }
+.rueda-astral {
+  display: block;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  animation: ruedaEntrar 1.15s cubic-bezier(.18, .72, .24, 1) both, ruedaRespira 7s ease-in-out .6s infinite;
+}
+@keyframes ruedaEntrar {
+  0% { opacity: 0; transform: scale(.5) rotate(-16deg); filter: drop-shadow(0 0 0 rgba(233,206,143,0)); }
+  100% { opacity: 1; transform: none; filter: drop-shadow(0 0 26px rgba(233,206,143,.35)); }
+}
+@keyframes ruedaRespira {
+  0%, 100% { filter: drop-shadow(0 0 14px rgba(233,206,143,.18)) drop-shadow(0 0 40px rgba(170,140,235,.12)); }
+  50% { filter: drop-shadow(0 0 30px rgba(233,206,143,.45)) drop-shadow(0 0 60px rgba(170,140,235,.28)); }
+}
+.rueda-giro {
+  transform-origin: 310px 310px;
+  animation: ruedaGirar 70s linear infinite;
+}
+@keyframes ruedaGirar { to { transform: rotate(360deg); } }
+.rueda-pulso {
+  transform-origin: 310px 310px;
+  animation: ruedaPulso 4.5s ease-in-out infinite;
+}
+@keyframes ruedaPulso {
+  0%, 100% { transform: scale(1); opacity: .35; }
+  50% { transform: scale(1.055); opacity: .9; }
+}
+.rueda-eje { stroke-linecap: round; animation: ejeRespira 3.2s ease-in-out infinite; }
+@keyframes ejeRespira {
+  0%, 100% { opacity: .5; }
+  50% { opacity: 1; }
+}
+.rueda-eje-label {
+  font-family: Georgia, serif;
+  letter-spacing: .04em;
+  animation: ejeFloat 4s ease-in-out infinite;
+}
+.rueda-eje-label.clave { text-shadow: 0 0 12px currentColor; }
+@keyframes ejeFloat {
+  0%, 100% { transform: translateY(0); opacity: .9; }
+  50% { transform: translateY(-3px); opacity: 1; }
+}
+.luz-astral {
+  position: absolute;
+  left: var(--lx);
+  top: var(--ly);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, rgba(233, 206, 143, 0.65) 40%, transparent 70%);
+  box-shadow: 0 0 12px 2px rgba(233, 206, 143, 0.55);
+  opacity: 0;
+  pointer-events: none;
+  animation: luzFlotar var(--ll, 3s) ease-in-out infinite;
+  animation-delay: var(--ld, 0s);
+}
+@keyframes luzFlotar {
+  0%, 100% { transform: translate(0, 0) scale(.6); opacity: 0; }
+  25% { opacity: .95; }
+  50% { transform: translate(7px, -14px) scale(1); opacity: .45; }
+  75% { opacity: .9; }
+}
+.medir-lista { display: grid; gap: 10px; }
+.medir-planeta {
+  display: flex;
+  gap: 13px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(233, 206, 143, 0.16);
+}
+.medir-planeta:hover { background: rgba(var(--arc-color, 233, 206, 143), 0.08); }
+.mp-glifo {
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  color: var(--cp, var(--dorado));
+  background: rgba(15, 13, 34, 0.7);
+  border: 1px solid rgba(var(--cp, 233, 206, 143), 0.45);
+  box-shadow: 0 0 14px rgba(var(--cp, 233, 206, 143), 0.18);
+}
+.mp-cuerpo { flex: 1; min-width: 0; }
+.mp-cuerpo b { color: var(--blanco-humo); font-size: 0.98rem; display: block; }
+.mp-signo { color: var(--dorado); font-weight: 400; font-size: 0.88rem; }
+.mp-retro { color: #ff9e6d; font-style: normal; font-weight: 400; font-size: 0.78rem; }
+.mp-frase {
+  margin-top: 5px;
+  color: var(--blanco);
+  font-family: var(--fuente-serif);
+  font-size: 1.02rem;
+  line-height: 1.5;
+}
+.chips-casas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  justify-content: center;
+}
+.chip-casa, .chip-gusto {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.84rem;
+  background: rgba(var(--arc-color, 233, 206, 143), 0.1);
+  border: 1px solid rgba(var(--arc-color, 233, 206, 143), 0.4);
+  color: var(--blanco-humo);
+}
+.chip-gusto {
+  background: rgba(139, 127, 199, 0.14);
+  border-color: rgba(139, 127, 199, 0.42);
+  color: var(--lavanda-suave);
+}
+.astral-aviso {
+  border-left: 3px solid var(--dorado);
+  background: rgba(212, 175, 55, 0.07);
+  padding: 14px 16px;
+  border-radius: 10px;
+  color: var(--blanco-humo);
+  font-family: var(--fuente-serif);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.astral-aviso p { margin: 0; }
+.astral-form input[list] { cursor: text; }
+
+/* --- ángulos sagrados: Asc, Desc, MC e IC --- */
+.carta-angulos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.angulo-tarjeta {
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  padding: 18px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(233, 206, 143, 0.28);
+  background: linear-gradient(160deg, rgba(22, 19, 50, 0.72), rgba(8, 7, 20, 0.55));
+  animation: apareceBloque .7s ease both;
+}
+.angulo-tarjeta::after {
+  content: "";
+  position: absolute;
+  left: -40%;
+  right: -40%;
+  bottom: -80%;
+  height: 130%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.28), transparent 62%);
+  opacity: 0;
+  animation: anguloBrillo 5.5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes anguloBrillo {
+  0%, 100% { opacity: 0; transform: translateY(20%); }
+  50% { opacity: 0.8; transform: translateY(-10%); }
+}
+.angulo-tarjeta.angulo-clave {
+  border-color: rgba(126, 232, 200, 0.5);
+  box-shadow: 0 0 22px rgba(126, 232, 200, 0.13);
+}
+.angulo-tarjeta.angulo-clave .angulo-nombre { color: #7ee8c8; }
+.angulo-glifo {
+  position: relative;
+  display: block;
+  font-size: 1.9rem;
+  margin-bottom: 7px;
+  animation: anguloFlota 4s ease-in-out infinite;
+}
+@keyframes anguloFlota {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+.angulo-nombre {
+  position: relative;
+  display: block;
+  color: var(--dorado);
+  font-family: var(--fuente-titulo);
+  font-size: 1.05rem;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.angulo-signo {
+  position: relative;
+  display: block;
+  margin-top: 5px;
+  color: var(--blanco);
+  font-family: var(--fuente-serif);
+  font-size: 1.18rem;
+}
+.angulo-tarjeta p {
+  position: relative;
+  margin-top: 8px;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--lavanda-suave);
+}
+
+/* --- textos más grandes y títulos brillantes en toda la carta astral --- */
+.astral-resultado .resultado-cabecera p { font-size: 1.25rem; }
+.astral-resultado .contexto-tirada p { font-size: 1.3rem; line-height: 1.7; }
+.astral-resultado .contexto-tirada .comparte { font-size: 1.05rem; }
+.astral-resultado .carta-grande .carta-texto h3 { font-size: 2.05rem; }
+.astral-resultado .carta-grande .carta-texto h4 { font-size: 1.3rem; }
+.astral-resultado .carta-grande .carta-texto .interp { font-size: 1.65rem; line-height: 1.75; }
+.astral-resultado .carta-grande .palabras span { font-size: 1.02rem; padding: 6px 13px; }
+.astral-instruccion { font-size: 1.22rem; line-height: 1.75; color: var(--lavanda-suave); margin: 8px 0; }
+.astral-titulo {
+  font-family: var(--fuente-deco);
+  font-size: clamp(1.7rem, 3.6vw, 2.5rem);
+  margin: 8px 0 6px;
+  letter-spacing: .04em;
+  background: linear-gradient(90deg, #fff7d1, #d9c5ff, #ffd9a8, #fff7d1);
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: brilloPremium 7s linear infinite;
+  text-shadow: 0 0 26px rgba(233, 206, 143, 0.2);
+}
+.astral-sub-titulo {
+  font-family: var(--fuente-deco);
+  font-size: 1.55rem;
+  color: var(--dorado);
+  text-align: center;
+  margin: 22px 0 4px;
+  text-shadow: 0 0 18px rgba(233, 206, 143, 0.25);
+}
+.astral-resultado .astral-seccion .etiqueta-seccion { font-size: 1rem; letter-spacing: 2px; }
+.astral-resultado .mp-cuerpo b { font-size: 1.28rem; }
+.astral-resultado .mp-signo { font-size: 1.12rem; }
+.astral-resultado .mp-frase { font-size: 1.28rem; line-height: 1.7; }
+.astral-resultado .mp-glifo { flex: 0 0 48px; width: 48px; height: 48px; font-size: 1.5rem; }
+.astral-resultado .mensaje-final-seccion-nueva p, .astral-resultado .arcangel-seccion-nueva p { font-size: 1.32rem; line-height: 1.75; }
+.astral-resultado .arcangel-seccion-nueva h3 { font-size: 1.8rem; }
+.astral-resultado .arcangel-seccion-nueva > span:not(.etiqueta-seccion) { font-size: 1.12rem; }
+.astral-resultado .rejilla .tarjeta p { font-size: 1.28rem; line-height: 1.7; }
+.astral-resultado .chip-casa, .astral-resultado .chip-gusto { font-size: 1.02rem; padding: 8px 15px; }
+.astral-resultado .astral-aviso p { font-size: 1.25rem; line-height: 1.7; }
+.astral-form p { font-size: 1.22rem; line-height: 1.75; }
+.astral-formulario label { font-size: 1.12rem; }
+.astral-formulario input { font-size: 1.12rem; padding: 12px 14px; }
+@media (max-width: 640px) {
+  .astral-seccion { padding: 14px; }
+  .mp-glifo { flex-basis: 40px; width: 40px; height: 40px; }
+  .astral-resultado .mp-frase { font-size: 1.2rem; }
+  .astral-resultado .carta-grande .carta-texto .interp { font-size: 1.45rem; }
 }

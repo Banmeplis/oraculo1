@@ -21,7 +21,7 @@ const TIRADAS = {
     { id: "cruz-celta", nombre: "Cruz Celta", icono: "🕊️", corto: "La lectura clásica y profunda de diez cartas.", n: 10, posiciones: [["Corazón del asunto", "El centro de la consulta"], ["Lo que cruza", "Las influencias que la atraviesan"], ["Lo que está por encima", "Consciente o metas"], ["Lo que está por debajo", "Inconsciente o raíces"], ["Lo que pasó", "Pasado reciente"], ["Lo que viene", "Futuro cercano"], ["Tu actitud", "Cómo te enfrentas a ello"], ["El entorno", "Influencias externas"], ["Esperanzas y miedos", "Lo que anhelas y temes"], ["Resultado", "La síntesis final"] ] },
     { id: "si-no",     nombre: "Sí o No directo", icono: "🎯", corto: "Una carta, una respuesta clara para tu pregunta.", n: 1, posiciones: [["Tu respuesta", "El veredicto del oráculo"]] },
     { id: "pregunta",  nombre: "Pregunta al Oráculo", icono: "🃏", corto: "Escribe tu pregunta y el arcángel idóneo responderá solo ese tema con tres cartas.", n: 3, pregunta: true, posiciones: [["Tu pregunta", "Lo que consultas al cielo"], ["La lección", "Lo que debes mirar"], ["La respuesta", "La señal del oráculo"]] },
-    { id: "carta-astral", nombre: "Carta Astral", icono: "🪐", corto: "Perfil astrológico de tu nacimiento: signo solar, elemento, fase lunar y arcángel regente.", n: 0, astral: true, posiciones: [] }
+    { id: "carta-astral", nombre: "Carta Astral", icono: "🪐", corto: "Rueda astral completa: los 10 planetas, tu signo solar y lunar, ascendente, casas, retrógrados, gustos y tu arcángel regente.", n: 0, astral: true, posiciones: [] }
   ],
 
   elegantIcono: { "1-carta": "🕯️", "3-cartas": "💫", "5-cartas": "🌟", "gran-tirada": "🛡️", "lectura-fuerte": "🔥", "cruz-celta": "🕊️", "si-no": "🎯", "pregunta": "🃏", "carta-astral": "🪐" },
@@ -42,7 +42,9 @@ const TIRADAS = {
     if (!t) return null;
     this.definirMazo();
     const mazo = this.barajar(this.mazo);
-    return { tirada: t, cartas: [], mazo, fuerte: tipo === "lectura-fuerte" ? true : (t.pregunta || t.astral ? false : Math.random() < 0.3) };
+    /* solo la tirada "Lectura Fuerte" activa el modo fuerte (elegido a propósito);
+       el resto siempre sale en su tono natural: las cartas deciden la sombra o la luz */
+    return { tirada: t, cartas: [], mazo, fuerte: tipo === "lectura-fuerte" };
   },
 
   /* construye la carta a partir del arcano, decidiendo sentido al azar */
@@ -265,6 +267,44 @@ const TIRADAS = {
     }
     coincidencias.sort((a, b) => b.puntaje - a.puntaje);
     return coincidencias;
+  },
+
+  /* ------------------------- análisis desde el servidor ---------------------
+     El motor oraculo-nlp.js (backend) analiza la pregunta con más temas y
+     matices que el análisis local. Aquí se pide ese análisis y se transforma
+     a las claves que la tirada ya conoce (arcángel, título, tipo). */
+  NLP_ARC: {
+    amor: "chamuel", dinero: "uriel", trabajo: "uriel", salud: "rafael", familia: "chamuel",
+    espiritual: "gabriel", energias: "miguel", espiritus: "miguel", fallecido: "miguel",
+    proteccion: "miguel", liberacion: "zadkiel", futuro: "jofiel", decision: "jofiel", mensaje: "gabriel"
+  },
+
+  async analisisPreguntaServidor(pregunta) {
+    try {
+      const data = await fetchJSON("/api/ia/analizar-pregunta", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pregunta })
+      });
+      return (data && data.ok && data.analisis) ? data.analisis : null;
+    } catch (e) { return null; }
+  },
+
+  /* fusiona el análisis del servidor en el resultado para que la lectura
+     use el tema/tipo/persona/keywords más exactos */
+  inyectarAnalisis(resultado, nl) {
+    if (!nl || !nl.temaPrincipal) return;
+    const mapear = t => ({ tema: t.clave, clave: this.NLP_ARC[t.clave] || "gabriel", titulo: t.titulo, icono: t.icono || "✨", puntaje: t.puntaje || 0 });
+    const temas = (nl.temas || []).map(mapear);
+    const principal = mapear(nl.temaPrincipal);
+    resultado.__analisis = principal;
+    resultado.__tipoPregunta = nl.tipo;
+    resultado.__temasPregunta = temas;
+    resultado.__temaClaveNLP = nl.temaPrincipal.clave;
+    resultado.__persona = nl.persona || null;
+    resultado.__parentesco = nl.parentesco || null;
+    resultado.__keywords = (nl.keywords || []).filter(k => k.length > 2).slice(0, 8);
+    resultado.__tono = nl.tono || "neutro";
   },
 
   /* --------------------------- esencia de cada carta ------------------------
@@ -786,21 +826,21 @@ const TIRADAS = {
 
     if (!invertidas.length) {
       return this.elegirDe([
-        `Mi consejo para hoy: avanza con lo que ${nombresD || "estas cartas"} te dicen. No dudes de ti: fíjate una meta pequeña para hoy y da ese paso. ${A}, desde su ${R}, te acompaña en cada uno.`,
-        `Haz esto con calma: deja que ${nombresD || "tu lectura"} te guíe y no corras a decidir cosas grandes todavía. Mantén lo que está bien, agrega un poquito de fe y sigue. ${A} está contigo.`,
+        `Avanza con lo que ${nombresD || "estas cartas"} te dicen. No dudes de ti: fíjate una meta pequeña para hoy y da ese paso. ${A}, desde su ${R}, te acompaña en cada uno.`,
+        `Haz esto con calma: camina al ritmo de ${nombresD || "tu lectura"} y no corras a decidir cosas grandes todavía. Mantén lo que está bien, agrega un poquito de fe y sigue. ${A} está contigo.`,
         `Elige una sola cosa de todo lo que sientes hoy y actúala: así la luz de ${nombresD || "tus cartas"} no se queda en palabras. ${A} te sostiene desde su ${R} mientras lo haces.`
       ]);
     }
     if (invertidas.length === grupo.length) {
       return this.elegirDe([
-        `Mi consejo para hoy: no pelees contra ${nombresI || "estas cartas"}. Solo escucha qué te están avisando y suelta lo que ya no te sirve. ${A} te dice, desde su ${R}: soltar también es avanzar.`,
-        `Haz una pausa, sí, pero no te quedes en ella: lo que ${nombresI || "la sombra"} te muestra es la clave para cambiar de rumbo a tiempo. Un paso pequeño y honesto de hoy vale más que diez mañana.`,
+        `No pelees contra ${nombresI || "estas cartas"}. Solo escucha qué te están avisando y suelta lo que ya no te sirve. ${A} te dice, desde su ${R}: soltar también es avanzar.`,
+        `Haz una pausa, sí, pero no te quedes en ella: escucha de cerca a ${nombresI || "la sombra"} porque ahí está la clave para cambiar de rumbo a tiempo. Un paso pequeño y honesto de hoy vale más que diez mañana.`,
         `No lo tomes como castigo: es una señal para frenar y mirar. Deja de dar vueltas a lo mismo, elige una salida posible hoy y empieza por ahí. ${A} sujeta tu mano, desde su ${R}.`
       ]);
     }
     return this.elegirDe([
-      `Mi consejo para hoy: quédate con lo bueno de ${nombresD || "tu lectura"} (avanza con eso) y atiende el aviso de ${nombresI || "las invertidas"} (suelta eso). Nada de todo o nada: un pasito hoy, otro mañana. ${A} te acompaña desde su ${R}.`,
-      `Haz esto: confirma tu camino con ${nombresD || "la luz"} y corrige una sola cosa que te muestre ${nombresI || "la sombra"}. Lo que pesa hoy se suelta con una decisión pequeña. ${A} camina a tu lado.`,
+      `Quédate con lo bueno de ${nombresD || "tu lectura"} (avanza con eso) y atiende el aviso de ${nombresI || "las invertidas"} (suelta eso). Nada de todo o nada: un pasito hoy, otro mañana. ${A} te acompaña desde su ${R}.`,
+      `Haz esto: confirma tu camino con ${nombresD || "la luz"} y corrige una sola cosa de lo que te señala ${nombresI || "la sombra"}. Lo que pesa hoy se suelta con una decisión pequeña. ${A} camina a tu lado.`,
       `Mezcla de luz y sombra es mezcla de oportunidad y aviso: agarra lo bueno, mira lo que te estás perdiendo y corrige a tiempo. ${A}, desde su ${R}, te guía para que no se te escape ninguna de las dos.`
     ]);
   },
@@ -820,12 +860,12 @@ const TIRADAS = {
     }
     if (invertidas.length === grupo.length) {
       return this.elegirDe([
-        `Y te regaño, porque venías con la respuesta delante y no querías verla: ${invertidas.map(c => c.nombre).join(" y ")} te lo dijeron tres veces y tú seguías igual. Hoy sí: obedece la señal.`,
+        `Venías con la respuesta delante y no querías verla: ${invertidas.map(c => c.nombre).join(" y ")} te lo ${invertidas.length > 1 ? "dijeron" : "dijo"} tres veces y tú seguías igual. Hoy sí: obedece la señal.`,
         `Un regaño de ${A}, sin rodeos: no es falta de suerte, es que no hiciste la tarea a tiempo. Mira lo que estas cartas te señalan y cambia antes de que la vida tenga que gritártelo.`
       ]);
     }
     return this.elegirDe([
-      `Y ${A} te regaña una sola cosa: no conviertas la señal de ${invertidas[0] ? invertidas[0].nombre : "la sombra"} en otra excusa para frenar. Se corrige rápido, se avanza igual de rápido. Hoy.`,
+      `Una sola cosa, ${A}: no conviertas la señal de ${invertidas[0] ? invertidas[0].nombre : "la sombra"} en otra excusa para frenar. Se corrige rápido, se avanza igual de rápido. Hoy.`,
       `Lo único que ${A} te reclama: sigues dejando para mañana lo que estas cartas ya te dijeron hoy. Un esfuerzo pequeño y real, ahora, y el aviso se vuelve tu mayor ventaja.`
     ]);
   },
@@ -1788,6 +1828,15 @@ const TIRADAS = {
     return base.split("{Pos}").join(this.fraseDePos(posLabel) || "tu historia");
   },
 
+  /* primera frase de un texto largo: se usa en la gran tirada para que cada
+     arcángel suelte solo su voz central y se recorte el resto del párrafo */
+  primeraFrase(texto) {
+    const t = String(texto || "").trim();
+    if (!t) return "";
+    const m = t.match(/^.*?[.!?…]+(?=\s|$)/);
+    return m ? m[0].trim() : t;
+  },
+
   /* ----------------------- motor semántico ----------------------- */
 
   /* ¿esta lectura trae algún arcano mayor? */
@@ -1851,7 +1900,12 @@ const TIRADAS = {
     if (!c.especial && !c.pares.length) return "";
     const partes = [];
     if (c.especial) partes.push(`${c.especial.titulo}: ${c.especial.mensaje}`);
-    if (c.pares.length) partes.push(c.pares.slice(0, 2).map(p => `tus cartas también señalan ${p}`).join(" A la vez, "));
+    if (c.pares.length) {
+      const ps = c.pares.slice(0, 2).map(p => `Tus cartas también señalan ${p}`);
+      partes.push(ps.length > 1
+        ? ps[0] + ". Además, " + ps[1].charAt(0).toLowerCase() + ps[1].slice(1)
+        : ps[0]);
+    }
     return partes.join(" ");
   },
 
@@ -2102,11 +2156,8 @@ const TIRADAS = {
         temas: b.temas.map(t => t.tema),
         arcangel: arc,
         regano: resultado.fuerte || tenor === "sombra",
-        texto,
-        cartasHtml: (tenor === "sombra" || tenor === "mixto")
-          ? this.reganoCartaHtml(b.temas.filter(t => t.carta.invertido).map(t => t.carta))
-          : "",
-        combinacion: this.combinacionDe(b)
+        texto: this.primeraFrase(texto),
+        cartasHtml: ""
       };
     }).concat(this.haySemantica(resultado.cartas)
       ? [{
@@ -2218,7 +2269,7 @@ const TIRADAS = {
     const A = this.nombreCorto(arc.nombre);
     const regania = this.reganoDePregunta(resultado);
     const tipo = resultado.__tipoPregunta;
-    const refNombre = tipo === "persona" ? (() => { const n = this.personaDePregunta(resultado.pregunta) || "esa persona"; return n === "esa persona" ? n : n.charAt(0).toUpperCase() + n.slice(1); })() : null;
+    const refNombre = tipo === "persona" ? (() => { const n = resultado.__persona || this.personaDePregunta(resultado.pregunta) || "esa persona"; return n === "esa persona" ? n : n.charAt(0).toUpperCase() + n.slice(1); })() : null;
 
     bloques.push({
       icono: arc.emoji,
@@ -2300,7 +2351,7 @@ const TIRADAS = {
     const arc = this.arcangeles[an.clave];
     const A = this.nombreCorto(arc.nombre);
     const cartas = resultado.cartas;
-    const tipo = this.tipoDePregunta(resultado.pregunta);
+    const tipo = resultado.__tipoPregunta || this.tipoDePregunta(resultado.pregunta);
     const derechas = cartas.filter(c => !c.invertido).length;
     const sombras = cartas.length - derechas;
     const principal = cartas[0];
@@ -2308,9 +2359,14 @@ const TIRADAS = {
     const faceta = principal.invertido ? (e ? e.sombra : "una lección que te pide mirar hacia dentro") : (e ? e.luz : "un mensaje de luz y confianza");
     const lista = cartas.map(c => `${c.nombre}${c.invertido ? " invertida" : ""}`).join(", ");
     const anTema = an.titulo.toLowerCase();
+    /* Ancla cada respuesta a la pregunta exacta del consultante */
+    const q = String(resultado.pregunta || "").trim();
+    const enmarco = q
+      ? nucleo => this.capitalizarPrimera("Sobre tu pregunta \u00AB" + q + "\u00BB, " + nucleo.replace(/^\s*sobre\s+/, ""))
+      : nucleo => this.capitalizarPrimera(nucleo);
 
     if (tipo === "fallecido") {
-      const nombre = this.personaDePregunta(resultado.pregunta);
+      const nombre = resultado.__persona || this.personaDePregunta(resultado.pregunta);
       const rel = this.parentescoDePregunta(resultado.pregunta);
       const ref = (rel ? "tu " + rel : (nombre || "esa persona"));
       let nucleo;
@@ -2330,7 +2386,7 @@ const TIRADAS = {
           `sobre ${ref}, tu lectura muestra el peso que guardas: ${lista}. ${A} te dice que no necesitas soltar a esa persona, solo soltar la culpa y la pena. Ella quiere verte entero: honrarla es vivir bien tu propia vida.`
         ]);
       }
-      return this.capitalizarPrimera(nucleo);
+      return enmarco(nucleo);
     }
 
     if (tipo === "espiritus") {
@@ -2351,7 +2407,7 @@ const TIRADAS = {
           `tu lectura advierte con cartas en sombra: ${lista}. ${A} te dice que intentemos siempre la luz primero: respira hondo, enciende una vela cuando lo sientas y recupera tu centro. La claridad nunca nace del miedo.`
         ]);
       }
-      return this.capitalizarPrimera(nucleo);
+      return enmarco(nucleo);
     }
 
     if (tipo === "energias") {
@@ -2372,7 +2428,7 @@ const TIRADAS = {
           `las cartas señalan una energía densa a tu alrededor: ${lista}. ${A} no quiere que lo tomes como miedo, sino como tarea: una limpieza del espacio (orden, sal, luz, incienso) y del ánimo (descanso, música buena, lindas compañías). Vuelves a respirar.`
         ]);
       }
-      return this.capitalizarPrimera(nucleo);
+      return enmarco(nucleo);
     }
 
     if (tipo === "salud") {
@@ -2400,7 +2456,7 @@ const TIRADAS = {
           `las cartas te muestran la parte de tu salud que evitas: ${lista}. ${A} te dice que el cuerpo no se persigue con miedo, se sostiene con constancia. Empieza por una cita o un descanso real: ese es el primer paso de la sanación.`
         ]);
       }
-      return this.capitalizarPrimera(nucleo);
+      return enmarco(nucleo);
     }
 
     if (tipo === "consejo") {
@@ -2421,7 +2477,7 @@ const TIRADAS = {
           `el consejo es equilibrar: sostén lo bueno y suelta lo que pesa. ${lista} te lo muestran. ${A} te acompaña a dar un paso a la vez: las decisiones más sabias no apuran, ordenan.`
         ]);
       }
-      return this.capitalizarPrimera(nucleo);
+      return enmarco(nucleo);
     }
 
     if (tipo === "si-no") {
@@ -2432,11 +2488,11 @@ const TIRADAS = {
           : (derechas === 0
             ? `la lectura te responde NO por ahora, y no es castigo: es un “aún no” del cielo. ${lista} te muestran el revés de este tiempo. ${A} te pide frenar, soltar y cambiar el rumbo: cuando lo hagas, la puerta se abre.`
             : `la lectura es un NO por ahora: ${lista}. ${A} ve que insistes donde la energía todavía no te acompaña. No es rechazo, es orden de pasos: atiende la señal y vuelve a preguntar con el corazón liviano.`));
-      return this.capitalizarPrimera(nucleo);
+      return enmarco(nucleo);
     }
 
     if (tipo === "persona") {
-      const nombre = this.personaDePregunta(resultado.pregunta);
+      const nombre = resultado.__persona || this.personaDePregunta(resultado.pregunta);
       const l = this.normalizarTexto(resultado.pregunta);
       const ref = nombre || "esa persona";
       const romantico = /\b(amor|pareja|novio|novia|esposo|esposa|marido|me ama|me amas|me quiere|me quieres|ex|regreso|regresa|vuelve|ruptura|enamor|me engaña|infiel|cortej)\b/.test(l);
@@ -2465,7 +2521,7 @@ const TIRADAS = {
             `${ref} llega en sombras a tu consulta: ${lista}. ${A} te dice que sí hay algo que se calla, y tiene nombre, pero no es la amenaza que imaginas: es algo que ${ref} prefiere no mirar todavía. No es una acusación, es una señal: dale espacio, deja que la verdad respire y no intentes arrebatársela con presión.`
           ]);
         }
-        return this.capitalizarPrimera(nucleo);
+        return enmarco(nucleo);
       }
 
       if (sombras === 0) {
@@ -2494,20 +2550,24 @@ const TIRADAS = {
         const veredicto = sombras === 0 ? "SÍ, sin condiciones" : (sombras < derechas ? "SÍ, con una condición" : "NO por ahora");
         nucleo = `La respuesta es ${veredicto}: ${nucleo}`;
       }
-      return this.capitalizarPrimera(nucleo);
+      return enmarco(nucleo);
     }
 
     const nucleo = this.elegirDe([
       `${principal.nombre} ${principal.invertido ? "está de cabeza y te pide frenar" : "brilla del derecho"} y anuncia ${faceta}. En el contexto de ${anTema}, ${lista} dibujan tu momento. ${A} te guía: mira las señales repetidas, porque tu respuesta no llega por una sola puerta.`,
       `${principal.nombre} ${principal.invertido ? "te pide voltear la mirada" : "se pone de tu lado"} con su mensaje: ${faceta}. ${A} lo confirma en ${anTema}: lo que preguntas ya está en movimiento y ${lista} te marcan hacia dónde fijarte.`
     ]);
-    return this.capitalizarPrimera(nucleo);
+    return enmarco(nucleo);
   },
 
   /* pide a la IA del servidor la respuesta afinada a la pregunta (si la hay).
+     Envía el análisis local (tema, clave, tipo, persona) para que el servidor
+     lo combine con su propio motor NLP y construya una respuesta más precisa.
      Devuelve null cuando no hay IA disponible y se conserva la determinista. */
   async pedirReflexionIA(resultado) {
     const an = resultado.__analisis;
+    const tipo = resultado.__tipoPregunta || this.tipoDePregunta(resultado.pregunta);
+    const persona = tipo === "persona" ? (resultado.__persona || this.personaDePregunta(resultado.pregunta) || "") : "";
     const cartas = (resultado.cartas || []).map((c, i) => ({
       nombre: c.nombre,
       invertido: !!c.invertido,
@@ -2518,7 +2578,14 @@ const TIRADAS = {
       const data = await fetchJSON("/api/ia/pregunta", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pregunta: resultado.pregunta, tema: an.titulo, cartas })
+        body: JSON.stringify({
+          pregunta: resultado.pregunta,
+          tema: an.titulo,
+          temaClave: resultado.__temaClaveNLP || an.clave,
+          tipo,
+          persona,
+          cartas
+        })
       });
       if (data && data.ok && data.respuesta) return data.respuesta;
     } catch (e) { /* sin IA, se mantiene la determinista */ }
@@ -2589,7 +2656,7 @@ const TIRADAS = {
     const esSiNo = tipoPre === "si-no";
     let ref = null;
     if (tipoPre === "persona") {
-      const nombre = this.personaDePregunta(resultado.pregunta);
+      const nombre = resultado.__persona || this.personaDePregunta(resultado.pregunta);
       if (nombre) ref = nombre.charAt(0).toUpperCase() + nombre.slice(1);
       else {
         const n = this.normalizarTexto(resultado.pregunta);
@@ -2825,9 +2892,16 @@ const TIRADAS = {
 
     let arcangeles;
     if (esPregunta) {
-      const temas = this.temasEnPregunta(resultadoHTML.pregunta);
-      const tipo = this.tipoDePregunta(resultadoHTML.pregunta);
-      const analisis = temas[0] || this.analizarPregunta(resultadoHTML.pregunta);
+      const yaAnalizado = resultadoHTML.__tipoPregunta && resultadoHTML.__analisis;
+      const temas = yaAnalizado
+        ? (resultadoHTML.__temasPregunta || [])
+        : this.temasEnPregunta(resultadoHTML.pregunta);
+      const tipo = yaAnalizado
+        ? resultadoHTML.__tipoPregunta
+        : this.tipoDePregunta(resultadoHTML.pregunta);
+      const analisis = yaAnalizado
+        ? resultadoHTML.__analisis
+        : (temas[0] || this.analizarPregunta(resultadoHTML.pregunta));
       resultadoHTML.__analisis = analisis;
       resultadoHTML.__tipoPregunta = tipo;
       resultadoHTML.__temasPregunta = temas;
@@ -2861,6 +2935,13 @@ const TIRADAS = {
           <span class="pregunta-arc-texto"><strong>${this.nombreCorto(aR.nombre)}</strong><small>${resultadoHTML.__tipoPregunta === "combinado" ? `${an.titulo} · responde con ${arcangeles.length} arcángeles` : `${an.titulo} · ${aR.regencia}`}</small></span>
         </div>
       </div>`;
+      if (resultadoHTML.__keywords && resultadoHTML.__keywords.length) {
+        const senales = resultadoHTML.__keywords.map(k => `<span>${this.escapar(k)}</span>`).join("");
+        html += `<div class="pregunta-senales vidrio">
+          <span class="pregunta-etiqueta">Lo que el oráculo detectó en tu pregunta</span>
+          <div class="palabras">${senales}</div>
+        </div>`;
+      }
     }
 
     resultadoHTML.cartas.forEach((c, i) => {
@@ -2918,25 +2999,48 @@ const TIRADAS = {
           ${b.presencia ? `<p class="presencia-arc">${b.presencia}</p>` : ""}
           ${b.respuestaIA ? `<p class="respuesta-ia" id="respuesta-ia">${b.texto}</p>` : (b.texto ? `<p>${b.texto}</p>` : "")}
           ${b.cartasHtml ? `<div class="regano-cartas">${b.cartasHtml}</div>` : ""}
-          ${b.combinacion ? (b.combinacion.cartas && b.combinacion.cartas.length ? `<div class="combo-visual">
-            ${b.combinacion.cartas.map(c => this.comboCartaHtml(c)).join('<span class="combo-mas">+</span>')}
-            ${b.combinacion.cartas.length > 1 ? '<span class="combo-mas combo-igual">=</span>' : ""}
-            <span class="combo-significado">${b.combinacion.enfocada ? "" : `<b>Se unen en ${this.contextoDeCombinacion(b.combinacion.cartas)}:</b> `}${b.combinacion.texto}</span>
-            ${b.combinacion.consejo ? `<span class="combo-consejo"><b>Mi consejo:</b> ${b.combinacion.consejo}</span>` : ""}
-            ${b.combinacion.regano ? `<span class="combo-regano"><b>Mi regaño:</b> ${b.combinacion.regano}</span>` : ""}
-          </div>` : "") : ""}
+          ${b.combinacion ? `<div class="combo-visual">
+            ${b.combinacion.cartas && b.combinacion.cartas.length ? `
+              ${b.combinacion.cartas.map(c => this.comboCartaHtml(c)).join('<span class="combo-mas">+</span>')}
+              ${b.combinacion.cartas.length > 1 ? '<span class="combo-mas combo-igual">=</span>' : ""}` : ""}
+            <span class="combo-significado${b.combinacion.cartas && b.combinacion.cartas.length ? "" : " sin-cartas"}">${b.combinacion.enfocada ? "" : `<b>Se unen en ${this.contextoDeCombinacion(b.combinacion.cartas || [])}:</b> `}${b.combinacion.texto}</span>
+          </div>` : ""}
         </div>`;
       }
     });
     htmlFinal += "</div>";
 
     html += htmlFinal + `
+      <div id="horoscopo-lectura"></div>
       <div class="centrado" style="margin-top:26px">
         <button class="btn btn-dorado" id="btn-nueva-tirada">Nueva lectura</button>
         <button class="btn btn-lavanda" id="btn-guardar">Guardar esta lectura</button>
       </div>
     </div>`;
     return html;
+  },
+
+  /* Horóscopo Negro anclado a la lectura: si el signo del usuario está en
+     su perfil, se muestra aquí la sección al terminar la tirada */
+  horoscopoLectura() {
+    const zona = document.getElementById("horoscopo-lectura");
+    if (!zona) return;
+    const signo = (typeof SESION !== "undefined" && SESION.signo) || null;
+    if (!signo || typeof window.fetchHoroscopo !== "function" || typeof window.horoscopoHTML !== "function") {
+      zona.innerHTML = `<div class="horoscopo-sec" style="--hc:#d4af37">
+        <div class="horoscopo-cab">
+          <span class="horoscopo-emoji">🌑</span>
+          <span class="horoscopo-titulo">Horóscopo Negro</span>
+          <span class="horoscopo-premium">PREMIUM ✦</span>
+        </div>
+        <p style="font-size:.92rem;line-height:1.6">Tu Horóscopo Negro viaja contigo en cada lectura: completa tu <b>fecha de nacimiento</b> en tu perfil para que el arcángel de tu signo te acompañe aquí también.</p>
+        <a class="btn btn-dorado" href="/perfil.html" style="margin-top:12px">Completar mi perfil ✦</a>
+      </div>`;
+      return;
+    }
+    fetchHoroscopo(signo.signo)
+      .then(d => { if (zona) zona.innerHTML = horoscopoHTML(d) || ""; })
+      .catch(() => {}); /* silencioso: la lectura ya está completa */
   },
 
   /* ============================ carta astral ============================== */
@@ -3023,40 +3127,537 @@ const TIRADAS = {
     return this.fasesLunares[0];
   },
 
+  /* ====================== motor de la carta astral real ==================== */
+  /* Cálculos astronómicos reales (astronomy-engine) para la rueda astral:
+     posiciones geocéntricas aparentes de los 10 cuerpos, retrógrados,
+     ascendente (ecuatorial → eclíptica), casas iguales y fase lunar. */
+
+  adjetivoElemento: {
+    Fuego: "apasionado y veloz", Tierra: "estable, sensorial y de raíces",
+    Aire: "racional, ligero y curioso", Agua: "profundo, cambiante y muy intuitivo"
+  },
+
+  glifosPlaneta: {
+    sol: "☉", luna: "☽", mercurio: "☿", venus: "♀", marte: "♂",
+    jupiter: "♃", saturno: "♄", urano: "♅", neptuno: "♆", pluton: "♇"
+  },
+
+  ordenPlanetas: ["sol", "luna", "mercurio", "venus", "marte", "jupiter", "saturno", "urano", "neptuno", "pluton"],
+
+  nombresPlanetas: {
+    sol: "Sol", luna: "Luna", mercurio: "Mercurio", venus: "Venus", marte: "Marte",
+    jupiter: "Júpiter", saturno: "Saturno", urano: "Urano", neptuno: "Neptuno", pluton: "Plutón"
+  },
+
+  lecturaPorPlaneta: {
+    sol: s => `Tu Sol marca tu esencia y tu vitalidad: ${s.rasgos[0].toLowerCase()} y tu luz es ${s.luz.toLowerCase()}.`,
+    luna: s => `Tu Luna rige tus emociones y tu memoria del alma: tu sentir es de ${s.elemento.toLowerCase()}, ${TIRADAS.adjetivoElemento[s.elemento].toLowerCase()}.`,
+    mercurio: s => `Tu Mercurio dibuja tu mente y tu palabra: procesas de forma ${s.modalidad.toLowerCase()} y tu curiosidad se enciende con ${s.elemento.toLowerCase()}.`,
+    venus: s => `Tu Venus rige tus gustos, tu belleza y cómo amas: aprecias lo ${TIRADAS.adjetivoElemento[s.elemento].toLowerCase()} y amas cuando hay armonía real, no apariencias.`,
+    marte: s => `Tu Marte enciende tu acción y tu deseo: actúas con impulsos ${TIRADAS.adjetivoElemento[s.elemento].toLowerCase()} y te mueves de forma ${s.modalidad.toLowerCase()}.`,
+    jupiter: s => `Tu Júpiter rige tu fe y tu abundancia: tu suerte crece cuando ${s.luz.toLowerCase()}.`,
+    saturno: s => `Tu Saturno marca tu disciplina y tu responsabilidad: tu madurez se afianza de forma ${s.modalidad.toLowerCase()} y sostiene todo lo que amas.`,
+    urano: s => `Tu Urano rige tu originalidad y tu libertad: piensas ${TIRADAS.adjetivoElemento[s.elemento].toLowerCase()} y cambias de rumbo de forma ${s.modalidad.toLowerCase()}.`,
+    neptuno: s => `Tu Neptuno rige tus sueños y tu espiritualidad: tu intuición es de ${s.elemento.toLowerCase()}, ${TIRADAS.adjetivoElemento[s.elemento].toLowerCase()}, y percibe más allá de lo visible.`,
+    pluton: s => `Tu Plutón marca tu poder de transformación: renaces de forma ${s.modalidad.toLowerCase()} y tu verdad tiene raíz de ${s.elemento.toLowerCase()}.`
+  },
+
+  gustosPorSigno: {
+    Aries: ["aventura", "retos nuevos", "deporte", "fuego en la cocina", "velocidad"],
+    Tauro: ["buena comida", "música suave", "comodidad", "naturaleza", "perfumes"],
+    "Géminis": ["conversar", "aprender de todo", "libros", "viajes cortos", "juegos de palabras"],
+    Cáncer: ["cocina de casa", "familia", "mar", "recuerdos", "música que llegue al alma"],
+    Leo: ["crear", "brillar", "fiestas", "arte", "reconocimiento"],
+    Virgo: ["orden", "detalles", "té y rituales", "leer bien las cosas", "cuidar la salud"],
+    Libra: ["arte", "armonía", "belleza", "diplomacia", "baile"],
+    Escorpio: ["misterio", "música profunda", "secretos", "poder interior", "noches de luna"],
+    Sagitario: ["viajar", "aprender", "filosofía", "naturaleza grande", "horizontes nuevos"],
+    Capricornio: ["planes", "tradición", "montañas", "solidez", "silencios con propósito"],
+    Acuario: ["ideas nuevas", "tecnología", "amistades", "futuro", "causas justas"],
+    Piscis: ["arte", "soñar", "agua", "música", "ayudar a otros"]
+  },
+
+  normDeg(g) { return ((Number(g) % 360) + 360) % 360; },
+
+  redondear(x, n = 1) { const p = Math.pow(10, n); return Math.round(Number(x) * p) / p; },
+
+  signoDeGrado(grados) {
+    const i = (Math.floor(this.normDeg(grados) / 30) % 12 + 12) % 12;
+    return this.signosAstrales[i];
+  },
+
+  astronomiaDisponible() { return typeof Astronomy !== "undefined" && typeof Astronomy.MakeTime === "function"; },
+
+  planetaCuerpo(clave) {
+    const m = { sol: "Sun", luna: "Moon", mercurio: "Mercury", venus: "Venus", marte: "Mars",
+      jupiter: "Jupiter", saturno: "Saturn", urano: "Uranus", neptuno: "Neptune", pluton: "Pluto" };
+    return m[clave] ? Astronomy.Body[m[clave]] : null;
+  },
+
+  lonDeCuerpo(clave, tiempo) {
+    if (clave === "sol") return this.normDeg(Astronomy.SunPosition(tiempo).elon);
+    if (clave === "luna") return this.normDeg(Astronomy.EclipticGeoMoon(tiempo).lon);
+    return this.normDeg(Astronomy.Ecliptic(Astronomy.GeoVector(this.planetaCuerpo(clave), tiempo, true)).elon);
+  },
+
+  desfaseTZ(iana, msUTC) {
+    try {
+      const dtf = new Intl.DateTimeFormat("en-US", {
+        timeZone: iana, hour12: false, year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit", second: "2-digit"
+      });
+      const p = {};
+      dtf.formatToParts(new Date(msUTC)).forEach(x => { p[x.type] = x.value; });
+      const local = Date.UTC(Number(p.year), Number(p.month) - 1, Number(p.day), Number(p.hour) % 24, Number(p.minute), Number(p.second));
+      return Math.round((local - msUTC) / 60000);
+    } catch { return 0; }
+  },
+
+  nacimientoUTC(fecha, hora, tz) {
+    const [y, m, d] = String(fecha || "").split("-").map(Number);
+    let hh = 12, mm = 0;
+    if (hora) { const p = String(hora).split(":"); hh = Number(p[0]); mm = Number(p[1] || 0); }
+    let ms = Date.UTC(y, m - 1, d, hh, mm);
+    if (!tz || tz === "UTC") return ms;
+    const off1 = this.desfaseTZ(tz, ms);
+    let ms2 = Date.UTC(y, m - 1, d, hh, mm) - off1 * 60000;
+    const off2 = this.desfaseTZ(tz, ms2);
+    if (off2 !== off1) ms2 = Date.UTC(y, m - 1, d, hh, mm) - off2 * 60000;
+    return ms2;
+  },
+
+  oblicuidadEcliptica(tiempo) {
+    const T = tiempo.tt / 36525;
+    return (23 + 26 / 60 + 21.448 / 3600) - (46.815 * T + 0.00059 * T * T - 0.001813 * T * T * T) / 3600;
+  },
+
+  gradosA(g) { return (Number(g) % 30 + 30) % 30; },
+
+  gradoTexto(g) { const r = this.redondear(this.gradosA(g), 0); return `${r}°`; },
+
+  calculoAstral(fecha, hora, lugar) {
+    const cal = { fecha, hora, lugar, offline: !this.astronomiaDisponible() };
+    if (cal.offline) return cal;
+
+    const sitio = this.ubicarLugar(lugar);
+    if (sitio) { cal.lugarNombre = sitio.nombre; cal.tz = sitio.tz; cal.lat = sitio.lat; cal.lon = sitio.lon; }
+    else if (lugar) cal.lugarNoEncontrado = String(lugar).trim();
+
+    const ms = this.nacimientoUTC(fecha, hora, sitio ? sitio.tz : "UTC");
+    if (!Number.isFinite(ms)) return cal;
+    cal.ms = ms;
+    const t0 = Astronomy.MakeTime(new Date(ms));
+
+    cal.sol = { lon: this.lonDeCuerpo("sol", t0) };
+
+    const planetas = this.ordenPlanetas.map(clave => {
+      const lon = this.lonDeCuerpo(clave, t0);
+      const signo = this.signoDeGrado(lon);
+      let retro = false;
+      if (clave !== "sol" && clave !== "luna") {
+        const dia = 7 * 86400000;
+        const lp = this.lonDeCuerpo(clave, Astronomy.MakeTime(new Date(ms + dia)));
+        const lm = this.lonDeCuerpo(clave, Astronomy.MakeTime(new Date(ms - dia)));
+        retro = ((lp - lm + 180 + 360) % 360) - 180 < 0;
+      }
+      return { clave, nombre: this.nombresPlanetas[clave], glifo: this.glifosPlaneta[clave], lon, signo, grado: this.gradosA(lon), retro };
+    });
+    cal.planetas = planetas;
+    cal.solPlaneta = planetas[0];
+    cal.lunaPlaneta = planetas[1];
+
+    /* fase lunar exacta desde la elongación Sol–Luna */
+    const elong = this.normDeg(planetas[1].lon - planetas[0].lon);
+    const edadDias = elong / 360 * 29.530588853;
+    cal.fase = this.fasesLunares.find(f => edadDias < f.h) || this.fasesLunares[0];
+
+    /* ascendente, medio cielo y casas iguales: piden hora y lugar exactos */
+    if (sitio && hora) {
+      const ramc = this.normDeg(Astronomy.SiderealTime(t0) * 15 + sitio.lon);
+      const eps = this.oblicuidadEcliptica(t0) * Math.PI / 180;
+      const R = Math.PI / 180;
+      const sinR = Math.sin(ramc * R), cosR = Math.cos(ramc * R), tanF = Math.tan(sitio.lat * R);
+      const mc = this.normDeg(Math.atan2(sinR, cosR * Math.cos(eps)) / R);
+      const asc = this.normDeg(Math.atan2(cosR, -(sinR * Math.cos(eps) + tanF * Math.sin(eps))) / R);
+      cal.asc = asc;
+      cal.mc = mc;
+      cal.ascSigno = this.signoDeGrado(asc);
+      cal.mcSigno = this.signoDeGrado(mc);
+      cal.casas = [];
+      for (let i = 1; i <= 12; i++) {
+        const c = this.normDeg(asc + (i - 1) * 30);
+        cal.casas.push({ num: i, lon: c, signo: this.signoDeGrado(c) });
+      }
+      planetas.forEach(p => {
+        p.casa = ((Math.floor(this.normDeg(p.lon - asc) / 30)) % 12 + 12) % 12 + 1;
+      });
+    }
+    return cal;
+  },
+
+  /* librería de ciudades → (zona horaria, latitud, longitud) para el ascendente */
+  CIUDADES_ASTRALES: {
+    "quito, ecuador": "America/Guayaquil|-0.1807|-78.4678",
+    "guayaquil, ecuador": "America/Guayaquil|-2.19|-79.8878",
+    "cuenca, ecuador": "America/Guayaquil|-2.9006|-79.0045",
+    "santiago, chile": "America/Santiago|-33.4489|-70.6693",
+    "santiago de chile": "America/Santiago|-33.4489|-70.6693",
+    "valparaiso, chile": "America/Santiago|-33.0472|-71.6126",
+    "buenos aires": "America/Argentina/Buenos_Aires|-34.6037|-58.3816",
+    "cordoba, argentina": "America/Argentina/Cordoba|-31.4201|-64.1888",
+    "rosario, argentina": "America/Argentina/Cordoba|-32.9468|-60.6393",
+    "mendoza, argentina": "America/Argentina/Mendoza|-32.8895|-68.8458",
+    "montevideo": "America/Montevideo|-34.9011|-56.1645",
+    "lima, peru": "America/Lima|-12.0464|-77.0428",
+    "bogota": "America/Bogota|4.711|-74.0721",
+    "medellin": "America/Bogota|6.2442|-75.5812",
+    "cali, colombia": "America/Bogota|3.4516|-76.532",
+    "barranquilla": "America/Bogota|10.9685|-74.7813",
+    "ciudad de mexico": "America/Mexico_City|19.4326|-99.1332",
+    "mexico": "America/Mexico_City|19.4326|-99.1332",
+    "guadalajara, mexico": "America/Mexico_City|20.6597|-103.3496",
+    "monterrey, mexico": "America/Monterrey|25.6866|-100.3161",
+    "caracas": "America/Caracas|10.4806|-66.9036",
+    "la paz, bolivia": "America/La_Paz|-16.4897|-68.1193",
+    "santa cruz de la sierra": "America/La_Paz|-17.7833|-63.1821",
+    "asuncion": "America/Asuncion|-25.2637|-57.5759",
+    "san josé, costa rica": "America/Costa_Rica|9.9281|-84.0907",
+    "ciudad de panama": "America/Panama|8.9824|-79.5199",
+    "panama": "America/Panama|8.9824|-79.5199",
+    "san salvador": "America/El_Salvador|13.6929|-89.2182",
+    "ciudad de guatemala": "America/Guatemala|14.6349|-90.5069",
+    "tegucigalpa": "America/Tegucigalpa|14.0723|-87.1921",
+    "managua": "America/Managua|12.1149|-86.2362",
+    "santo domingo": "America/Santo_Domingo|18.4861|-69.9312",
+    "la habana": "America/Havana|23.1136|-82.3666",
+    "san juan, puerto rico": "America/Puerto_Rico|18.4655|-66.1057",
+    "santiago de cuba": "America/Havana|20.0247|-75.8215",
+    "são paulo": "America/Sao_Paulo|-23.5505|-46.6333",
+    "sao paulo": "America/Sao_Paulo|-23.5505|-46.6333",
+    "rio de janeiro": "America/Sao_Paulo|-22.9068|-43.1729",
+    "brasilia": "America/Sao_Paulo|-15.8267|-47.9218",
+    "salvador, brasil": "America/Bahia|-12.9777|-38.5016",
+    "recife": "America/Recife|-8.0476|-34.877",
+    "fortaleza": "America/Fortaleza|-3.7319|-38.5267",
+    "belo horizonte": "America/Sao_Paulo|-19.9167|-43.9345",
+    "curitiba": "America/Sao_Paulo|-25.4284|-49.2733",
+    "manaus": "America/Manaus|-3.1190|-60.0217",
+    "nueva york": "America/New_York|40.7128|-74.0060",
+    "new york": "America/New_York|40.7128|-74.0060",
+    "los angeles": "America/Los_Angeles|34.0522|-118.2437",
+    "los angeles, estados unidos": "America/Los_Angeles|34.0522|-118.2437",
+    "chicago": "America/Chicago|41.8781|-87.6298",
+    "houston": "America/Chicago|29.7604|-95.3698",
+    "miami": "America/New_York|25.7617|-80.1918",
+    "dallas": "America/Chicago|32.7767|-96.7970",
+    "phoenix": "America/Phoenix|33.4484|-112.0740",
+    "denver": "America/Denver|39.7392|-104.9903",
+    "seattle": "America/Los_Angeles|47.6062|-122.3321",
+    "san francisco": "America/Los_Angeles|37.7749|-122.4194",
+    "atlanta": "America/New_York|33.7490|-84.3880",
+    "boston": "America/New_York|42.3601|-71.0589",
+    "washington": "America/New_York|38.9072|-77.0369",
+    "detroit": "America/Detroit|42.3314|-83.0458",
+    "las vegas": "America/Los_Angeles|36.1699|-115.1398",
+    "portland": "America/Los_Angeles|45.5152|-122.6784",
+    "vancouver": "America/Vancouver|49.2827|-123.1207",
+    "toronto": "America/Toronto|43.6532|-79.3832",
+    "montreal": "America/Toronto|45.5017|-73.5673",
+    "ottawa": "America/Toronto|45.4215|-75.6972",
+    "hawaii": "Pacific/Honolulu|21.3069|-157.8583",
+    "honolulu": "Pacific/Honolulu|21.3069|-157.8583",
+    "anchorage": "America/Anchorage|61.2181|-149.9003",
+    "madrid": "Europe/Madrid|40.4168|-3.7038",
+    "barcelona": "Europe/Madrid|41.3874|2.1686",
+    "valencia, españa": "Europe/Madrid|39.4699|-0.3763",
+    "sevilla": "Europe/Madrid|37.3891|-5.9845",
+    "bilbao": "Europe/Madrid|43.2630|-2.9350",
+    "zaragoza": "Europe/Madrid|41.6488|-0.8891",
+    "malaga": "Europe/Madrid|36.7213|-4.4214",
+    "londres": "Europe/London|51.5074|-0.1278",
+    "london": "Europe/London|51.5074|-0.1278",
+    "paris": "Europe/Paris|48.8566|2.3522",
+    "berlin": "Europe/Berlin|52.5200|13.4050",
+    "munich": "Europe/Berlin|48.1351|11.5820",
+    "roma": "Europe/Rome|41.9028|12.4964",
+    "milan": "Europe/Rome|45.4642|9.1900",
+    "lisboa": "Europe/Lisbon|38.7223|-9.1393",
+    "oporto": "Europe/Lisbon|41.1579|-8.6291",
+    "amsterdam": "Europe/Amsterdam|52.3676|4.9041",
+    "bruselas": "Europe/Brussels|50.8503|4.3517",
+    "viena": "Europe/Vienna|48.2082|16.3738",
+    "zurich": "Europe/Zurich|47.3769|8.5417",
+    "estocolmo": "Europe/Stockholm|59.3293|18.0686",
+    "copenhague": "Europe/Copenhagen|55.6761|12.5683",
+    "dublin": "Europe/Dublin|53.3498|-6.2603",
+    "praga": "Europe/Prague|50.0755|14.4378",
+    "budapest": "Europe/Budapest|47.4979|19.0402",
+    "atenas": "Europe/Athens|37.9838|23.7275",
+    "helsinki": "Europe/Helsinki|60.1699|24.9384",
+    "estambul": "Europe/Istanbul|41.0082|28.9784",
+    "moscu": "Europe/Moscow|55.7558|37.6173",
+    "el cairo": "Africa/Cairo|30.0444|31.2357",
+    "lagos": "Africa/Lagos|6.5244|3.3792",
+    "casablanca": "Africa/Casablanca|33.5731|-7.5898",
+    "nairobi": "Africa/Nairobi|-1.2921|36.8219",
+    "johannesburgo": "Africa/Johannesburg|-26.2041|28.0473",
+    "tel aviv": "Asia/Jerusalem|32.0853|34.7818",
+    "dubai": "Asia/Dubai|25.2048|55.2708",
+    "riyad": "Asia/Riyadh|24.7136|46.6753",
+    "mumbai": "Asia/Kolkata|19.0760|72.8777",
+    "nueva delhi": "Asia/Kolkata|28.6139|77.2090",
+    "karachi": "Asia/Karachi|24.8607|67.0011",
+    "bangkok": "Asia/Bangkok|13.7563|100.5018",
+    "singapur": "Asia/Singapore|1.3521|103.8198",
+    "yakarta": "Asia/Jakarta|-6.2088|106.8456",
+    "manila": "Asia/Manila|14.5995|120.9842",
+    "hong kong": "Asia/Hong_Kong|22.3193|114.1694",
+    "shanghai": "Asia/Shanghai|31.2304|121.4737",
+    "pekin": "Asia/Shanghai|39.9042|116.4074",
+    "tokyo": "Asia/Tokyo|35.6762|139.6503",
+    "seul": "Asia/Seoul|37.5665|126.9780",
+    "sydney": "Australia/Sydney|-33.8688|151.2093",
+    "melbourne": "Australia/Melbourne|-37.8136|144.9631",
+    "auckland": "Pacific/Auckland|-36.8509|174.7645"
+  },
+
+  ubicarLugar(lugar) {
+    if (!lugar) return null;
+    const l = String(lugar).trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (!l) return null;
+    let mejor = null;
+    for (const k of Object.keys(this.CIUDADES_ASTRALES)) {
+      if (l.includes(k) && (!mejor || k.length > mejor.k.length)) mejor = { k, v: this.CIUDADES_ASTRALES[k] };
+    }
+    if (!mejor) return null;
+    const [tz, lat, lon] = mejor.v.split("|");
+    return { nombre: mejor.k, tz, lat: Number(lat), lon: Number(lon) };
+  },
+
+  anguloCard(nombre, glifo, signoObj, lon, texto, clave) {
+    return `<div class="angulo-tarjeta${clave ? " angulo-clave" : ""}">
+      <span class="angulo-glifo">${glifo}</span>
+      <span class="angulo-nombre">${nombre}</span>
+      <span class="angulo-signo">${signoObj.emoji} ${signoObj.signo} · ${this.gradoTexto(lon)}</span>
+      <p>${texto}</p>
+    </div>`;
+  },
+
+  /* rueda astral SVG: signos por elemento, casas, ejes Asc-Dsc y MC-IC, planetas */
+  ruedaAstralHTML(cal) {
+    if (!cal || !cal.planetas) return "";
+    const cx = 310, cy = 310, RAD = Math.PI / 180;
+    const R1 = 288, R2 = 206, R3 = 156, RP = 183;
+    const colores = { Fuego: "#ff8a6b", Tierra: "#8fd48f", Aire: "#8fd0e8", Agua: "#b39dfa" };
+    const pt = (r, a) => { const t = a * RAD; return [cx + r * Math.cos(t), cy - r * Math.sin(t)]; };
+    const sector = (a0, a1, rA, rB) => {
+      const [x1, y1] = pt(rB, a0), [x2, y2] = pt(rB, a1), [x3, y3] = pt(rA, a1), [x4, y4] = pt(rA, a0);
+      return `M${x1},${y1} A${rB},${rB} 0 ${(a1 - a0) > 180 ? 1 : 0} 1 ${x2},${y2} L${x3},${y3} A${rA},${rA} 0 ${(a1 - a0) > 180 ? 1 : 0} 0 ${x4},${y4} Z`;
+    };
+    const usarCasas = cal.asc != null && Array.isArray(cal.casas);
+
+    let s = `<svg viewBox="0 0 620 620" class="rueda-astral" role="img" aria-label="Rueda de la carta astral" style="width:100%;max-width:560px;display:block;margin:0 auto">
+      <defs>
+        <radialGradient id="ruedaFondo" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="rgba(28,24,60,0.9)"/>
+          <stop offset="100%" stop-color="rgba(12,10,28,0.95)"/>
+        </radialGradient>
+        <radialGradient id="ruedaCentroGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="rgba(233,206,143,0.3)"/>
+          <stop offset="100%" stop-color="rgba(233,206,143,0)"/>
+        </radialGradient>
+      </defs>
+      <circle cx="${cx}" cy="${cy}" r="${R1 + 14}" fill="url(#ruedaFondo)" stroke="rgba(233,206,143,0.4)"/>
+      <circle cx="${cx}" cy="${cy}" r="300" fill="none" class="rueda-giro" stroke="rgba(233,206,143,0.55)" stroke-width="2.2" stroke-dasharray="3 12" stroke-linecap="round"/>`;
+
+    /* anillo de signos: solo el color sagrado de su elemento, sin letreros */
+    for (let i = 0; i < 12; i++) {
+      const sg = this.signosAstrales[i];
+      const a0 = i * 30, col = colores[sg.elemento];
+      s += `<path d="${sector(a0, a0 + 30, R2, R1)}" fill="${col}" opacity="0.18" stroke="rgba(233,206,143,0.28)" stroke-width="1"/>`;
+    }
+
+    /* anillo de casas */
+    if (usarCasas) {
+      for (let i = 0; i < 12; i++) {
+        const a0 = this.normDeg(cal.asc + i * 30);
+        if (i % 2 === 0) s += `<path d="${sector(a0, a0 + 30, R3, R2)}" fill="rgba(255,255,255,0.07)"/>`;
+        const [p1, p2] = [pt(R2, a0), pt(R3, a0)];
+        s += `<line x1="${p1[0]}" y1="${p1[1]}" x2="${p2[0]}" y2="${p2[1]}" stroke="rgba(233,206,143,0.45)" stroke-width="1"/>`;
+        const [nx, ny] = pt(148, a0 + 12);
+        s += `<text x="${nx}" y="${ny}" text-anchor="middle" font-size="13" fill="#d9c07a" font-family="Verdana,sans-serif">${i + 1}</text>`;
+      }
+    }
+
+    /* ejes sagrados: horizonte (Asc y Desc) y meridiano (MC e IC) */
+    if (usarCasas) {
+      const marcador = (a, txt, col, principal) => {
+        const [x1, y1] = pt(126, a);
+        const [x2, y2] = pt(292, a);
+        s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="rueda-eje" stroke="${col}" stroke-width="5" opacity="0.16" stroke-linecap="round"/>`;
+        s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="2" opacity="0.95" stroke-linecap="round"/>`;
+        const [mx, my] = pt(294, a);
+        s += `<circle cx="${mx}" cy="${my}" r="3.6" fill="${col}"/>`;
+        const [tx, ty] = pt(principal ? 248 : 240, a);
+        if (principal) {
+          s += `<text x="${tx}" y="${ty}" text-anchor="middle" font-weight="700" font-size="18" fill="${col}" class="rueda-eje-label clave">${txt}</text>`;
+        } else {
+          s += `<text x="${tx}" y="${ty}" text-anchor="middle" font-size="13.5" fill="${col}" class="rueda-eje-label">${txt}</text>`;
+        }
+      };
+      marcador(cal.asc, "Asc", "#7ee8c8", true);
+      marcador(this.normDeg(cal.asc + 180), "Desc", "#ffd9a8", true);
+      marcador(cal.mc, "MC", "#ff9e6d", false);
+      marcador(this.normDeg(cal.mc + 180), "IC", "#c7b3ff", false);
+    }
+
+    /* planetas */
+    for (const p of cal.planetas) {
+      const a = this.normDeg(p.lon);
+      const [px, py] = pt(RP, a);
+      s += `<g transform="translate(${px},${py})">
+        <circle r="15" fill="rgba(20,17,48,0.92)" stroke="#e9ce8f" stroke-width="1.2"/>
+        <text y="5" text-anchor="middle" font-size="18" fill="#f7edd1">${p.glifo}</text>
+      </g>`;
+      if (p.retro) {
+        s += `<text x="${px + 10}" y="${py - 10}" text-anchor="middle" font-size="11" fill="#ff9e6d" font-family="Verdana,sans-serif">℞</text>`;
+      }
+    }
+
+    /* centro con halo respirante */
+    s += `<circle cx="${cx}" cy="${cy}" r="120" fill="rgba(10,9,24,0.68)" stroke="rgba(233,206,143,0.35)"/>
+      <circle cx="${cx}" cy="${cy}" r="120" fill="url(#ruedaCentroGlow)"/>
+      <circle cx="${cx}" cy="${cy}" r="138" fill="none" stroke="rgba(233,206,143,0.55)" stroke-width="1.4" class="rueda-pulso"/>
+      <text x="${cx}" y="${cy - 9}" text-anchor="middle" font-size="18" fill="#f4e9c9" font-family="Georgia,serif" style="letter-spacing:.05em">Tu cielo</text>
+      <text x="${cx}" y="${cy + 15}" text-anchor="middle" font-size="18" fill="#f4e9c9" font-family="Georgia,serif" style="letter-spacing:.05em">al nacer</text>`;
+    if (cal.lugarNombre) {
+      s += `<text x="${cx}" y="${cy + 40}" text-anchor="middle" font-size="13" fill="#c9b6ea" font-family="Verdana,sans-serif">${this.escapar(cal.lugarNombre)}</text>`;
+    }
+
+    s += `</svg>`;
+    const chispas = Array.from({ length: 9 }, (_, i) =>
+      `<span class="luz-astral" style="--lx:${(8 + Math.random() * 84).toFixed(1)}%;--ly:${(10 + Math.random() * 80).toFixed(1)}%;--ld:${(Math.random() * 5).toFixed(1)}s;--ll:${(2.2 + Math.random() * 2.6).toFixed(2)}s"></span>`).join("");
+    return `<div class="rueda-escena">${s}${chispas}</div>`;
+  },
+
   armarCartaAstral(datos) {
-    const s = this.signoDe(datos.fecha);
-    const fase = this.faseLunarDe(datos.fecha);
+    const cal = this.calculoAstral(datos.fecha, datos.hora, datos.lugar);
+    const s = (cal.solPlaneta && cal.solPlaneta.signo) || this.signoDe(datos.fecha);
+    const fase = cal.fase || { ...(this.faseLunarDe(datos.fecha) || {}) };
     const arc = this.arcangeles[s.arcangel];
-    const lugar = datos.lugar ? `<p style="margin-top:12px">Naciste en ${this.escapar(datos.lugar)}.</p>` : "";
     const rasgos = s.rasgos.map(r => `<div class="tarjeta" style="padding:16px;text-align:center"><p style="color:var(--lavanda-suave)">${r}</p></div>`).join("");
-    let html = '<div class="resultado">';
-    html += '<div class="resultado-cabecera"><div class="deco">🪐</div><p>Tu carta astral · perfil personalizado</p></div>';
+    const gustos = (this.gustosPorSigno[s.signo] || []).map(g => `<span class="chip-gusto">${g}</span>`).join("");
+    const tieneCasas = !!cal.casas;
+    const solP = cal.solPlaneta;
+    const lunaP = cal.lunaPlaneta;
+
+    let html = '<div class="resultado astral-resultado">';
+    html += '<div class="resultado-cabecera"><div class="deco">🪐</div><p>Tu carta astral · mediciones reales de tu cielo</p></div>';
     html += `<div class="contexto-tirada vidrio">
       <h3 style="color:var(--dorado);margin-bottom:10px">Interpretación Angelical · Carta Astral</h3>
-      <p class="comparte"><small>✨ Galería de tu cielo al nacer, guiada por tu arcángel ✨</small></p>
+      <p class="comparte"><small>✨ La rueda de tu nacimiento, los 10 cuerpos celestes y tu arcángel ✨</small></p>
     </div>`;
+
+    /* sol */
     html += `<div class="carta-grande vidrio" style="--arc-color:${arc.color};animation-delay:.25s">
       <div class="carta-texto" style="flex:1">
-        <h4>Tu sol</h4>
+        <h4>Tu sol · ${solP ? this.gradoTexto(solP.lon) : ""}</h4>
         <h3>${s.signo} <span style="font-size:1.4rem">${s.emoji}</span></h3>
         <div class="palabras"><span>${s.elemento}</span><span>${s.modalidad}</span><span>Regente: ${s.planeta}</span></div>
         <p class="interp">Tu esencia de ${s.elemento.toLowerCase()} te regala ${s.luz}. Tu reto de alma es ${s.reto}.</p>
       </div>
     </div>`;
+
+    /* rueda */
+    if (cal.planetas) {
+      html += `<section class="astral-seccion vidrio">
+        <span class="etiqueta-seccion">La rueda de tu cielo</span>
+        <h2 class="astral-titulo">Tu carta en círculo</h2>
+        <p class="astral-instruccion">Posición real de tus planetas al nacer${tieneCasas ? ", con tus casas y los ejes Ascendente-Descendente (horizonte) y Medio Cielo-Fondo del Cielo" : ""}.</p>
+        ${this.ruedaAstralHTML(cal)}
+      </section>`;
+    }
+
+    /* fase lunar + signo lunar */
     html += `<div class="mensaje-final-seccion-nueva" style="margin-top:18px">
-      <h2 style="font-size:1.35rem">Tu fase lunar · ${fase.ico} ${fase.nombre}</h2>
-      <p>${fase.texto}</p>
-      ${lugar}
+      <h2 class="astral-titulo">Tu fase lunar · ${fase.ico} ${fase.nombre}</h2>
+      ${lunaP ? `<p style="margin-top:6px"><b>Tu Luna está en ${lunaP.signo.signo} ${lunaP.signo.emoji} (${this.gradoTexto(lunaP.lon)})</b> · ${lunaP.retro ? "retrógrada " : ""}${this.lecturaPorPlaneta.luna(lunaP.signo)}</p>` : ""}
+      <p style="margin-top:10px">${fase.texto}</p>
+      ${datos.lugar ? `<p style="margin-top:12px">Naciste en ${this.escapar(datos.lugar)}.</p>` : ""}
     </div>`;
+
+    /* mediciones: los 10 planetas */
+    if (cal.planetas) {
+      const filas = cal.planetas.map(p => {
+        const signo = p.signo;
+        const casa = p.casa ? ` · casa ${p.casa}` : "";
+        return `<div class="medir-planeta">
+          <div class="mp-glifo" style="--cp:${p.retro ? "#ff9e6d" : "#e9ce8f"}">${p.glifo}</div>
+          <div class="mp-cuerpo">
+            <b>${p.nombre} <span class="mp-signo">${signo.emoji} ${signo.signo} ${this.gradoTexto(p.lon)}${p.retro ? ' <i class="mp-retro">retrógrado</i>' : ""}</span>${casa}</b>
+            <p class="mp-frase">${this.lecturaPorPlaneta[p.clave](signo)}</p>
+          </div>
+        </div>`;
+      }).join("");
+      html += `<section class="astral-seccion vidrio">
+        <span class="etiqueta-seccion">Tus mediciones celestes</span>
+        <h2 class="astral-titulo">Los 10 planetas de tu nacimiento</h2>
+        <div class="medir-lista">${filas}</div>
+      </section>`;
+    }
+
+    /* cuatro ángulos sagrados + casas */
+    if (tieneCasas) {
+      const desc = this.normDeg(cal.asc + 180);
+      const ic = this.normDeg(cal.mc + 180);
+      const chips = cal.casas.map(c => `<span class="chip-casa">${c.num}. ${c.signo.emoji} ${c.signo.signo}</span>`).join("");
+      const angulos =
+        this.anguloCard("Ascendente", "🌅", cal.ascSigno, cal.asc,
+          "Tu sello ante el mundo: la energía que proyectas al llegar, tu carisma y cómo comienzas cada cosa.", true) +
+        this.anguloCard("Descendente", "🌇", this.signoDeGrado(desc), desc,
+          "Tu espejo en los demás: las alianzas, parejas y personas que atraes, y el trato que ofreces a los otros.", true) +
+        this.anguloCard("Medio Cielo", "✦", cal.mcSigno, cal.mc,
+          "Tu vocación y tu lugar en el mundo: la cima a la que te llama tu oficio, tu reconocimiento y tu legado.", false) +
+        this.anguloCard("Fondo del Cielo", "🏡", this.signoDeGrado(ic), ic,
+          "Tu raíz privada: el hogar, la familia y el santuario emocional del que vienes y al que siempre vuelves.", false);
+      html += `<section class="astral-seccion vidrio astral-angulos">
+        <span class="etiqueta-seccion">El marco sagrado de tu vida</span>
+        <h2 class="astral-titulo">Tus cuatro ángulos</h2>
+        <p class="astral-instruccion">Ascendente y Descendente forman el eje del horizonte en tu rueda: lo que das al mundo y lo que atraes. El Medio Cielo y su fondo trazan tu vocación y tu raíz. <b>Tu Ascendente en ${cal.ascSigno.signo}</b> es tu puerta de entrada al mundo.</p>
+        <div class="carta-angulos">${angulos}</div>
+        <h3 class="astral-sub-titulo">Las 12 casas de tu cielo</h3>
+        <p class="astral-instruccion">Cada casa guarda un escenario de tu vida: la 1ª tu persona, la 7ª tus uniones, la 10ª tu vocación… y tus planetas las habitan.</p>
+        <div class="chips-casas">${chips}</div>
+      </section>`;
+    } else if (!cal.offline && !cal.lugarNoEncontrado) {
+      html += `<div class="astral-aviso vidrio" style="margin-top:18px">
+        <p><b>Faltan datos para tu ascendente y tus casas.</b> Añade tu <b>hora exacta</b> de nacimiento y un <b>lugar reconocido</b> (ej.: Quito, Ecuador) y la rueda girará con tus casas, tu ascendente y la casa de cada planeta.</p>
+      </div>`;
+    } else if (cal.lugarNoEncontrado) {
+      html += `<div class="astral-aviso vidrio" style="margin-top:18px">
+        <p><b>No encontré «${this.escapar(cal.lugarNoEncontrado)}».</b> Escribe una ciudad reconocida (ej.: Quito, Ecuador · Bogotá · Madrid) para calcular tu ascendente y tus casas.</p>
+      </div>`;
+    }
+
+    /* arcángel */
     html += `<div class="arcangel-seccion-nueva" style="--arc-color:${arc.color};margin-top:18px">
       <span class="etiqueta-seccion">Arcángel regente de ${s.signo}</span>
       <h3>${arc.nombre}</h3>
       <span>${arc.regencia}</span>
       <p>${arc.mensaje}</p>
     </div>`;
+
+    /* rasgos y gustos */
     html += `<div class="rejilla rejilla-3" style="margin-top:18px">${rasgos}</div>`;
+    if (gustos) html += `<section class="astral-seccion vidrio">
+      <span class="etiqueta-seccion">Tus gustos y afinidades</span>
+      <p class="astral-instruccion">Lo que tu ${s.signo} ama casi sin darse cuenta:</p>
+      <div class="chips-casas">${gustos}</div>
+    </section>`;
+
+    /* cierre */
     html += `<div class="mensaje-final-seccion-nueva" style="margin-top:18px">
-      <h2 style="font-size:1.35rem">El mensaje final de tu carta astral</h2>
+      <h2 class="astral-titulo">El mensaje final de tu carta astral</h2>
       <p>${s.signo}, ${this.nombreCorto(arc.nombre)} te deja esta palabra al oído:</p>
       <p style="margin-top:10px"><em>“${arc.consejo}”</em></p>
       <p style="margin-top:12px">Tu luz nace inteligente y tu reto es solo el maestro que la afina. Respira, confía y camina.</p>
@@ -3071,10 +3672,13 @@ const TIRADAS = {
   },
 
   guardarAstral(datos) {
-    const s = this.signoDe(datos.fecha);
-    const fase = this.faseLunarDe(datos.fecha);
+    const cal = this.calculoAstral(datos.fecha, datos.hora, datos.lugar);
+    const s = cal.solPlaneta && cal.solPlaneta.signo ? cal.solPlaneta.signo : this.signoDe(datos.fecha);
+    const fase = cal.fase || this.faseLunarDe(datos.fecha) || { nombre: "" };
     const arc = this.arcangeles[s.arcangel];
-    const resumen = `Carta Astral · ${s.signo} (${s.elemento}) · ${fase.nombre} · Regente: ${this.nombreCorto(arc.nombre)}`;
+    const luna = cal.lunaPlaneta ? ` · Luna en ${cal.lunaPlaneta.signo.signo}` : "";
+    const asc = cal.ascSigno ? ` · Asc ${cal.ascSigno.signo}` : "";
+    const resumen = `Carta Astral · ${s.signo} (${s.elemento})${luna}${asc} · ${fase.nombre} · Regente: ${this.nombreCorto(arc.nombre)}`;
     const lectura = { tirada: "Carta Astral", cartas: [], resumen };
     const historial = JSON.parse(localStorage.getItem("oraculoLecturas") || "[]");
     historial.unshift({ fecha: new Date().toISOString(), tirada: "Carta Astral", cartas: [], resumen });
@@ -3120,9 +3724,10 @@ const TIRADAS = {
 function mostrarFormularioAstral(d) {
   const escena = document.getElementById("escena-tarot");
   document.querySelectorAll(".opcion-palo").forEach(x => x.classList.add("oculto"));
+  const ciudades = Object.keys(TIRADAS.CIUDADES_ASTRALES).map(c => `<option value="${c.replace(/,/g, ", ").replace(/  +/g, " ")}"></option>`).join("");
   escena.innerHTML = `
     <div class="centrado astral-form">
-      <p style="margin-bottom:14px">Tu carta astral se arma con tu fecha de nacimiento. Si añades la hora y el lugar, tu lectura se afina: la luna y tu arcángel cambian con ellos. Llena lo que sepas:</p>
+      <p style="margin-bottom:14px">Tu carta astral se arma con tu fecha de nacimiento. Con la <b>hora</b> y el <b>lugar</b> exactos, la rueda suma tu ascendente, tus casas y la casa de cada planeta. Llena lo que sepas:</p>
       <form id="form-astral" class="astral-formulario">
         <label class="astral-campo">Fecha de nacimiento *
           <input type="date" id="astral-fecha" required aria-label="Fecha de nacimiento">
@@ -3131,7 +3736,8 @@ function mostrarFormularioAstral(d) {
           <input type="time" id="astral-hora" aria-label="Hora de nacimiento">
         </label>
         <label class="astral-campo">Lugar (opcional)
-          <input type="text" id="astral-lugar" maxlength="90" placeholder="Ej.: Quito, Ecuador" aria-label="Lugar de nacimiento">
+          <input type="text" id="astral-lugar" maxlength="90" list="lista-ciudades" placeholder="Ej.: Quito, Ecuador" aria-label="Lugar de nacimiento">
+          <datalist id="lista-ciudades">${ciudades}</datalist>
         </label>
         <button class="btn btn-dorado" type="submit" style="justify-self:center">Revelar mi carta astral</button>
         <p class="oculto astral-aviso" id="aviso-astral">Elige primero tu fecha de nacimiento.</p>
@@ -3360,8 +3966,17 @@ function mostrarEleccion(r) {
   }
 }
 
-function mostrarResultado(r) {
+async function mostrarResultado(r) {
   const escena = document.getElementById("escena-tarot");
+  if (r.tirada && r.tirada.pregunta && r.pregunta && !r.__analisis) {
+    const espera = document.createElement("div");
+    espera.className = "centrado";
+    espera.innerHTML = '<p style="margin-bottom:14px">El oráculo está leyendo tu pregunta...</p><div class="spinner" style="display:block"></div>';
+    escena.innerHTML = "";
+    escena.appendChild(espera);
+    const nl = await TIRADAS.analisisPreguntaServidor(r.pregunta);
+    if (nl) TIRADAS.inyectarAnalisis(r, nl);
+  }
   const d = document.createElement("div");
   d.id = "contenido-resultado";
   d.innerHTML = TIRADAS.armarResultado(r);
@@ -3369,6 +3984,7 @@ function mostrarResultado(r) {
   escena.appendChild(d);
   document.getElementById("btn-nueva-tirada").addEventListener("click", () => location.reload());
   document.getElementById("btn-guardar").addEventListener("click", () => TIRADAS.guardar(r));
+  TIRADAS.horoscopoLectura();
 
   if (r.tirada && r.tirada.pregunta && r.pregunta) {
     const nodo = document.getElementById("respuesta-ia");
