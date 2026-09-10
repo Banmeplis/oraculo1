@@ -2944,7 +2944,7 @@ nav.menu a.btn-whatsapp:hover {
   margin: 10px auto 6px;
   text-align: center;
   font-family: var(--fuente-serif);
-  font-size: 1.28rem;
+  font-size: 1.45rem;
   font-weight: 700;
   letter-spacing: .03em;
   color: var(--dorado);
@@ -3023,15 +3023,15 @@ nav.menu a.btn-whatsapp:hover {
   box-shadow: 0 0 14px rgba(var(--cp, 233, 206, 143), 0.18);
 }
 .mp-cuerpo { flex: 1; min-width: 0; }
-.mp-cuerpo b { color: var(--blanco-humo); font-size: 0.98rem; display: block; }
-.mp-signo { color: var(--dorado); font-weight: 400; font-size: 0.88rem; }
-.mp-retro { color: #ff9e6d; font-style: normal; font-weight: 400; font-size: 0.78rem; }
+.mp-cuerpo b { color: var(--blanco-humo); font-size: 1.12rem; display: block; }
+.mp-signo { color: var(--dorado); font-weight: 400; font-size: 1rem; }
+.mp-retro { color: #ff9e6d; font-style: normal; font-weight: 400; font-size: 0.9rem; }
 .mp-frase {
   margin-top: 5px;
   color: var(--blanco);
   font-family: var(--fuente-serif);
-  font-size: 1.02rem;
-  line-height: 1.5;
+  font-size: 1.15rem;
+  line-height: 1.55;
 }
 .chips-casas {
   display: flex;
@@ -3060,8 +3060,8 @@ nav.menu a.btn-whatsapp:hover {
   border-radius: 10px;
   color: var(--blanco-humo);
   font-family: var(--fuente-serif);
-  font-size: 1rem;
-  line-height: 1.5;
+  font-size: 1.15rem;
+  line-height: 1.55;
 }
 .astral-aviso p { margin: 0; }
 .astral-form input[list] { cursor: text; }
@@ -3130,25 +3130,25 @@ nav.menu a.btn-whatsapp:hover {
   margin-top: 5px;
   color: var(--blanco);
   font-family: var(--fuente-serif);
-  font-size: 1.18rem;
+  font-size: 1.3rem;
 }
 .angulo-tarjeta p {
   position: relative;
   margin-top: 8px;
-  font-size: 1.05rem;
+  font-size: 1.2rem;
   line-height: 1.6;
   color: var(--lavanda-suave);
 }
 
 /* --- textos más grandes y títulos brillantes en toda la carta astral --- */
-.astral-resultado .resultado-cabecera p { font-size: 1.25rem; }
-.astral-resultado .contexto-tirada p { font-size: 1.3rem; line-height: 1.7; }
-.astral-resultado .contexto-tirada .comparte { font-size: 1.05rem; }
+.astral-resultado .resultado-cabecera p { font-size: 1.4rem; }
+.astral-resultado .contexto-tirada p { font-size: 1.45rem; line-height: 1.7; }
+.astral-resultado .contexto-tirada .comparte { font-size: 1.2rem; }
 .astral-resultado .carta-grande .carta-texto h3 { font-size: 2.05rem; }
-.astral-resultado .carta-grande .carta-texto h4 { font-size: 1.3rem; }
-.astral-resultado .carta-grande .carta-texto .interp { font-size: 1.65rem; line-height: 1.75; }
-.astral-resultado .carta-grande .palabras span { font-size: 1.02rem; padding: 6px 13px; }
-.astral-instruccion { font-size: 1.22rem; line-height: 1.75; color: var(--lavanda-suave); margin: 8px 0; }
+.astral-resultado .carta-grande .carta-texto h4 { font-size: 1.4rem; }
+.astral-resultado .carta-grande .carta-texto .interp { font-size: 1.8rem; line-height: 1.8; }
+.astral-resultado .carta-grande .palabras span { font-size: 1.1rem; padding: 6px 13px; }
+.astral-instruccion { font-size: 1.38rem; line-height: 1.8; color: var(--lavanda-suave); margin: 8px 0; }
 .astral-titulo {
   font-family: var(--fuente-deco);
   font-size: clamp(1.7rem, 3.6vw, 2.5rem);
@@ -3170,23 +3170,23 @@ nav.menu a.btn-whatsapp:hover {
   margin: 22px 0 4px;
   text-shadow: 0 0 18px rgba(233, 206, 143, 0.25);
 }
-.astral-resultado .astral-seccion .etiqueta-seccion { font-size: 1rem; letter-spacing: 2px; }
-.astral-resultado .mp-cuerpo b { font-size: 1.28rem; }
-.astral-resultado .mp-signo { font-size: 1.12rem; }
-.astral-resultado .mp-frase { font-size: 1.28rem; line-height: 1.7; }
+.astral-resultado .astral-seccion .etiqueta-seccion { font-size: 1.1rem; letter-spacing: 2px; }
+.astral-resultado .mp-cuerpo b { font-size: 1.4rem; }
+.astral-resultado .mp-signo { font-size: 1.22rem; }
+.astral-resultado .mp-frase { font-size: 1.42rem; line-height: 1.75; }
 .astral-resultado .mp-glifo { flex: 0 0 48px; width: 48px; height: 48px; font-size: 1.5rem; }
-.astral-resultado .mensaje-final-seccion-nueva p, .astral-resultado .arcangel-seccion-nueva p { font-size: 1.32rem; line-height: 1.75; }
+.astral-resultado .mensaje-final-seccion-nueva p, .astral-resultado .arcangel-seccion-nueva p { font-size: 1.45rem; line-height: 1.8; }
 .astral-resultado .arcangel-seccion-nueva h3 { font-size: 1.8rem; }
-.astral-resultado .arcangel-seccion-nueva > span:not(.etiqueta-seccion) { font-size: 1.12rem; }
-.astral-resultado .rejilla .tarjeta p { font-size: 1.28rem; line-height: 1.7; }
-.astral-resultado .chip-casa, .astral-resultado .chip-gusto { font-size: 1.02rem; padding: 8px 15px; }
-.astral-resultado .astral-aviso p { font-size: 1.25rem; line-height: 1.7; }
-.astral-form p { font-size: 1.22rem; line-height: 1.75; }
-.astral-formulario label { font-size: 1.12rem; }
-.astral-formulario input { font-size: 1.12rem; padding: 12px 14px; }
+.astral-resultado .arcangel-seccion-nueva > span:not(.etiqueta-seccion) { font-size: 1.25rem; }
+.astral-resultado .rejilla .tarjeta p { font-size: 1.4rem; line-height: 1.75; }
+.astral-resultado .chip-casa, .astral-resultado .chip-gusto { font-size: 1.15rem; padding: 8px 15px; }
+.astral-resultado .astral-aviso p { font-size: 1.38rem; line-height: 1.75; }
+.astral-form p { font-size: 1.32rem; line-height: 1.75; }
+.astral-formulario label { font-size: 1.2rem; }
+.astral-formulario input { font-size: 1.2rem; padding: 12px 14px; }
 @media (max-width: 640px) {
   .astral-seccion { padding: 14px; }
   .mp-glifo { flex-basis: 40px; width: 40px; height: 40px; }
-  .astral-resultado .mp-frase { font-size: 1.2rem; }
-  .astral-resultado .carta-grande .carta-texto .interp { font-size: 1.45rem; }
+  .astral-resultado .mp-frase { font-size: 1.3rem; }
+  .astral-resultado .carta-grande .carta-texto .interp { font-size: 1.55rem; }
 }

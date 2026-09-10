@@ -10,7 +10,7 @@
   <!--   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script> -->
   <!-- Y el script de Google AdSense: -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6331831674832770" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="/css/estilo.css?v=44">
+  <link rel="stylesheet" href="/css/estilo.css?v=45">
 </head>
 <body>
 
@@ -40,6 +40,7 @@
         <a href="#" data-vista="posts">📚 Mis publicaciones</a>
         <a href="#" data-vista="lecturas">🔮 Mis lecturas</a>
         <a href="#" data-vista="usuarios" id="link-usuarios" class="oculto">👥 Usuarios</a>
+        <a href="#" data-vista="ads" id="link-ads" class="oculto">📄 Ads.txt</a>
       </aside>
 
       <div>
@@ -99,6 +100,26 @@
           </p>
           <div id="lista-usuarios"></div>
         </section>
+
+        <!-- ADS.TXT (solo admin) -->
+        <section id="vista-ads" class="oculto">
+          <h3>Ads.txt Manager</h3>
+          <p style="color:var(--lavanda-suave);font-size:.92rem;margin-bottom:16px">
+            Verifica tu cuenta ante Google AdSense / redes de anuncios. Formato por línea:
+            <b>dominio, identificador, DIRECT o RESELLER, token de verificación</b>.
+            La página pública es <a href="/ads.txt" style="color:var(--dorado)">/ads.txt</a>.
+          </p>
+          <div id="aviso-ads"></div>
+          <div class="campo">
+            <label for="ads-contenido">Contenido de ads.txt</label>
+            <textarea id="ads-contenido" style="min-height:200px;font-family:ui-monospace,Consolas,monospace;font-size:.95rem"
+              placeholder="google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0"></textarea>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-dorado" id="btn-guardar-ads">Guardar ads.txt</button>
+            <button class="btn btn-suave" id="btn-recargar-ads">Recargar</button>
+          </div>
+        </section>
       </div>
     </div>
   </main>
@@ -128,6 +149,7 @@
         SESION.renderizar();
         if (d.user.rol === "admin") {
           document.getElementById("link-usuarios").classList.remove("oculto");
+          document.getElementById("link-ads").classList.remove("oculto");
         }
         renderHoroscopoPanel();
       } catch { location.href = "/login.html?redir=panel"; }
@@ -168,6 +190,7 @@
         if (a.dataset.vista === "posts") cargarPostsPanel();
         if (a.dataset.vista === "lecturas") cargarLecturas();
         if (a.dataset.vista === "usuarios") cargarUsuarios();
+        if (a.dataset.vista === "ads") cargarAds();
       });
     });
 
@@ -363,6 +386,34 @@
         }));
       } catch (e) { c.innerHTML = '<div class="aviso error">' + e.message + '</div>'; }
     }
-  </script>
+
+    /* ads.txt (solo admin) */
+    const avisoAds = document.getElementById("aviso-ads");
+    function mostrarAds(texto, tipo) {
+      avisoAds.innerHTML = '<div class="aviso ' + tipo + '">' + texto + '</div>';
+    }
+
+    async function cargarAds() {
+      try {
+        const d = await fetchJSON("/api/admin/ads");
+        document.getElementById("ads-contenido").value = d.contenido;
+        avisoAds.innerHTML = "";
+      } catch (e) { mostrarAds(e.message, "error"); }
+    }
+
+    document.getElementById("btn-guardar-ads").addEventListener("click", async () => {
+      try {
+        const resp = await fetch("/api/admin/ads", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contenido: document.getElementById("ads-contenido").value })
+        });
+        const d = await resp.json();
+        if (!resp.ok) { mostrarAds(escapHtml(d.error || "Error al guardar"), "error"); return; }
+        mostrarAds("ads.txt guardado ✓ Ya se sirve en <a href='/ads.txt' style='color:var(--dorado)'>/ads.txt</a>", "ok");
+      } catch (e) { mostrarAds(escapHtml(e.message || "Error"), "error"); }
+    });
+
+    document.getElementById("btn-recargar-ads").addEventListener("click", cargarAds);
 </body>
 </html>

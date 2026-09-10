@@ -187,21 +187,10 @@ window.INICIO = (function () {
     importante: { etiqueta: "Portal energético importante" }
   };
 
-  function reduccionNumerologica(n) {
-    var r = n;
-    while (r > 33 || (r > 9 && r !== 11 && r !== 22)) {
-      var s = 0;
-      while (r > 0) { s += r % 10; r = Math.floor(r / 10); }
-      r = s;
-    }
-    return r;
-  }
-
   function portalDelDia(fecha) {
     var f = fecha || new Date();
     var dia = f.getDate();
     var mes = f.getMonth() + 1;
-    var anio = f.getFullYear();
     var fraccion = faseLunar(f);
     var puntos = 0;
 
@@ -210,11 +199,6 @@ window.INICIO = (function () {
 
     /* día espejo (día == mes): 1/1, 2/2 ... 12/12, resonancia numérica */
     if (dia === mes) puntos += 1;
-
-    /* la fecha completa reducida cae en número maestro (11, 22 o 33) */
-    if (reduccionNumerologica(dia + mes + anio) === 11 ||
-        reduccionNumerologica(dia + mes + anio) === 22 ||
-        reduccionNumerologica(dia + mes + anio) === 33) puntos += 1;
 
     /* luna nueva o luna llena: ventanas de gran energía */
     var distNueva = Math.min(fraccion, 1 - fraccion);
@@ -339,7 +323,6 @@ window.INICIO = (function () {
     arcangelDelDia: arcangelDelDia,
     mensajeDelDia: mensajeDelDia,
     faseLunar: faseLunar,
-    portalDelDia: portalDelDia,
-    reduccionNumerologica: reduccionNumerologica
+    portalDelDia: portalDelDia
   };
 })();

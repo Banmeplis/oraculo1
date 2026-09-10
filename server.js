@@ -103,6 +103,14 @@ app.use(session({
 /* ----------------------------- archivos estáticos ---------------------- */
 fs.mkdirSync(cfg.UPLOADS, { recursive: true });
 
+const RUTA_ADS = path.join(__dirname, "public", "ads.txt");
+
+app.get("/ads.txt", (req, res) => {
+  let contenido = "";
+  try { contenido = fs.readFileSync(RUTA_ADS, "utf8"); } catch {}
+  res.type("text/plain").set("Cache-Control", "no-cache, no-store, must-revalidate").send(contenido);
+});
+
 const ESTATICO = express.static(path.join(__dirname, "public"), {
   maxAge: "30d",
   immutable: true,

@@ -1,10 +1,34 @@
 const express = require("express");
+const fs = require("fs");
+const path = require("path");
 const bcrypt = require("bcryptjs");
 const db = require("../database.js");
 const cfg = require("../config/index.js");
 const { requiereAdmin } = require("../middleware/auth.js");
 
 const router = express.Router();
+
+const RUTA_ADS = path.join(__dirname, "..", "public", "ads.txt");
+
+function leerAds() {
+  try { return fs.readFileSync(RUTA_ADS, "utf8"); } catch { return ""; }
+}
+
+router.get("/ads", requiereAdmin, (req, res) => {
+  res.json({ contenido: leerAds() });
+});
+
+router.put("/ads", requiereAdmin, (req, res) => {
+  const contenido = String((req.body || {}).contenido || "");
+  if (contenido.length > 20000)
+    return res.status(400).json({ error: "¡No se trata de escribir aquí toda la enciclopedia!" });
+  const lineas = contenido.split(/\r?\n/).map(l => l.trim());
+  const invalidas = lineas.filter(l => l !== "" && !/^[A-Za-z0-9.\-]+\s*,\s*[^\s,]+\s*,\s*(DIRECT|RESELLER|ADX|ADSENSE)\s*(,\s*\S+\s*)?(,\s*[A-Za-z0-9\-\/]+\s*)?$/i.test(l));
+  if (invalidas.length)
+    return res.status(400).json({ error: "Línea no válida: «" + invalidas[0] + "». Formato: dominio, identificador, DIRECT/RESELLER, token" });
+  fs.writeFileSync(RUTA_ADS, contenido.replace(/\r\n/g, "\n"));
+  res.json({ ok: true, contenido });
+});
 
 router.get("/usuarios", requiereAdmin, (req, res) => {
   const esMaster = String(req.usuario.email).toLowerCase() === cfg.MASTER_EMAIL;
