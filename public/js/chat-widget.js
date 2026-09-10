@@ -25,10 +25,12 @@
   let notifVistas = 0;
   let chatId = null;
   let chatNombre = "";
+  const abiertas = []; /* conversaciones abiertas (pestañas): {id, nombre, avatar} */
   let maxId = 0;
   let marcarNuevos = true;
   let timerPoll = null;
   let timerBadge = null;
+  let timerPresencia = null;
   const ui = {};
 
   const $ = (id) => document.getElementById(id);
@@ -60,6 +62,9 @@
   function guardarUltimo(u) {
     try { localStorage.setItem(LS_ULTIMO, JSON.stringify({ id: u.id, nombre: u.nombre, avatar: u.avatar })); } catch {}
   }
+  function ultimaVez(v) {
+    return typeof window.tiempoUltimaVez === "function" ? window.tiempoUltimaVez(v) : "";
+  }
   function leerEstilo() {
     try { return JSON.parse(localStorage.getItem(LS_ESTILO) || "{}"); } catch { return {}; }
   }
@@ -77,8 +82,9 @@
     const div = document.createElement("div");
     div.innerHTML = `
       <div class="chat-widget" id="chat-widget">
-        <div class="chat-panel oculto" id="chat-panel">
-          <div class="chat-vista-lista" id="chat-vista-lista">
+<div class="chat-panel oculto" id="chat-panel">
+        <div class="chat-tabs oculto" id="chat-tabs"></div>
+        <div class="chat-vista-lista" id="chat-vista-lista">
             <div class="chat-panel-titulo">
               <div class="chat-panel-titulo-info">✨ Amigos<small id="chat-lista-unread"></small></div>
               <button class="chat-panel-x" id="chat-cerrar" aria-label="Cerrar">✕</button>
@@ -210,6 +216,108 @@
     ui.fab.classList.toggle("tiene-nuevos", total > 0);
   }
 
+  /* ------------------------- pestañas de conversaciones -------------------- */
+  function avatarConPresencia(u, s) {
+    const a = avatar(u, s);
+    if (!u.online) return a;
+    return `<span class="contacto-presencia-av">${a}<span class="presencia-dot on"></span></span>`;
+  }
+
+  function registrarAbierta(amigo) {
+    if (!abiertas.find(x => x.id === amigo.id)) abiertas.push({ id: amigo.id, nombre: amigo.nombre, avatar: amigo.avatar });
+    pintarPestanas();
+  }
+
+  function pintarPestanas() {
+    const zona = $("chat-tabs");
+    if (!abiertas.length) { zona.classList.add("oculto"); zona.innerHTML = ""; return; }
+    zona.classList.remove("oculto");
+    zona.innerHTML = abiertas.map(a => `
+      <div class="chat-tab ${a.id === chatId ? "activo" : ""}" data-tab="${a.id}">
+        <span class="contacto-avatar">${esc(a.nombre.trim()[0] || "?")}</span>
+        <span class="chat-tab-nombre">${esc(a.nombre)}</span>
+        <i class="chat-tab-x" data-cerrar="${a.id}" aria-hidden="true">✕</i>
+      </div>`).join("") + `<button class="chat-tab chat-tab-mas" id="chat-tab-mas" title="Elegir amigo">+</button>`;
+    zona.querySelectorAll("[data-tab]").forEach(t => t.addEventListener("click", () => {
+      const amigo = contactos.find(c => c.amigo.id === Number(t.dataset.tab));
+      if (amigo) {
+        chatId = amigo.amigo.id; chatNombre = amigo.amigo.nombre; maxId = 0; marcarNuevos = true;
+        document.getElementById("chat-cab-nombre").textContent = amigo.amigo.nombre;
+        const cab = document.getElementById("chat-cab-avatar");
+        cab.innerHTML = "";
+        cab.insertAdjacentHTML("beforeend", avatarConPresencia(amigo.amigo, 40));
+        pintarEstadoCabecera(amigo.amigo);
+        aplicarEstilo(); cargarConversacion(false);
+        pintarPestanas();
+      }
+    }));
+    zona.querySelectorAll("[data-cerrar]").forEach(x => x.addEventListener("click", (e) => { e.stopPropagation(); cerrarPestana(Number(x.dataset.cerrar)); }));
+    $("chat-tab-mas").addEventListener("click", (e) => { e.stopPropagation(); irALista(); });
+  }
+
+  function cerrarPestana(id) {
+    const i = abiertas.findIndex(a => a.id === id);
+    if (i < 0) return;
+    abiertas.splice(i, 1);
+    if (id === chatId) {
+      if (abiertas.length) {
+        const sigue = abiertas[0];
+        const amigo = contactos.find(c => c.amigo.id === sigue.id);
+        chatId = sigue.id; chatNombre = sigue.nombre; maxId = 0; marcarNuevos = true;
+        document.getElementById("chat-cab-nombre").textContent = sigue.nombre;
+        document.getElementById("chat-cab-avatar").innerHTML = "";
+        document.getElementById("chat-cab-avatar").insertAdjacentHTML("beforeend", avatarConPresencia(amigo ? amigo.amigo : sigue, 40));
+        pintarEstadoCabecera(amigo ? amigo.amigo : sigue);
+        aplicarEstilo(); cargarConversacion(false);
+      } else {
+        chatId = null; chatNombre = "";
+        document.getElementById("chat-cab-nombre").textContent = "";
+        document.getElementById("chat-cab-avatar").innerHTML = "";
+        irALista();
+      }
+    }
+    pintarPestanas();
+  }
+
+  /* ------------------- presencia (estado en cabecera y barra) -------------- */
+  function pintarEstadoCabecera(otro) {
+    if (!otro) return;
+    const zona = document.getElementById("chat-cab-estado");
+    if (!zona) return;
+    if (otro.online) {
+      zona.innerHTML = '<span class="presencia-dot on"></span><span class="esta-on">Conectada ahora</span>';
+    } else if (otro.ultima_actividad) {
+      zona.innerHTML = '<span class="esta-off">Ausente · ' + ultimaVez(otro.ultima_actividad) + '</span>';
+    } else {
+      zona.innerHTML = '<span class="esta-off">Miembro del círculo</span>';
+    }
+  }
+
+  function iniciarPresencia() {
+    detenerPresencia();
+    actualizarPresencia();
+    timerPresencia = setInterval(actualizarPresencia, 12000);
+  }
+  function detenerPresencia() {
+    if (timerPresencia) { clearInterval(timerPresencia); timerPresencia = null; }
+  }
+
+  async function actualizarPresencia() {
+    try {
+      const d = await fetchJSON("/api/presencia");
+      const vivos = new Set((d.contacto || []).map(x => x.id));
+      contactos.forEach(c => {
+        const antes = c.amigo.online;
+        c.amigo.online = vivos.has(c.amigo.id);
+        if (antes !== c.amigo.online) { pintarLista(); actualizarFab(); }
+      });
+      if (ui.vistaChat.classList.contains("oculto") === false) {
+        const otro = (d.contacto || []).find(x => x.id === chatId) || { online: false, ultima_actividad: null };
+        pintarEstadoCabecera(otro);
+      }
+    } catch { /* silencioso */ }
+  }
+
   function pintarLista() {
     const noLeidos = contactos.reduce((s, x) => s + (x.noLeidos || 0), 0);
     ui.listaUnread.textContent = noLeidos > 0 ? ` · ${noLeidos} sin leer` : "";
@@ -222,10 +330,12 @@
       const badge = c.noLeidos > 0 ? `<span class="contacto-noleidos">${c.noLeidos}</span>` : "";
       const meta = c.baneado
         ? '<span class="contacto-meta" style="color:#ff8095">suspendida</span>'
-        : `<span class="contacto-meta">${c.ultimoMensaje ? (c.ultimoMensaje.esMio ? "Tú: " : "") + esc(c.ultimoMensaje.contenido).split("\n")[0] : "Envía un mensaje"}</span>`;
+        : u.online
+          ? '<span class="con-linea"><span class="presencia-dot on"></span> Conectado</span>'
+          : `<span class="contacto-meta">${c.ultimoMensaje ? (c.ultimoMensaje.esMio ? "Tú: " : "") + esc(c.ultimoMensaje.contenido).split("\n")[0] : "Envía un mensaje"}</span>`;
       return `
         <div class="contacto-item ${u.id === chatId ? "activo" : ""}" data-amigo="${u.id}">
-          ${avatar(u, 40)}
+          ${avatarConPresencia(u, 40)}
           <div class="contacto-datos">
             <div class="contacto-nombre">${esc(u.nombre)} ${badge}</div>
             ${meta}
@@ -247,10 +357,12 @@
     maxId = 0;
     marcarNuevos = true;
     guardarUltimo(amigo);
+    registrarAbierta(amigo);
     document.getElementById("chat-cab-nombre").textContent = amigo.nombre;
     const cab = document.getElementById("chat-cab-avatar");
     cab.innerHTML = "";
-    cab.insertAdjacentHTML("beforeend", avatar(amigo));
+    cab.insertAdjacentHTML("beforeend", avatarConPresencia(amigo, 40));
+    pintarEstadoCabecera(amigo);
     cerrarVistaLista();
     aplicarEstilo();
     abrirPanelCompleto();
@@ -275,6 +387,7 @@
     ui.mensajes.innerHTML = "";
     try {
       const d = await fetchJSON("/api/chat/" + chatId + "/mensajes");
+      if (d.otro) pintarEstadoCabecera(d.otro);
       d.mensajes.forEach(m => renderBurbuja(m));
       maxId = d.maxId || 0;
     } catch (e) {
@@ -311,6 +424,7 @@
 
   function abrirPanelCompleto() {
     ui.panel.classList.remove("oculto");
+    iniciarPresencia();
     if (!ui.vistaChat.classList.contains("oculto")) iniciarPoll();
     else pintarLista();
   }
@@ -318,6 +432,7 @@
   function cerrarPanel() {
     ui.panel.classList.add("oculto");
     detenerPoll();
+    detenerPresencia();
   }
 
   function iniciarPoll() {
@@ -332,6 +447,7 @@
     if (!chatId || ui.vistaLista.classList.contains("oculto") === false) return;
     try {
       const d = await fetchJSON("/api/chat/" + chatId + "/mensajes?desde=" + maxId);
+      if (d.otro) pintarEstadoCabecera(d.otro);
       if (d.mensajes.length) {
         if (marcarNuevos) {
           ui.mensajes.insertAdjacentHTML("beforeend", '<div class="sep-nuevos">✨ mensajes nuevos</div>');
@@ -432,6 +548,7 @@
     if (chatId) {
       const sigue = contactos.find(c => c.amigo.id === chatId);
       if (!sigue) { chatId = null; chatNombre = ""; actualizarFab(); }
+      else registrarAbierta(sigue.amigo);
     }
     timerBadge = setInterval(refrescarContactos, 25000);
   }

@@ -2930,6 +2930,31 @@ nav.menu a.btn-whatsapp:hover {
   animation: ruedaGirar 70s linear infinite;
 }
 @keyframes ruedaGirar { to { transform: rotate(360deg); } }
+.rueda-giro.contra {
+  transform-origin: 310px 310px;
+  animation: ruedaGirarReversa 52s linear infinite;
+}
+.rueda-beads { transform-origin: 310px 310px; animation: ruedaGirar 34s linear infinite; }
+.rueda-beads.luna {
+  transform-origin: 310px 310px;
+  animation: ruedaGirarReversa 58s linear infinite;
+}
+@keyframes ruedaGirarReversa { to { transform: rotate(-360deg); } }
+.astro-resalta {
+  margin: 10px auto 6px;
+  text-align: center;
+  font-family: var(--fuente-serif);
+  font-size: 1.28rem;
+  font-weight: 700;
+  letter-spacing: .03em;
+  color: var(--dorado);
+  background: linear-gradient(110deg, #e9ce8f, #f7f0d8 45%, #c7b3ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: ejeFloat 4s ease-in-out infinite;
+  text-shadow: 0 0 24px rgba(233, 206, 143, 0.35);
+}
 .rueda-pulso {
   transform-origin: 310px 310px;
   animation: ruedaPulso 4.5s ease-in-out infinite;

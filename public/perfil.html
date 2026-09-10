@@ -10,7 +10,7 @@
   <!--   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script> -->
   <!-- Y el script de Google AdSense: -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6331831674832770" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="/css/estilo.css?v=43">
+  <link rel="stylesheet" href="/css/estilo.css?v=44">
 </head>
 <body>
 
@@ -38,8 +38,11 @@
         <h3 id="perfil-nombre"></h3>
         <p id="perfil-email" style="color:var(--lavanda-suave)"></p>
         <p id="perfil-rol" style="font-size:.85rem;color:var(--dorado)"></p>
+        <span id="perfil-signo" class="perfil-signo oculto"></span>
       </div>
     </div>
+
+    <div id="seccion-horoscopo-perfil" style="margin-top:24px"></div>
 
     <div id="aviso" class="oculto"></div>
 
@@ -56,6 +59,11 @@
       <div class="campo">
         <label for="pf-bio">Sobre mí</label>
         <textarea id="pf-bio" placeholder="Cuéntale al universo quién eres..."></textarea>
+      </div>
+      <div class="campo">
+        <label for="pf-fecha">Fecha de nacimiento <span style="color:var(--dorado)">✧</span></label>
+        <input type="date" id="pf-fecha" max="2013-12-31" min="1901-01-01">
+        <small style="color:var(--lavanda-suave)">Despierta tu signo y tu Horóscopo Negro. Ya registrada no es obligatoria, pero puedes cambiarla.</small>
       </div>
       <div class="centrado">
         <button class="btn btn-dorado" id="btn-guardar-perfil">Guardar cambios</button>
@@ -83,8 +91,8 @@
     <div class="logo"><span>☾</span> EL CENDERO DE LOS AR🌙ANGELES</div>
   </footer>
 
-  <script src="/js/app.js?v=16"></script>
-  <script src="/js/chat-widget.js?v=3"></script>
+  <script src="/js/app.js?v=17"></script>
+  <script src="/js/chat-widget.js?v=4"></script>
   <script>
     function aviso(el, texto, tipo) {
       el.classList.remove("oculto");
@@ -107,7 +115,17 @@
       document.getElementById("pf-nombre").value = perfil.nombre;
       document.getElementById("pf-bio").value = perfil.bio || "";
       document.getElementById("pf-avatar").value = perfil.avatar || "";
+      document.getElementById("pf-fecha").value = perfil.fecha_nacimiento || "";
       actualizarAvatar(perfil.avatar, perfil.nombre);
+
+      const chipSigno = document.getElementById("perfil-signo");
+      if (perfil.signo) {
+        chipSigno.classList.remove("oculto");
+        chipSigno.innerHTML = zodiacoChipHTML(perfil.signo) +
+          ' <span>' + escapHtml(perfil.signo.signo) + ' · ' + escapHtml(perfil.signo.elemento) +
+          ' · regente ' + escapHtml(perfil.signo.arcangel) + ' · Premio ✦</span>';
+      }
+      renderHoroscopoPerfil();
 
       document.getElementById("pf-avatar").addEventListener("input", (e) => actualizarAvatar(e.target.value, perfil.nombre));
       document.getElementById("pf-nombre").addEventListener("input", (e) => actualizarAvatar(document.getElementById("pf-avatar").value, e.target.value));
@@ -116,12 +134,21 @@
         const body = {
           nombre: document.getElementById("pf-nombre").value.trim(),
           bio: document.getElementById("pf-bio").value,
-          avatar: document.getElementById("pf-avatar").value.trim() || null
+          avatar: document.getElementById("pf-avatar").value.trim() || null,
+          fecha_nacimiento: document.getElementById("pf-fecha").value || null
         };
         if (!body.nombre) { aviso(document.getElementById("aviso"), "El nombre no puede estar vacío", "error"); return; }
         try {
-          await fetchJSON("/api/perfil", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+          const r = await fetchJSON("/api/perfil", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
           aviso(document.getElementById("aviso"), "Perfil actualizado ✓", "ok");
+          if (r.signo && r.signo.signo) {
+            const chipSigno = document.getElementById("perfil-signo");
+            chipSigno.classList.remove("oculto");
+            chipSigno.innerHTML = zodiacoChipHTML(r.signo) +
+              ' <span>' + escapHtml(r.signo.signo) + ' · ' + escapHtml(r.signo.elemento) +
+              ' · regente ' + escapHtml(r.signo.arcangel) + ' · Premio ✦</span>';
+            renderHoroscopoPerfil();
+          }
           SESION.cargar();
         } catch (e) { aviso(document.getElementById("aviso"), e.message, "error"); }
       });
@@ -143,6 +170,27 @@
       const av = document.getElementById("avatar-mostrar");
       if (url) { av.style.backgroundImage = "url('" + url + "')"; av.textContent = ""; }
       else { av.style.backgroundImage = ""; av.textContent = (nombre || "O").trim()[0].toUpperCase(); }
+    }
+
+    async function renderHoroscopoPerfil() {
+      const caja = document.getElementById("seccion-horoscopo-perfil");
+      if (!caja) return;
+      const s = perfil.signo;
+      if (!s) {
+        caja.innerHTML = `
+          <div class="horoscopo-sec horoscopo-vacio">
+            <b style="font-family:var(--fuente-deco);font-size:1.15rem">Horóscopo Negro · despiértalo</b>
+            <p>Añade tu fecha de nacimiento arriba y guarda los cambios para encender tu signo con su lectura del día y de la semana.</p>
+          </div>`;
+        return;
+      }
+      caja.innerHTML = '<div class="horoscopo-cargando">Despertando tu Horóscopo Negro ✨</div>';
+      try {
+        const d = await fetchHoroscopo(s.signo);
+        caja.innerHTML = horoscopoHTML(d) || "";
+      } catch {
+        caja.innerHTML = "";
+      }
     }
   </script>
 </body>

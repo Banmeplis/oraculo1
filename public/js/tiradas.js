@@ -3468,7 +3468,8 @@ const TIRADAS = {
         </radialGradient>
       </defs>
       <circle cx="${cx}" cy="${cy}" r="${R1 + 14}" fill="url(#ruedaFondo)" stroke="rgba(233,206,143,0.4)"/>
-      <circle cx="${cx}" cy="${cy}" r="300" fill="none" class="rueda-giro" stroke="rgba(233,206,143,0.55)" stroke-width="2.2" stroke-dasharray="3 12" stroke-linecap="round"/>`;
+      <circle cx="${cx}" cy="${cy}" r="300" fill="none" class="rueda-giro" stroke="rgba(233,206,143,0.55)" stroke-width="2.2" stroke-dasharray="3 12" stroke-linecap="round"/>
+      <circle cx="${cx}" cy="${cy}" r="296" fill="none" class="rueda-giro contra" stroke="rgba(170,140,235,0.42)" stroke-width="1.6" stroke-dasharray="2 10" stroke-linecap="round"/>`;
 
     /* anillo de signos: solo el color sagrado de su elemento, sin letreros */
     for (let i = 0; i < 12; i++) {
@@ -3477,6 +3478,19 @@ const TIRADAS = {
       s += `<path d="${sector(a0, a0 + 30, R2, R1)}" fill="${col}" opacity="0.18" stroke="rgba(233,206,143,0.28)" stroke-width="1"/>`;
     }
 
+    /* coronas orbitantes: dos anillos de cuentas sagradas girando en sentidos opuestos */
+    const aroBeads = (n, r, col, px) => {
+      let g = "";
+      for (let i = 0; i < n; i++) {
+        const a = i * (360 / n);
+        const [bx, by] = pt(r, a);
+        g += `<circle cx="${bx}" cy="${by}" r="${px}" fill="${col}" opacity="0.7"/>`;
+      }
+      return `<g class="rueda-beads ${px === "1.8" ? "sol" : "luna"}">${g}</g>`;
+    };
+    s += aroBeads(18, 300, "rgba(233,206,143,0.85)", "1.8");
+    s += aroBeads(10, 288, "rgba(170,140,235,0.78)", "2.4");
+
     /* anillo de casas */
     if (usarCasas) {
       for (let i = 0; i < 12; i++) {
@@ -3484,8 +3498,6 @@ const TIRADAS = {
         if (i % 2 === 0) s += `<path d="${sector(a0, a0 + 30, R3, R2)}" fill="rgba(255,255,255,0.07)"/>`;
         const [p1, p2] = [pt(R2, a0), pt(R3, a0)];
         s += `<line x1="${p1[0]}" y1="${p1[1]}" x2="${p2[0]}" y2="${p2[1]}" stroke="rgba(233,206,143,0.45)" stroke-width="1"/>`;
-        const [nx, ny] = pt(148, a0 + 12);
-        s += `<text x="${nx}" y="${ny}" text-anchor="middle" font-size="13" fill="#d9c07a" font-family="Verdana,sans-serif">${i + 1}</text>`;
       }
     }
 
@@ -3573,7 +3585,7 @@ const TIRADAS = {
       html += `<section class="astral-seccion vidrio">
         <span class="etiqueta-seccion">La rueda de tu cielo</span>
         <h2 class="astral-titulo">Tu carta en círculo</h2>
-        <p class="astral-instruccion">Posición real de tus planetas al nacer${tieneCasas ? ", con tus casas y los ejes Ascendente-Descendente (horizonte) y Medio Cielo-Fondo del Cielo" : ""}.</p>
+        <p class="astral-instruccion">Posición real de tus planetas al nacer, con el eje Ascendente-Descendente (horizonte) y el Medio Cielo-Fondo del Cielo (meridiano).</p>
         ${this.ruedaAstralHTML(cal)}
       </section>`;
     }
@@ -3606,15 +3618,15 @@ const TIRADAS = {
       </section>`;
     }
 
-    /* cuatro ángulos sagrados + casas */
+    /* cuatro ángulos sagrados: Asc y Desc son los protagonistas */
     if (tieneCasas) {
       const desc = this.normDeg(cal.asc + 180);
       const ic = this.normDeg(cal.mc + 180);
-      const chips = cal.casas.map(c => `<span class="chip-casa">${c.num}. ${c.signo.emoji} ${c.signo.signo}</span>`).join("");
+      const descSigno = this.signoDeGrado(desc);
       const angulos =
         this.anguloCard("Ascendente", "🌅", cal.ascSigno, cal.asc,
           "Tu sello ante el mundo: la energía que proyectas al llegar, tu carisma y cómo comienzas cada cosa.", true) +
-        this.anguloCard("Descendente", "🌇", this.signoDeGrado(desc), desc,
+        this.anguloCard("Descendente", "🌇", descSigno, desc,
           "Tu espejo en los demás: las alianzas, parejas y personas que atraes, y el trato que ofreces a los otros.", true) +
         this.anguloCard("Medio Cielo", "✦", cal.mcSigno, cal.mc,
           "Tu vocación y tu lugar en el mundo: la cima a la que te llama tu oficio, tu reconocimiento y tu legado.", false) +
@@ -3622,12 +3634,10 @@ const TIRADAS = {
           "Tu raíz privada: el hogar, la familia y el santuario emocional del que vienes y al que siempre vuelves.", false);
       html += `<section class="astral-seccion vidrio astral-angulos">
         <span class="etiqueta-seccion">El marco sagrado de tu vida</span>
-        <h2 class="astral-titulo">Tus cuatro ángulos</h2>
-        <p class="astral-instruccion">Ascendente y Descendente forman el eje del horizonte en tu rueda: lo que das al mundo y lo que atraes. El Medio Cielo y su fondo trazan tu vocación y tu raíz. <b>Tu Ascendente en ${cal.ascSigno.signo}</b> es tu puerta de entrada al mundo.</p>
+        <h2 class="astral-titulo">Tu Ascendente y tu Descendente</h2>
+        <p class="astro-resalta">Cómo te ve el mundo · Asc ${cal.ascSigno.signo} ${cal.ascSigno.emoji} · Desc ${descSigno.signo} ${descSigno.emoji}</p>
+        <p class="astral-instruccion">Tu ascendente es la máscara con que saludas la vida: tu carisma, tu primera impresión y el rumbo que tomas al levantarte. Enfrente, tu descendente te muestra las personas y alianzas que atraes. El Medio Cielo y su fondo cierran el marco con tu vocación y tu raíz.</p>
         <div class="carta-angulos">${angulos}</div>
-        <h3 class="astral-sub-titulo">Las 12 casas de tu cielo</h3>
-        <p class="astral-instruccion">Cada casa guarda un escenario de tu vida: la 1ª tu persona, la 7ª tus uniones, la 10ª tu vocación… y tus planetas las habitan.</p>
-        <div class="chips-casas">${chips}</div>
       </section>`;
     } else if (!cal.offline && !cal.lugarNoEncontrado) {
       html += `<div class="astral-aviso vidrio" style="margin-top:18px">

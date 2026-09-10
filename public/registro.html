@@ -10,7 +10,7 @@
   <!--   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script> -->
   <!-- Y el script de Google AdSense: -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6331831674832770" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="/css/estilo.css?v=43">
+  <link rel="stylesheet" href="/css/estilo.css?v=44">
 </head>
 <body>
 
@@ -47,6 +47,11 @@
         <label for="password">Contraseña</label>
         <input type="password" id="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres">
       </div>
+      <div class="campo">
+        <label for="fecha-nacimiento">Tu fecha de nacimiento <span style="color:var(--dorado)">✧</span></label>
+        <input type="date" id="fecha-nacimiento" max="2013-12-31" min="1901-01-01" required aria-describedby="ayuda-fecha">
+        <small id="ayuda-fecha" style="color:var(--lavanda-suave)">Con ella despertamos tu signo en el Horóscopo Negro ✨</small>
+      </div>
       <button class="btn btn-dorado" id="btn-crear" style="width:100%">Crear mi cuenta</button>
 
       <div class="separador"><span>o únete con</span></div>
@@ -65,20 +70,26 @@
     <div class="logo"><span>☾</span> EL CENDERO DE LOS AR🌙ANGELES</div>
   </footer>
 
-  <script src="/js/app.js?v=16"></script>
-  <script src="/js/chat-widget.js?v=3"></script>
+  <script src="/js/app.js?v=17"></script>
+  <script src="/js/chat-widget.js?v=4"></script>
   <script>
     document.getElementById("btn-crear").addEventListener("click", async () => {
       const aviso = document.getElementById("aviso-registro");
       aviso.innerHTML = "";
       try {
+        const fecha = document.getElementById("fecha-nacimiento").value;
+        if (!fecha) {
+          aviso.innerHTML = '<div class="aviso error">Pon tu fecha de nacimiento para despertar tu signo en el Horóscopo Negro ✨</div>';
+          return;
+        }
         const d = await fetchJSON("/api/registro", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             nombre: document.getElementById("nombre").value.trim(),
             email: document.getElementById("email").value.trim(),
-            password: document.getElementById("password").value
+            password: document.getElementById("password").value,
+            fecha_nacimiento: fecha
           })
         });
         location.href = "/panel.html?bienvenida=1";

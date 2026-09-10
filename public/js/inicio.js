@@ -298,11 +298,38 @@ window.INICIO = (function () {
     caja.insertAdjacentHTML("beforeend", '<div class="rd-particulas" aria-hidden="true">' + particulas + "</div>");
   }
 
+  /* ------------------- Horóscopo Negro (sección premium del inicio) -------- */
+  function renderHoroscopoHome() {
+    var caja = document.getElementById("horoscopo-inicio");
+    if (!caja) return;
+    var u = window.SESION && window.SESION.usuario;
+    if (!u) { caja.style.display = "none"; caja.innerHTML = ""; return; }
+    if (!u.signo) {
+      caja.style.display = "";
+      caja.innerHTML =
+        '<div class="horoscopo-sec horoscopo-vacio">' +
+        '<b style="font-family:var(--fuente-deco);font-size:1.15rem">Horóscopo Negro · solo para ti</b>' +
+        '<p>Completa tu fecha de nacimiento en tu perfil y tu signo se encenderá aquí, con su lectura del día y de la semana.</p>' +
+        '<a class="btn btn-dorado" style="padding:10px 22px" href="/perfil.html">Completar mi perfil ✦</a></div>';
+      return;
+    }
+    if (!window.fetchHoroscopo) return;
+    caja.style.display = "";
+    caja.innerHTML = '<div class="horoscopo-cargando">Despertando tu Horóscopo Negro ✨</div>';
+    window.fetchHoroscopo(u.signo.signo).then(function (d) {
+      if (!d || !d.delDia) return;
+      caja.innerHTML = window.horoscopoHTML(d);
+    }).catch(function () { caja.innerHTML = ""; });
+  }
+
   function init() {
     renderCicloLunar();
     renderRegenteDia();
     renderEstaciones();
     renderOdometer();
+    renderHoroscopoHome();
+    /* si la sesión llegó después del primer intento, refrescar */
+    document.addEventListener("oraculo:sesion", renderHoroscopoHome);
   }
 
   document.addEventListener("DOMContentLoaded", init);

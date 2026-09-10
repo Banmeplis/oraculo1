@@ -71,11 +71,13 @@ const AMIGOS = {
       const u = c.amigo;
       const meta = c.baneado
         ? '<span class="contacto-meta" style="color:#ff8095">cuenta suspendida</span>'
-        : `<span class="contacto-meta">${c.ultimoMensaje ? (c.ultimoMensaje.esMio ? "Tú: " : "") + escapHtml(c.ultimoMensaje.contenido).split("\n")[0] : "Envía un mensaje"}</span>`;
+        : u.online
+          ? '<span class="con-linea"><span class="presencia-dot on"></span> Conectada ahora</span>'
+          : `<span class="contacto-meta">${c.ultimoMensaje ? (c.ultimoMensaje.esMio ? "Tú: " : "") + escapHtml(c.ultimoMensaje.contenido).split("\n")[0] : "Envía un mensaje"}</span>`;
       const badge = c.noLeidos > 0 ? `<span class="contacto-noleidos">${c.noLeidos}</span>` : "";
       return `
         <div class="contacto-item" data-chat="${u.id}">
-          ${this.avatar(u)}
+          ${this.avatarConPresencia(u, 40)}
           <div class="contacto-datos">
             <div class="contacto-nombre">${escapHtml(u.nombre)} ${badge}</div>
             ${meta}
@@ -323,6 +325,13 @@ const AMIGOS = {
       return `<div class="contacto-avatar" style="overflow:hidden"><img src="${escapHtml(u.avatar)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>`;
     }
     return `<div class="contacto-avatar">${inicial}</div>`;
+  },
+
+  avatarConPresencia(u, s) {
+    const ajuste = (s ? `width:${s}px;height:${s}px;min-width:${s}px;` : "") + (u.avatar ? "overflow:hidden" : "");
+    const a = this.avatar(u);
+    if (!u.online) return a;
+    return `<span class="contacto-presencia-av"${s ? ` style="${ajuste}"` : ""}>${a}<span class="presencia-dot on"></span></span>`;
   },
 
   aviso(texto, tipo) {

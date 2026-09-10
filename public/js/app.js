@@ -22,6 +22,58 @@ function escapHtml(valor) {
   }[caracter]));
 }
 
+/* "ultima vez" de una marca de actividad: hace X min, hace X h, ayer o la fecha */
+function tiempoUltimaVez(valor) {
+  const f = new Date(String(valor || "").replace(" ", "T") + "Z");
+  if (Number.isNaN(f.getTime())) return "";
+  const dif = Date.now() - f.getTime();
+  if (dif < 60000) return "ahora mismo";
+  const min = Math.floor(dif / 60000);
+  if (min < 60) return "hace " + min + " min";
+  const h = Math.floor(min / 60);
+  if (h < 24) return "hace " + h + " h";
+  return "visto " + f.toLocaleDateString("es-ES", { day: "numeric", month: "short" });
+}
+
+/* ------------------------------ Horóscopo Negro -------------------------- */
+/* Datos del Horóscopo Negro por signo (server: /api/horoscopo). Cada página
+   que quiera la sección usa fetchHoroscopo(signo) + horoscopoHTML(datos). */
+async function fetchHoroscopo(signo) {
+  const q = signo ? "?signo=" + encodeURIComponent(signo) : "";
+  return fetchJSON("/api/horoscopo" + q);
+}
+
+function horoscopoHTML(d) {
+  if (!d || !d.signo || !d.delDia) return "";
+  const col = escapHtml(d.signo.color || "#d4af37");
+  return `
+    <div class="bloque-horoscopo-lectura">
+      <div class="horoscopo-sec" style="--hc:${col}">
+        <div class="horoscopo-cab">
+          <span class="horoscopo-emoji">${escapHtml(d.signo.emoji)}</span>
+          <span class="horoscopo-titulo">Horóscopo Negro · ${escapHtml(d.signo.signo)}</span>
+          <span class="horoscopo-premium">PREMIUM ✦</span>
+        </div>
+        <div class="horoscopo-dia">
+          <b>Hoy · ${escapHtml(d.delDia.fecha)}</b>
+          <p>${escapHtml(d.delDia.texto)}</p>
+          <span class="horoscopo-num">✦ Número de luz: ${d.delDia.numero} · Día de ${escapHtml(d.signo.arcangel)}</span>
+        </div>
+        <div class="horoscopo-semana">
+          <b>Tu semana · ${escapHtml(d.semana.desde)} → ${escapHtml(d.semana.hasta)}</b>
+          <p>${escapHtml(d.semana.texto)}</p>
+        </div>
+      </div>
+    </div>`;
+}
+
+function zodiacoChipHTML(signo) {
+  if (!signo) return "";
+  const col = escapHtml(signo.color || "#d4af37");
+  return `<span class="zodiaco-chip" style="--zc-color:${col}"
+    title="${escapHtml(signo.signo)} · ${escapHtml(signo.elemento)} · Miembro premium ✦">${escapHtml(signo.emoji)}</span>`;
+}
+
 /* Portadas de Unsplash: entrega srcset webp a 400/800/1200 px para que el
    móvil baje la versión justa (mucho menos tráfico y render más rápido). */
 function portadaVaria(url, ancho) {
@@ -112,9 +164,12 @@ const SESION = {
     } catch { this._usuario = null; }
     this.renderizar();
     if (this._usuario) actualizarNotificaciones();
+    document.dispatchEvent(new CustomEvent("oraculo:sesion", { detail: { user: this._usuario } }));
   },
 
   get usuario() { return this._usuario; },
+
+  get signo() { return (this._usuario && this._usuario.signo) || null; },
 
   async verificarAuth() {
     try {
@@ -129,7 +184,7 @@ const SESION = {
           zona.innerHTML = `
             <div class="user-menu">
               ${avatar}
-              <span class="user-name">${escapHtml(nombre)}</span>
+              <span class="user-name">${escapHtml(nombre)}</span>${zodiacoChipHTML(u.signo)}
               <a href="/amigos.html" class="btn-amigos" title="Amigos y chat" aria-label="Amigos y chat">💬<span class="amigo-badge oculto" id="amigo-badge">0</span></a>
               <a href="https://wa.me/593978874821" target="_blank" rel="noopener" class="btn-whatsapp" title="Escríbenos por WhatsApp" aria-label="WhatsApp">
                 <svg class="wa-ico" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16.004 3.2c-7.06 0-12.8 5.741-12.8 12.8 0 2.258.59 4.468 1.697 6.42L3.2 28.8l6.438-1.683c1.872 1.029 4.109 1.683 6.366 1.683 7.06 0 12.8-5.74 12.8-12.8 0-7.06 5.74-12.8 12.8-12.8zm6.374 17.544c-.262.736-1.464 1.36-2.04 1.408-.543.048-1.2.066-1.936-.12-.423-.107-.966-.247-1.66-.485-2.91-1.003-4.806-3.354-4.95-3.508-.144-.154-1.182-1.571-1.182-2.998 0-1.426.748-2.127 1.014-2.418.266-.291.58-.364.773-.364.194 0 .388 0 .557.01.178.01.417-.067.653.5.242.582.82 2.003.894 2.148.073.145.122.315.024.509-.097.194-.145.315-.29.484-.145.17-.305.378-.436.507-.146.145-.297.302-.127.592.169.29.754 1.243 1.62 2.013 1.113.99 2.051 1.297 2.342 1.443.291.145.46.121.63-.073.17-.194.728-.85.921-1.142.194-.29.388-.242.654-.145.266.097 1.69.797 1.98.942.29.145.484.218.555.339.07.121.07.699-.192 1.435z"/></svg>
@@ -166,7 +221,7 @@ const SESION = {
       const inicial = (this._usuario.nombre || "O").trim()[0].toUpperCase();
       zona.innerHTML = `
         <nav class="menu">
-          <a href="/panel.html">Hola, ${this._usuario.nombre.split(" ")[0]} ✦</a>
+          <a href="/panel.html">Hola, ${this._usuario.nombre.split(" ")[0]} ${zodiacoChipHTML(this._usuario.signo)} ✦</a>
           <a href="/perfil.html">Perfil</a>
           <a href="/amigos.html">Amigos<span class="amigo-badge oculto" id="amigo-badge">0</span></a>
           <a href="#" id="btn-salir">Salir</a>

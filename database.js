@@ -120,6 +120,10 @@ try { db.exec("ALTER TABLE lecturas ADD COLUMN favorita INTEGER NOT NULL DEFAULT
 try { db.exec("ALTER TABLE users ADD COLUMN avatar TEXT"); } catch {}
 try { db.exec("ALTER TABLE users ADD COLUMN bio TEXT"); } catch {}
 try { db.exec("ALTER TABLE users ADD COLUMN baneado INTEGER NOT NULL DEFAULT 0"); } catch {}
+/* fecha de nacimiento (para el signo del Horóscopo Negro) y última actividad
+   (para el estado conectado/offline del chat) */
+try { db.exec("ALTER TABLE users ADD COLUMN fecha_nacimiento TEXT"); } catch {}
+try { db.exec("ALTER TABLE users ADD COLUMN ultima_actividad TEXT"); } catch {}
 /* normaliza el estado de amistad: el sistema usa 'aceptada' (pueden existir filas
    históricas o sembradas como 'aceptado') */
 try { db.exec("UPDATE amistades SET estado = 'aceptada' WHERE estado IN ('aceptado', 'aceptadas', 'aceptados')"); } catch {}

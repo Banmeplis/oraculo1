@@ -10,7 +10,7 @@
   <!--   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script> -->
   <!-- Y el script de Google AdSense: -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6331831674832770" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="/css/estilo.css?v=43">
+  <link rel="stylesheet" href="/css/estilo.css?v=44">
 </head>
 <body>
 
@@ -31,6 +31,8 @@
       <h2>Mi panel mágico</h2>
       <p id="bienvenida"></p>
     </section>
+
+    <div id="seccion-horoscopo-panel" style="margin-bottom:24px"></div>
 
     <div class="panel-layout">
       <aside class="tarjeta panel-nav" style="padding:12px">
@@ -105,8 +107,8 @@
     <div class="logo"><span>☾</span> EL CENDERO DE LOS AR🌙ANGELES</div>
   </footer>
 
-  <script src="/js/app.js?v=16"></script>
-  <script src="/js/chat-widget.js?v=3"></script>
+  <script src="/js/app.js?v=17"></script>
+  <script src="/js/chat-widget.js?v=4"></script>
   <script>
     let archivoPortada = null, archivoVideo = null;
     const aviso = document.getElementById("aviso-nueva");
@@ -127,10 +129,32 @@
         if (d.user.rol === "admin") {
           document.getElementById("link-usuarios").classList.remove("oculto");
         }
+        renderHoroscopoPanel();
       } catch { location.href = "/login.html?redir=panel"; }
       cargarPostsPanel();
       cargarLecturas();
     });
+
+    async function renderHoroscopoPanel() {
+      const caja = document.getElementById("seccion-horoscopo-panel");
+      if (!caja || !SESION.usuario) return;
+      if (!SESION.usuario.signo) {
+        caja.innerHTML = `
+          <div class="horoscopo-sec horoscopo-vacio">
+            <b style="font-family:var(--fuente-deco);font-size:1.15rem">Horóscopo Negro · despiértalo</b>
+            <p>Añade tu fecha de nacimiento en tu perfil y tu signo se encenderá aquí, con su lectura del día y de la semana.</p>
+            <a class="btn btn-dorado" style="padding:10px 22px" href="/perfil.html">Completar mi perfil ✦</a>
+          </div>`;
+        return;
+      }
+      caja.innerHTML = '<div class="horoscopo-cargando">Despertando tu Horóscopo Negro ✨</div>';
+      try {
+        const d = await fetchHoroscopo(SESION.usuario.signo.signo);
+        caja.innerHTML = horoscopoHTML(d) || "";
+      } catch {
+        caja.innerHTML = "";
+      }
+    }
 
     /* pestañas */
     document.querySelectorAll(".panel-nav a").forEach(a => {
