@@ -1,0 +1,17 @@
+#!/bin/sh
+# Antes de cada push, descarga los usuarios y artículos nuevos de producción
+# (Render) hacia la BD local. Solo lectura en producción; nunca sube datos.
+# El push continúa aunque falle la sincronización.
+if [ -f scripts/sincronizar-usuarios.js ]; then
+  node scripts/sincronizar-usuarios.js
+  if [ $? -ne 0 ]; then
+    echo "[pre-push] ⚠ No se pudieron sincronizar usuarios; el push continúa igualmente."
+  fi
+fi
+if [ -f scripts/sincronizar-articulos.js ]; then
+  node scripts/sincronizar-articulos.js
+  if [ $? -ne 0 ]; then
+    echo "[pre-push] ⚠ No se pudieron sincronizar artículos; el push continúa igualmente."
+  fi
+fi
+exit 0

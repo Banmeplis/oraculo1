@@ -1,6 +1,7 @@
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const db = require("../database.js");
 const cfg = require("../config/index.js");
@@ -28,6 +29,46 @@ router.put("/ads", requiereAdmin, (req, res) => {
     return res.status(400).json({ error: "Línea no válida: «" + invalidas[0] + "». Formato: dominio, identificador, DIRECT/RESELLER, token" });
   fs.writeFileSync(RUTA_ADS, contenido.replace(/\r\n/g, "\n"));
   res.json({ ok: true, contenido });
+});
+
+router.get("/sync/usuarios", (req, res) => {
+  if (!cfg.SYNC_TOKEN)
+    return res.status(503).json({ error: "SYNC_TOKEN no está configurado en este despliegue" });
+  const dado = Buffer.from(String(req.get("x-sync-token") || ""));
+  const esperado = Buffer.from(String(cfg.SYNC_TOKEN));
+  if (dado.length !== esperado.length || !crypto.timingSafeEqual(dado, esperado))
+    return res.status(401).json({ error: "Token de sincronización inválido" });
+  const usuarios = db.prepare(`
+    SELECT id, nombre, email, rol, avatar, bio, baneado, proveedor, password_hash,
+           creado_en, fecha_nacimiento, ultima_actividad
+    FROM users ORDER BY id ASC
+  `).all();
+  res.json({ ok: true, usuarios });
+});
+
+/* Exporta los artículos (y sus comentarios) para que la BD local pueda bajar
+   los nuevos publicados desde el sitio web. Solo LECTURA: nunca modifica nada. */
+router.get("/sync/posts", (req, res) => {
+  if (!cfg.SYNC_TOKEN)
+    return res.status(503).json({ error: "SYNC_TOKEN no está configurado en este despliegue" });
+  const dado = Buffer.from(String(req.get("x-sync-token") || ""));
+  const esperado = Buffer.from(String(cfg.SYNC_TOKEN));
+  if (dado.length !== esperado.length || !crypto.timingSafeEqual(dado, esperado))
+    return res.status(401).json({ error: "Token de sincronización inválido" });
+  const posts = db.prepare(`
+    SELECT p.id, p.autor_id, p.titulo, p.resumen, p.cuerpo, p.portada, p.video,
+           p.publicado, p.creado_en, p.actualizado,
+           u.nombre AS autor, u.email AS autor_email
+    FROM posts p JOIN users u ON u.id = p.autor_id
+    ORDER BY p.id ASC
+  `).all();
+  const comentarios = db.prepare(`
+    SELECT c.id, c.post_id, c.user_id, c.autor, c.cuerpo, c.creado_en,
+           u.email AS user_email
+    FROM comentarios c LEFT JOIN users u ON u.id = c.user_id
+    ORDER BY c.id ASC
+  `).all();
+  res.json({ ok: true, posts, comentarios });
 });
 
 router.get("/usuarios", requiereAdmin, (req, res) => {

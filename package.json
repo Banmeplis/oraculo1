@@ -5,7 +5,10 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "sync:usuarios": "node scripts/sincronizar-usuarios.js",
+    "sync:articulos": "node scripts/sincronizar-articulos.js",
+    "sync": "node scripts/sincronizar-usuarios.js && node scripts/sincronizar-articulos.js"
   },
   "dependencies": {
     "astronomy-engine": "^2.1.19",

@@ -19,6 +19,9 @@ module.exports = {
   SECRETO: process.env.SECRETO_SESION || CONFIG.secret || "oraculo-secreto-local-cambiar",
   MASTER_EMAIL: String(process.env.MASTER_EMAIL || "juanshinku@gmail.com").toLowerCase(),
   ORIGEN_PUBLICO: process.env.ORIGEN_PUBLICO || "",
+  /* sincronización de usuarios de producción → BD local (pre-push hook) */
+  SYNC_TOKEN: process.env.SYNC_TOKEN || (CONFIG.sync && CONFIG.sync_token) || "",
+  SYNC_ORIGEN: process.env.SYNC_ORIGEN || "https://oraculo1-hhwc.onrender.com",
   GOOGLE: {
     client_id: process.env.GOOGLE_CLIENT_ID || (CONFIG.google && CONFIG.google.client_id) || "",
     client_secret: process.env.GOOGLE_CLIENT_SECRET || (CONFIG.google && CONFIG.google.client_secret) || ""
