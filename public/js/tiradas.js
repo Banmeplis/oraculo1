@@ -2909,11 +2909,6 @@ const TIRADAS = {
     html += '<div class="resultado-cabecera"><div class="deco">' + this.elegantIcono[t.id] + "</div>";
     html += "<p>Resultado de la tirada de tarot completa gratis</p></div>";
 
-    html += `<div class="contexto-tirada vidrio">
-      <h3 style="color:var(--dorado);margin-bottom:10px">Interpretación Angelical</h3>
-      <p class="comparte"><small>✨ Comparte tu resultado con quien quieras ✨</small></p>
-    </div>`;
-
     let arcangeles;
     if (esPregunta) {
       const yaAnalizado = resultadoHTML.__tipoPregunta && resultadoHTML.__analisis;
@@ -2940,11 +2935,23 @@ const TIRADAS = {
     }
     const arcangel = arcangeles[0];
     this.aplicarFondo(arcangeles);
-    html += `<div class="arcangel-regente vidrio">
-      <p class="ar-presentes">
-        <span class="ar-titulo">${esPregunta ? (resultadoHTML.__tipoPregunta === "combinado" ? "Los arcángeles que te responden:" : "El arcángel que te responde:") : "Arcángeles presentes:"}</span>
-        ${arcangeles.map(a => `<span class="ar-chip" style="--chip:${a.color}"><span class="arc-avatar"><img src="${a.img}" alt="${this.nombreCorto(a.nombre)}" loading="lazy"><i></i><i></i><i></i><i></i></span>${this.nombreCorto(a.nombre)}</span>`).join("")}
-      </p>
+
+    html += `<div class="arcangel-regente vidrio" style="--color-arc:${arcangel.color}">
+      <div class="ar-seal"><img src="${arcangel.img}" alt="${this.nombreCorto(arcangel.nombre)}" loading="lazy"></div>
+      <div class="ar-info">
+        <small>${esPregunta ? "El arcángel que te responde" : "Arcángel regente de esta lectura"}</small>
+        <h3>${arcangel.nombre}</h3>
+        <span class="ar-regencia">${arcangel.regencia}</span>
+        <p class="ar-mensaje">${arcangel.mensaje}</p>
+        <div class="ar-fila">
+          ${arcangeles.map(a => `<span class="ar-chip" style="--chip:${a.color}">${a.emoji} ${this.nombreCorto(a.nombre)}</span>`).join("")}
+        </div>
+      </div>
+    </div>`;
+
+    html += `<div class="contexto-tirada vidrio">
+      <h3 style="color:var(--dorado);margin-bottom:10px">Interpretación Angelical</h3>
+      <p class="comparte"><small>✨ Comparte tu resultado con quien quieras ✨</small></p>
     </div>`;
 
     if (esPregunta) {
@@ -3263,6 +3270,13 @@ const TIRADAS = {
 
   gradoTexto(g) { const r = this.redondear(this.gradosA(g), 0); return `${r}°`; },
 
+  gradoCompleto(g) {
+    const m = this.gradosA(g);
+    const gd = Math.floor(m + 1e-10);
+    const mn = Math.floor((m - gd) * 60 + 1e-9);
+    return `${gd}°${String(mn).padStart(2, "0")}′`;
+  },
+
   calculoAstral(fecha, hora, lugar) {
     const cal = { fecha, hora, lugar, offline: !this.astronomiaDisponible() };
     if (cal.offline) return cal;
@@ -3274,6 +3288,7 @@ const TIRADAS = {
     const ms = this.nacimientoUTC(fecha, hora, sitio ? sitio.tz : "UTC");
     if (!Number.isFinite(ms)) return cal;
     cal.ms = ms;
+    cal.jd = ms / 86400000 + 2440587.5;
     const t0 = Astronomy.MakeTime(new Date(ms));
 
     cal.sol = { lon: this.lonDeCuerpo("sol", t0) };
@@ -3311,15 +3326,22 @@ const TIRADAS = {
       cal.mc = mc;
       cal.ascSigno = this.signoDeGrado(asc);
       cal.mcSigno = this.signoDeGrado(mc);
-      cal.casas = [];
-      for (let i = 1; i <= 12; i++) {
-        const c = this.normDeg(asc + (i - 1) * 30);
-        cal.casas.push({ num: i, lon: c, signo: this.signoDeGrado(c) });
+      let cusps = null;
+      if (Math.abs(sitio.lat) < 66) {
+        try { cusps = this.casasPlacidus(this.normDeg(asc), ramc, this.oblicuidadEcliptica(t0), sitio.lat); } catch (e) { cusps = null; }
       }
+      if (!cusps) cusps = Array.from({ length: 12 }, (_, i) => this.normDeg(asc + i * 30));
+      cal.casas = cusps.map((c, i) => ({ num: i + 1, lon: this.normDeg(c), signo: this.signoDeGrado(c) }));
       planetas.forEach(p => {
         p.casa = ((Math.floor(this.normDeg(p.lon - asc) / 30)) % 12 + 12) % 12 + 1;
       });
     }
+
+    /* Lilith (Luna Oscura) media: punto de la eclíptica del apogeo lunar */
+    const te = (cal.jd - 2451545) / 36525;
+    cal.lilith = this.normDeg(83.3532430 + 0.11140408635 * te);
+    cal.lilithSigno = this.signoDeGrado(cal.lilith);
+    if (cal.casas) cal.lilithCasa = ((Math.floor(this.normDeg(cal.lilith - cal.asc) / 30)) % 12 + 12) % 12 + 1;
     return cal;
   },
 
@@ -3580,6 +3602,386 @@ const TIRADAS = {
     return `<div class="rueda-escena">${s}${chispas}</div>`;
   },
 
+  /* ------------------- reporte completo de la carta astral ------------------ */
+
+  casasNombres: ["Primera", "Segunda", "Tercera", "Cuarta", "Quinta", "Sexta",
+    "Séptima", "Octava", "Novena", "Décima", "Undécima", "Duodécima"],
+
+  areaPlaneta: {
+    sol: "la identidad, la vitalidad y el propósito",
+    luna: "las emociones y la memoria del alma",
+    mercurio: "la mente, la palabra y la forma de aprender",
+    venus: "la forma de amar, la belleza y el placer",
+    marte: "la acción, el deseo y la valentía",
+    jupiter: "la fe, la abundancia y la expansión",
+    saturno: "la responsabilidad, la disciplina y la estructura",
+    urano: "la libertad, la originalidad y el cambio",
+    neptuno: "los sueños, la intuición y la espiritualidad",
+    pluton: "el poder interior y la transformación"
+  },
+
+  introPlaneta: {
+    sol: "Es tu factor central: la cualidad básica de tu conciencia y el regente de tu vitalidad. Revela cómo brillas, qué te fortalece y el propósito que anima tu personalidad.",
+    luna: "Gobierna tu parte emocional, tus hábitos y tu refugio. Cuenta cómo reaccionas por dentro, qué te da seguridad y el pulso de tu vida cotidiana.",
+    mercurio: "Simboliza tu comunicación, tu juicio y tu reflexión. Muestra la curiosidad de tu mente, tu palabra y la manera en que procesas lo que vives.",
+    venus: "Simboliza lo bello y lo deseable: tu necesidad de armonía, tu vida amorosa y tu capacidad de entrega. Es tu magnetismo y tu estética.",
+    marte: "Es tu fuerza iniciadora, tu coraje y tu impulso a la acción. Tu energía busca exteriorizar deseos y defender tu territorio.",
+    jupiter: "Es tu crecimiento en todos los sentidos: conocer más, llegar a ser más, expandir horizontes. Tu fe y tu abundancia fluyen con él.",
+    saturno: "Es la responsabilidad, la estructura y el tiempo. Sus límites forjan madurez: te concede tras el esfuerzo y te enseña a sostener.",
+    urano: "Es la emancipación: romper esquemas para ser único. Tu verdadero yo pide independencia, originalidad e ideas de futuro.",
+    neptuno: "Es la conciencia cósmica: imaginación, intuición e inspiración que llegan desde lo invisible. Te conecta con lo que no se ve.",
+    pluton: "Es la transformación inevitable: los cambios profundos que nacen en tu interior y suben a la superficie. Poder y renacimiento."
+  },
+
+  textoRetro: {
+    mercurio: "Mercurio retrógrado: tu mente procesa hacia adentro. Las ideas se gestan antes de expresarse, vuelves a revisar antes de avanzar y tu memoria trabaja en los detalles que otros pasan por alto.",
+    venus: "Venus retrógrada: el amor vuelve una y otra vez sobre los temas del corazón. Te invita a reconciliarte contigo y a amar desde la verdad interior, sin repetir los patrones de siempre.",
+    marte: "Marte retrógrado: tu impulso se canaliza en ciclos de ida y vuelta. Primero hacia dentro: aprender a frenar, medir tu energía y actuar solo cuando la decisión es tuya.",
+    jupiter: "Júpiter retrógrado: tu fe nace de la propia experiencia y no de lo heredado. No confías en la suerte: planificas, aprendes de tus propias caídas y sabes que mereces lo que construyes.",
+    saturno: "Saturno retrógrado: tu responsabilidad se revisa a solas. Maduras por dentro antes que por imposición externa, sanando tu relación con la autoridad y con el tiempo.",
+    urano: "Urano retrógrado: la rebeldía es interna. Irrumpes hacia dentro: repiensas tu libertad antes de romper con lo de afuera.",
+    neptuno: "Neptuno retrógrada: tu mundo interior te pide ordenar lo que percibes. Dones intuitivos, sí, y también la tarea de distinguir los sueños de las realidades.",
+    pluton: "Plutón retrógrado: tu poder se transforma en silencio. Temes ser controlado y guardas tu fuerza hasta que decides exponerla: es tu supervivencia más íntima."
+  },
+
+  textosAscendente: {
+    "Aries": "Un amanecer que no espera: caminas mirando hacia delante, con prisa heroica y ganas de encender caminos. El mundo te ve llegar antes de que llegues, y eso te hace memoria para muchos.",
+    "Tauro": "La calma que sostiene: tu presencia da seguridad, sabe esperar y descansa en lo que ya está probado. El mundo percibe que contigo se puede descansar.",
+    "Géminis": "La palabra que abre puertas: llegas conversando, preguntando, conectando personas e ideas en un instante. Tu puerta de entrada a lo nuevo es la curiosidad.",
+    "Cáncer": "Puertas cargadas de memoria: te presentas cuidando, intuyendo y protegiendo. El mundo siente que contigo hay un abrazo esperándolo, aunque tu coraza sepa de mareas internas.",
+    "Leo": "El sol que se presenta: tu presencia ilumina, generosa y magnética. Llegas como quien trae luz, y el mundo tiende a seguirte sin saber por qué.",
+    "Virgo": "El detalle que ordena: te muestras preciso, útil, atento a lo que nadie ve. Tu puerta hacia la vida es la observación al servicio de mejorar las cosas.",
+    "Libra": "La gracia que equilibra: llegas buscando armonía, escuchando las dos campanas y embelleciendo cada encuentro. Tu sello es la elegancia de los vínculos.",
+    "Escorpio": "La profundidad que se reserva: tu mirada lo ve todo y no lo dice todo. Llegas con magnetismo y misterio; el mundo siente que contigo se puede ir al fondo.",
+    "Sagitario": "El horizonte que se abre: te presentas con fe, movimiento y palabra directa. Tu puerta hacia lo nuevo es el viaje y la verdad sin adornos.",
+    "Capricornio": "La cumbre que se propone: llegas serio, firme y confiable, con un plan que no cuentas todavía. El mundo distingue en ti el esfuerzo por llegar.",
+    "Acuario": "La libertad que despierta: te presentas original, racional y de futuro. Tu sello inquieta a los conformistas y une a los que buscan algo distinto.",
+    "Piscis": "El velo que acoge: llegas suave, soñador, sintiendo el clima de la sala antes de cruzar la puerta. El mundo se abre contigo casi sin darse cuenta."
+  },
+
+  textosCasa: [
+    "La Casa 1 es la de tu identidad y tu cuerpo: cómo te presentas, cómo comienzas y el sello personal que abres en cada puerta. Aquí tu energía se muestra sin filtros y construye tu primera impresión.",
+    "La Casa 2 es la de tus recursos: el dinero, los bienes, la autoestima y todo lo que consideras valioso. Aquí aprender a valorarte se vuelve tu forma de sostener tu vida.",
+    "La Casa 3 es la del ambiente cercano: hermanos, vecinos, estudios, palabras y viajes cortos. Aquí tu mente cotidiana dialoga con tu mundo y deja huella en cada conversación.",
+    "La Casa 4 es tu raíz: el hogar, la familia y el santuario emocional del que vienes. Aquí se guarda tu pasado, tu refugio y la tierra que nutre todo lo demás.",
+    "La Casa 5 es la de la creatividad y el placer: el romance, los hijos, el juego y los talentos que disfrutas. Aquí tu niño interior sale a brillar y a crear por el simple gusto de hacerlo.",
+    "La Casa 6 es la del trabajo de cada día: la rutina, la salud, el servicio y el oficio que perfeccionas. Aquí la constancia se vuelve tu forma de cuidar el cuerpo y el espíritu.",
+    "La Casa 7 es la de las alianzas: la pareja, los socios, los contratos y el espejo que son los otros para ti. Aquí aprendes a compartir tu vida y a encontrar en el tú la otra mitad de tu historia.",
+    "La Casa 8 es la de la transformación: lo compartido, lo que muere para renacer, la intimidad y el poder. Aquí tus recursos y tus vínculos se transforman en fuerza interior.",
+    "La Casa 9 es la de los horizontes: los viajes largos, los estudios altos, la filosofía y la fe. Aquí tu mente se expande y tu verdad se vuelve más grande.",
+    "La Casa 10 es tu cima: la vocación, la profesión, la imagen pública y el legado que dejas. Aquí tu esfuerzo se vuelve reconocimiento y tu nombre encuentra su lugar en el mundo.",
+    "La Casa 11 es la de los amigos y los proyectos de futuro: los grupos, las causas, los sueños compartidos. Aquí tu visión del mañana y tus alianzas se unen para hacer lo posible.",
+    "La Casa 12 es la de la vida interior: los sueños, el inconsciente, los retiros y los santuarios secretos. Aquí termina y comienza cada ciclo, y de aquí brota tu intuición más fina."
+  ],
+
+  textosLilith: {
+    "Aries": "en Aries tu sombra pide ser vista, anunciada y defendida con fuego. El deseo que guardas tiene urgencia y reclama su lugar.",
+    "Tauro": "en Tauro tu deseo oculto es sensorial y posesivo, creativo y firme como la tierra. La abundancia es tu forma de pensar: no dejes que el miedo dicte tu valor.",
+    "Géminis": "en Géminis tu lado salvaje habla: rompe silencios que otros mantienen. Tu deseo escurre entre palabras e ideas que nadie espera de ti.",
+    "Cáncer": "en Cáncer tu sombra anida en la memoria y el instinto. Eres imán de lo protegido y lo oculto, y tu fuerza vuelve cuando te permites sentir.",
+    "Leo": "en Leo tu deseo exige brillar sin pedir perdón. Nada de ser la nota al pie: tu teatro interno quiere escenario.",
+    "Virgo": "en Virgo tu sombra es perfeccionista y secreta: analiza el placer hasta comprenderlo. Tu deseo se esconde bajo el orden.",
+    "Libra": "en Libra tu lado oscuro negocia lo que no te atreves a pedir. El deseo se disfraza de equilibrio para no asustar.",
+    "Escorpio": "en Escorpio tu deseo es profundo y transformador, alquímico. Tu sombra sabe de poder y de renacimiento, y reclama la verdad.",
+    "Sagitario": "en Sagitario tu sombra es errante, idealista y libre. Tu deseo pide horizonte y no soporta la jaula de la rutina.",
+    "Capricornio": "en Capricornio tu sombra aspira a la cima y a la herencia. El deseo de construir y perdurar hierve bajo tu frialdad.",
+    "Acuario": "en Acuario tu lado oculto rompe las reglas para liberarse de todos. Tu deseo es la libertad pensada, la utopía encarnada.",
+    "Piscis": "en Piscis tu sombra se disuelve en todo y en nada. Tu deseo es místico y oceánico, invisible de tan profundo."
+  },
+
+  distTexto: {
+    cualidades: {
+      "Cardinal": "Tienes la mayor concentración de planetas en signos Cardinales: los que marcan el comienzo de cada estación. Son pioneros que toman la delantera y crean cosas; líderes naturales. Su destello de acción e iniciativa tiene un precio: la paciencia se agota rápido, y esa vulnerabilidad es justo lo que hay que trabajar. La naturaleza cardinal se resume en dos palabras: acción e iniciativa.",
+      "Fijo": "Tienes la mayor concentración de planetas en signos Fijos: los que sostienen el corazón de cada estación. Son la constancia, la lealtad y la capacidad de mantener rumbo cuando todo tiembla. Su energía no necesita prisa: edifica, estabiliza y defiende lo que ama. El reto está en soltar lo que ya cumplió su tiempo, porque la resistencia también puede congelar la vida.",
+      "Mutable": "Tienes la mayor concentración de planetas en signos Mutables: los que cierran cada estación y hacen de puente. Son adaptables, versátiles y abiertos al flujo de la vida. Su talento es cambiar sin romperse y traducir lo aprendido en nuevos comienzos. El desafío es no convertirse en dispersión: la flexibilidad es un regalo cuando se elige, y una trampa cuando todo se pospone."
+    },
+    elementos: {
+      "Fuego": "Tienes la mayor concentración de planetas en los signos de Fuego: plasma puro, iniciativa y vitalidad desbordante. Los signos de fuego actúan desde el impulso y el entusiasmo, encienden caminos y lideran sin pedir permiso. Su reto es dosificar la llama para no quemarse: la pasión es un motor cuando el freno también es tuyo.",
+      "Tierra": "Tienes la mayor concentración de planetas en los signos de Tierra: lo sólido, lo concreto y lo sensorial. Construyes con paciencia, confías en lo que se puede tocar y tu palabra pesa. El mundo material es tu escuela y tu taller. El reto es no volverte rigidez: la tierra fértil también necesita moverse para seguir dando fruto.",
+      "Aire": "Tienes la mayor concentración de planetas en los signos de Aire: gas, palabra, pensamiento. Tu mente es tu brújula: racional, ligera y siempre conectando ideas y personas. Analizas antes de sentir y comunicas con claridad. El reto es bajar la cabeza al corazón: pensar mucho es un don, pero sentir también es parte del mapa.",
+      "Agua": "Tienes la mayor concentración de planetas en los signos de Agua: las personas influenciadas por este elemento basan su percepción en la intuición y los instintos. Son receptivas, emocionales, intuitivas, espirituales, imaginativas, creativas y profundamente empáticas. Su sensibilidad les permite sentir las energías de quienes las rodean, y eso a menudo las vuelve más compasivas y disponibles para ayudar. El reto es no dejarse llevar en demasiadas direcciones: quien siente tanto también necesita su propio ancla."
+    },
+    polaridad: {
+      "Masculino": "Tienes la mayor concentración de planetas en signos Masculinos (Yang): el impulso que busca, conquista y va. Tu energía se proyecta hacia fuera, con acción, palabra y decisión. El reto es aprender a recibir y descansar: el hacer constante no siempre es avanzar.",
+      "Femenino": "Tienes la mayor concentración de planetas en signos Femeninos (Yin): son mayormente introvertidos, con una actitud expectante, pasiva y en armonía con su entorno. En lugar de moverse de forma activa hacia aquello que se proponen, lo atraen hacia sí, magnéticamente. Frente al mundo exterior muestran una actitud más reservada y tímida, que guarda una gran fuerza que espera su momento."
+    },
+    cuadrantes: {
+      "C1": "Tienes la mayor concentración de planetas en el cuadrante 1: el individualismo que nace de ti hacia el mundo. Tu identidad, tu cuerpo y tu voz son el centro. Las casas de este cuadrante se relacionan con el descubrimiento de quién eres y cómo te presentas.",
+      "C2": "Tienes la mayor concentración de planetas en el cuadrante 2: la vida se te juega en lo concreto y cotidiano. El hogar, el trabajo diario, la salud y el servicio a otros son tu territorio de aprendizaje. Es el cuadrante de la construcción silenciosa.",
+      "C3": "Tienes la mayor concentración de planetas en el cuadrante 3: tu crecimiento pasa por el encuentro con el otro. Las alianzas, las sociedades y las relaciones personales son tu espejo; y luego la expansión hacia la filosofía, los viajes y el conocimiento alto. Es el cuadrante del vínculo y del horizonte.",
+      "C4": "Tienes la mayor concentración de planetas en el cuadrante 4: tu individualismo se precipita hacia el mundo exterior. El deseo de probarte a ti mismo, la lucha por el poder y la influencia en la sociedad, la carrera, y el participar en el trabajo colectivo imponiendo tus planes e intereses. Se relaciona con la culminación y la integración en el entorno: por eso las casas de este cuadrante hablan de madurez. Casa 10: mi propósito. Casa 11: mi ideología. Casa 12: mi vida interior integrada en el colectivo."
+    }
+  },
+
+  prologoAstral: "La carta astral es un mapa del cielo tal como se veía en el momento de tu nacimiento, incluida la mitad invisible que queda bajo el horizonte. En el círculo central está la Tierra; a su alrededor, los doce signos forman la banda de la eclíptica y los planetas se mueven entre ellos a velocidades distintas. El análisis de esta situación astral revela tus puntos fuertes y débiles en esta encarnación, y te ayuda a ver dónde darán fruto fácilmente tus esfuerzos y en qué aspectos conviene cultivar tolerancia y paciencia para superar las dificultades. Recuerda siempre este principio: los astros inclinan, pero no obligan. Es tu actitud la que determina el resultado.",
+
+  epilogoAstral: "La Carta Astral es un extenso y detallado documento que va descubriendo las facetas más importantes de tu vida. La repetición de un mismo factor a lo largo de la interpretación es un síntoma inequívoco de que tendrá más fuerza en tu vida; la contradicción de factores es un síntoma de dualidad. La resolución de ese conflicto, tan común en muchas cartas natales, la determinará tu propia evolución psicológica y espiritual: tu madurez ante la vida. Por encima de toda influencia astrológica se sitúa siempre el poder de tu voluntad. Porque los astros inclinan, pero no obligan, y el sabio gobierna las estrellas mientras el necio las obedece. Que todo lo que aquí se ha revelado te sirva de provecho a lo largo de toda tu vida.",
+
+  casaNombre(n) { return this.casasNombres[n - 1] || ("Casa " + n); },
+
+  casasPlacidus(asc, ramc, eps, lat) {
+    const R = Math.PI / 180;
+    const norm = g => ((g % 360) + 360) % 360;
+    const raDe = lon => Math.atan2(Math.sin(lon * R) * Math.cos(eps * R), Math.cos(lon * R)) / R;
+    const decDe = lon => Math.asin(Math.sin(lon * R) * Math.sin(eps * R)) / R;
+    const cusp = (base, frac, diurna) => {
+      let lon = base + 30;
+      for (let it = 0; it < 40; it++) {
+        const dec = decDe(lon), ra = raDe(lon);
+        const ad = Math.asin(Math.tan(dec * R) * Math.tan(lat * R)) / R;
+        const sa = diurna ? 90 + ad : 90 - ad;
+        const objetivo = frac * sa;
+        let md = norm(ra - base); if (md > 180) md -= 360;
+        const err = objetivo - md;
+        const der = Math.cos(eps * R) / (Math.pow(Math.cos(lon * R), 2) + Math.pow(Math.sin(lon * R) * Math.cos(eps * R), 2));
+        lon += err / der;
+        if (Math.abs(err) < 1e-5) break;
+      }
+      return norm(lon);
+    };
+    const c11 = cusp(ramc, 1 / 3, true);
+    const c12 = cusp(ramc, 2 / 3, true);
+    const c2 = cusp(norm(ramc + 180), 1 / 3, false);
+    const c3 = cusp(norm(ramc + 180), 2 / 3, false);
+    const c1 = norm(asc);
+    const c4 = norm(ramc + 180);
+    const c10 = norm(ramc);
+    return [c1, c2, c3, c4, norm(c11 + 180), norm(c12 + 180), norm(c1 + 180), norm(c2 + 180), norm(c3 + 180), c10, c11, c12];
+  },
+
+  cuerposAspecto(cal) {
+    const cuerpos = cal.planetas.map(p => ({
+      clave: p.clave, nombre: p.nombre, glifo: p.glifo, lon: p.lon, esAngulo: false
+    }));
+    if (cal.asc != null) cuerpos.push({ clave: "asc", nombre: "Ascendente", glifo: "AS", lon: cal.asc, esAngulo: true });
+    if (cal.mc != null) cuerpos.push({ clave: "mc", nombre: "Mediocielo", glifo: "MC", lon: cal.mc, esAngulo: true });
+    return cuerpos;
+  },
+
+  aspectosDe(cal) {
+    const defs = [
+      { tipo: "Conjunción", angulo: 0, orb: 8, color: "#ffd166" },
+      { tipo: "Sextil",     angulo: 60, orb: 6, color: "#7ee8c8" },
+      { tipo: "Cuadratura", angulo: 90, orb: 8, color: "#ff6b6b" },
+      { tipo: "Trígono",    angulo: 120, orb: 8, color: "#b39dfa" },
+      { tipo: "Oposición",  angulo: 180, orb: 8, color: "#ff9e6d" }
+    ];
+    const cuerpos = this.cuerposAspecto(cal);
+    const lista = [];
+    for (let i = 0; i < cuerpos.length; i++) {
+      for (let j = i + 1; j < cuerpos.length; j++) {
+        const a = cuerpos[i], b = cuerpos[j];
+        const dif = this.normDeg(a.lon - b.lon);
+        const delta = Math.min(dif, 360 - dif);
+        let mejor = null;
+        defs.forEach(d => {
+          const desvio = Math.min(Math.abs(delta - d.angulo), Math.abs(delta - (360 - d.angulo)));
+          if (desvio <= d.orb && (!mejor || desvio < mejor.desvio)) mejor = { desvio, d };
+        });
+        if (mejor) lista.push({ a, b, tipo: mejor.d.tipo, color: mejor.d.color, grados: Math.round(delta) + "°" });
+      }
+    }
+    const ordenPlan = ["sol", "luna", "mercurio", "venus", "marte", "jupiter", "saturno", "urano", "neptuno", "pluton", "asc", "mc"];
+    return lista.sort((x, y) =>
+      ordenPlan.indexOf(x.a.clave) - ordenPlan.indexOf(y.a.clave) ||
+      ordenPlan.indexOf(x.b.clave) - ordenPlan.indexOf(y.b.clave));
+  },
+
+  textoAspecto(a) {
+    const areaA = a.a.esAngulo ? "tu proyección exterior" : this.areaPlaneta[a.a.clave] || "tu energía";
+    const areaB = a.b.esAngulo ? (a.b.clave === "mc" ? "tu vocación y tu legado" : "tu sello ante el mundo") : this.areaPlaneta[a.b.clave] || "tu energía";
+    const nb = (n) => n.replace("El ", "");
+    const textos = {
+      "Conjunción": `La ${a.tipo} entre ${a.a.nombre} y ${a.b.nombre} funde ${areaA} con ${areaB}: ambos pulsos trabajan como uno solo. Es un tema central de tu carta, difícil de separar, que se potencia o se apaga según lo atiendas. Aprender a utilizarlo con conciencia es uno de tus mayores regalos.`,
+      "Sextil": `El ${a.tipo} entre ${a.a.nombre} y ${a.b.nombre} es una oportunidad que se activa con tu intención: ${areaA} y ${areaB} pueden aliarse cuando das el primer paso. No llega solo: se enciende cuando te mueves y aprovechas la brisa a favor.`,
+      "Cuadratura": `La ${a.tipo} entre ${a.a.nombre} y ${a.b.nombre} genera tensión creativa: ${areaA} se enfrenta con ${areaB} y te empuja a crecer. Esa fricción, bien gestionada, se convierte en impulso para construir lo que de otra forma nunca intentarías. El conflicto es el motor de tu evolución.`,
+      "Trígono": `El ${a.tipo} entre ${a.a.nombre} y ${a.b.nombre} fluye con naturalidad: ${areaA} y ${areaB} se apoyan sin esfuerzo y te otorgan un talento que emerge como si nada. Es una corriente de respaldo que conviene activar con acciones concretas para no dormirla.`,
+      "Oposición": `La ${a.tipo} entre ${a.a.nombre} y ${a.b.nombre} plantea un equilibrio pendiente: ${nb(a.a.nombre)} y ${nb(a.b.nombre)} se miran desde el espejo. La madurez llega cuando dejas de elegir una sola de las dos voces y aprendes a integrarlas. Es la danza de tu vida, y el centro lo pones tú.`
+    };
+    return textos[a.tipo] || "";
+  },
+
+  distribucionHTML(cal) {
+    const total = (cal.planetas || []).length;
+    if (!total) return "";
+    const paleta = {
+      Fuego: "#ff8a6b", Tierra: "#8fd48f", Aire: "#8fd0e8", Agua: "#b39dfa",
+      Cardinal: "#e9ce8f", Fijo: "#c7b3ff", Mutable: "#7ee8c8",
+      Masculino: "#ff9e6d", Femenino: "#e79bc9",
+      C1: "#7ee8c8", C2: "#8fd0e8", C3: "#ffd9a8", C4: "#c7b3ff"
+    };
+    const reparte = (criterio, etiquetas) => {
+      const conteo = {};
+      (cal.planetas || []).forEach(p => { const k = criterio(p); conteo[k] = (conteo[k] || 0) + 1; });
+      const filas = Object.keys(conteo).sort((a, b) => conteo[b] - conteo[a]).map(k => ({
+        clave: k, nombre: etiquetas[k] || k, n: conteo[k],
+        pct: Math.round(conteo[k] / total * 1000) / 10, color: paleta[k] || "#e9ce8f"
+      }));
+      const dom = filas[0];
+      return { filas, dom, total };
+    };
+    const barra = (b) => `
+      <div class="dist-fila">
+        <div class="dist-rotulo"><b>${b.nombre}</b><span class="dist-cuenta">${b.n} planeta${b.n === 1 ? "" : "s"} · ${b.pct}%</span></div>
+        <div class="dist-barra"><div class="dist-llenado" style="--w:${b.pct}%;--c:${b.color}"></div></div>
+      </div>`;
+    const bloque = (titulo, icono, b) => `
+      <div class="dist-bloque dist-revelar">
+        <div class="dist-titulo">${icono} ${titulo}</div>
+        <div class="dist-barras">${b.filas.map(barra).join("")}</div>
+        <p class="dist-texto">${b.dom ? (this.distTexto[titulo.toLowerCase()] || {})[b.dom.clave] : ""}</p>
+      </div>`;
+
+    const cua = reparte(p => p.signo.modalidad, { Cardinal: "Cardinales", Fijo: "Fijos", Mutable: "Mutables" });
+    const ele = reparte(p => p.signo.elemento, { Fuego: "Fuego", Tierra: "Tierra", Aire: "Aire", Agua: "Agua" });
+    const pol = reparte(p => (p.signo.elemento === "Fuego" || p.signo.elemento === "Aire") ? "Masculino" : "Femenino", { Masculino: "Masculino", Femenino: "Femenino" });
+    let cuad = null;
+    if ((cal.planetas || []).every(p => p.casa)) {
+      cuad = reparte(p => "C" + (Math.ceil(p.casa / 3)), { C1: "Cuadrante 1", C2: "Cuadrante 2", C3: "Cuadrante 3", C4: "Cuadrante 4" });
+    }
+
+    return `<section class="astral-seccion vidrio astral-distribucion">
+      <span class="etiqueta-seccion">Distribución de Planetas</span>
+      <h2 class="astral-titulo">Cómo se reparte tu energía por cualidad, elemento, polaridad y cuadrante</h2>
+      <p class="astral-instruccion">Las modalidades (cualidades), los elementos, la polaridad y los cuadrantes muestran dónde concentras tus fuerzas y qué terrenos de la vida protagonizan tu venir.</p>
+      <div class="dist-cuadricula">
+        ${bloque("cualidades", "✦", cua)}
+        ${bloque("elementos", "🔥", ele)}
+        ${bloque("polaridad", "☯", pol)}
+        ${cuad ? bloque("cuadrantes", "🌐", cuad) : ""}
+      </div>
+    </section>`;
+  },
+
+  tablaCasasHTML(cal) {
+    if (!cal.casas) return "";
+    const filas = cal.casas.map(c => `
+      <tr>
+        <td><b>${this.casaNombre(c.num)}</b>${c.num === 1 ? " (AC)" : c.num === 10 ? " (MC)" : ""}</td>
+        <td>${this.gradoCompleto(c.lon)}</td>
+        <td>${c.signo.emoji} ${c.signo.signo}</td>
+      </tr>`).join("");
+    return `<section class="astral-seccion vidrio astral-casas">
+      <span class="etiqueta-seccion">Tabla de Casas · Placidus</span>
+      <h2 class="astral-titulo">Las doce casas de tu cielo</h2>
+      <p class="astral-instruccion">Cada casa es un terreno de la vida; en su cúspide se asienta el signo que la rige en tu nacimiento. Aquí abajo, dónde vive cada energía y qué signo la recibe.</p>
+      <div class="tabla-casas">
+        <table>
+          <thead><tr><th>Casa</th><th>Cúspide</th><th>Signo</th></tr></thead>
+          <tbody>${filas}</tbody>
+        </table>
+      </div>
+    </section>`;
+  },
+
+  textoPlanetaEnSigno(p, signo) {
+    const base = this.lecturaPorPlaneta[p.clave] ? this.lecturaPorPlaneta[p.clave](signo) : "";
+    const adj = this.adjetivoElemento[signo.elemento];
+    return `${signo.signo} es un signo de ${signo.elemento.toLowerCase()} (${adj}). ${base} Tu ${p.nombre} actúa de forma ${signo.modalidad.toLowerCase()}, y se enciende con ${signo.rasgos[0].toLowerCase()} y ${signo.rasgos[1].toLowerCase()}. Su luz te regala: ${signo.luz}. El reto de este emplazamiento: ${signo.reto}.`;
+  },
+
+  textoPlanetaEnCasa(p, num) {
+    return `${this.textosCasa[num - 1]} Con tu ${p.nombre} aquí, ${this.areaPlaneta[p.clave] || "tu energía"} se expresa en este terreno de la vida y lo convierte en un escenario donde tu alma quiere actuar.`;
+  },
+
+  planetaSeccionHTML(p) {
+    const signo = p.signo;
+    const retro = p.retro && this.textoRetro[p.clave] ? `
+      <div class="retro-carta">
+        <span class="retro-ico">℞</span>
+        <p>${this.textoRetro[p.clave]}</p>
+      </div>` : "";
+    const casa = p.casa ? `
+      <div class="planeta-en">
+        <span class="planeta-en-ico">🏠</span>
+        <div>
+          <div class="planeta-en-titulo">El ${p.nombre} en la ${this.casaNombre(p.casa)} Casa</div>
+          <p>${this.textoPlanetaEnCasa(p, p.casa)}</p>
+        </div>
+      </div>` : "";
+    return `<div class="planeta-detalle dist-revelar" style="--pl-c:${p.color}">
+      <div class="planeta-cab">
+        <span class="planeta-glifo">${p.glifo}</span>
+        <div>
+          <div class="planeta-titulo">El ${p.nombre}${retro ? " · retrógrado" : ""}</div>
+          <div class="planeta-sub">en ${signo.signo} ${signo.emoji} ${this.gradoCompleto(p.lon)}${p.casa ? " · " + this.casaNombre(p.casa) + " Casa" : ""}</div>
+        </div>
+      </div>
+      <p class="planeta-intro">${this.introPlaneta[p.clave] || ""}</p>
+      <div class="planeta-en">
+        <span class="planeta-en-ico">✦</span>
+        <div>
+          <div class="planeta-en-titulo">El ${p.nombre} en ${signo.signo}</div>
+          <p>${this.textoPlanetaEnSigno(p, signo)}</p>
+        </div>
+      </div>
+      ${retro}${casa}
+    </div>`;
+  },
+
+  lilithHTML(cal) {
+    if (cal.lilith == null) return "";
+    const signo = cal.lilithSigno;
+    const casa = cal.lilithCasa ? `
+      <div class="planeta-en">
+        <span class="planeta-en-ico">🏠</span>
+        <div>
+          <div class="planeta-en-titulo">Lilith en la ${this.casaNombre(cal.lilithCasa)} Casa</div>
+          <p>${this.textosCasa[cal.lilithCasa - 1]} En este lugar, el deseo que guardas encuentra su escenario: tu Luna Oscura aquí no pide ser controlada, sino integrada.</p>
+        </div>
+      </div>` : "";
+    return `<div class="planeta-detalle dist-revelar lilith-detalle" style="--pl-c:#e79bc9">
+      <div class="planeta-cab">
+        <span class="planeta-glifo">☾</span>
+        <div>
+          <div class="planeta-titulo">Lilith · la Luna Oscura</div>
+          <div class="planeta-sub">en ${signo.signo} ${signo.emoji} ${this.gradoCompleto(cal.lilith)}${cal.lilithCasa ? " · " + this.casaNombre(cal.lilithCasa) + " Casa" : ""}</div>
+        </div>
+      </div>
+      <p class="planeta-intro">Lilith es el apogeo de la Luna: el punto más alejado de la Tierra en la órbita lunar. No es un astro, sino un punto del cielo que representa dónde alejamos nuestros aspectos más salvajes: el deseo, la rebelión y la verdad que no se deja domesticar. Tu Lilith ${this.textosLilith[signo.signo] || "marca el lugar donde tu deseo escondido espera ser liberado."}</p>
+      ${casa}
+      <div class="retro-carta lilith-mantra">
+        <span class="retro-ico">🌑</span>
+        <p><b>Tu mantra:</b> «LA ABUNDANCIA ES UNA FORMA DE PENSAR. No dejo que el miedo y mi pasado me controlen. Soy digno de amor y verdad.»</p>
+      </div>
+    </div>`;
+  },
+
+  planetasHTML(cal) {
+    const lista = (cal.planetas || []).map(p => this.planetaSeccionHTML(p)).join("");
+    const lilith = this.lilithHTML(cal);
+    if (!lista && !lilith) return "";
+    return `<section class="astral-seccion vidrio astral-planetas">
+      <span class="etiqueta-seccion">Los planetas · el Sol, la Luna y las estrellas errantes</span>
+      <h2 class="astral-titulo">Tu cielo, planeta a planeta</h2>
+      <p class="astral-instruccion">Cada cuerpo celeste revela un aspecto de ti: el Sol tu esencia, la Luna tus emociones, y cada planeta un pulso distinto de tu carácter y tu destino.</p>
+      ${lista}${lilith}
+    </section>`;
+  },
+
+  aspectosHTML(cal) {
+    if (!cal.planetas || !cal.planetas.length) return "";
+    const lista = this.aspectosDe(cal);
+    if (!lista.length) return "";
+    const filas = lista.map((a, i) => `
+      <div class="aspecto-tarjeta dist-revelar" style="animation-delay:${i * 0.06}s">
+        <div class="aspecto-orb">
+          <span class="ao-cuerpo"><i>${a.a.glifo}</i><b>${a.a.nombre.replace("El ", "")}</b></span>
+          <span class="ao-linea" style="border-color:${a.color}"></span>
+          <span class="ao-tipo"><b>${a.tipo}</b><small>${a.grados}</small></span>
+          <span class="ao-linea" style="border-color:${a.color}"></span>
+          <span class="ao-cuerpo"><i>${a.b.glifo}</i><b>${a.b.nombre.replace("El ", "")}</b></span>
+        </div>
+        <p class="aspecto-texto">${this.textoAspecto(a)}</p>
+      </div>`).join("");
+    return `<section class="astral-seccion vidrio astral-aspectos">
+      <span class="etiqueta-seccion">Aspectos astrológicos</span>
+      <h2 class="astral-titulo">Los diálogos entre tus planetas</h2>
+      <p class="astral-instruccion">Los aspectos son las relaciones que forman los planetas entre sí, determinadas por los ángulos matemáticos que existen entre ellos. Estos son los que hablan en tu cielo:</p>
+      ${filas}
+    </section>`;
+  },
+
   armarCartaAstral(datos) {
     const cal = this.calculoAstral(datos.fecha, datos.hora, datos.lugar);
     const s = (cal.solPlaneta && cal.solPlaneta.signo) || this.signoDe(datos.fecha);
@@ -3588,7 +3990,6 @@ const TIRADAS = {
     const rasgos = s.rasgos.map(r => `<div class="tarjeta" style="padding:16px;text-align:center"><p style="color:var(--lavanda-suave)">${r}</p></div>`).join("");
     const gustos = (this.gustosPorSigno[s.signo] || []).map(g => `<span class="chip-gusto">${g}</span>`).join("");
     const tieneCasas = !!cal.casas;
-    const solP = cal.solPlaneta;
     const lunaP = cal.lunaPlaneta;
 
     let html = '<div class="resultado astral-resultado">';
@@ -3598,15 +3999,15 @@ const TIRADAS = {
       <p class="comparte"><small>✨ La rueda de tu nacimiento, los 10 cuerpos celestes y tu arcángel ✨</small></p>
     </div>`;
 
-    /* sol */
-    html += `<div class="carta-grande vidrio" style="--arc-color:${arc.color};animation-delay:.25s">
-      <div class="carta-texto" style="flex:1">
-        <h4>Tu sol · ${solP ? this.gradoTexto(solP.lon) : ""}</h4>
-        <h3>${s.signo} <span style="font-size:1.4rem">${s.emoji}</span></h3>
-        <div class="palabras"><span>${s.elemento}</span><span>${s.modalidad}</span><span>Regente: ${s.planeta}</span></div>
-        <p class="interp">Tu esencia de ${s.elemento.toLowerCase()} te regala ${s.luz}. Tu reto de alma es ${s.reto}.</p>
+    /* prólogo */
+    html += `<section class="astral-seccion vidrio astral-prologo dist-revelar">
+      <span class="etiqueta-seccion">Prólogo</span>
+      <h2 class="astral-titulo">${s.signo} ${s.emoji} · la llama de tu cielo</h2>
+      <p class="dist-texto">${this.prologoAstral}</p>
+      <div class="prologo-firma">
+        <span>${s.emoji} ${s.signo}</span><span class="prologo-sep">·</span><span>${s.elemento}</span><span class="prologo-sep">·</span><span>${s.modalidad}</span><span class="prologo-sep">·</span><span>Regente ${s.planeta}</span>
       </div>
-    </div>`;
+    </section>`;
 
     /* rueda */
     if (cal.planetas) {
@@ -3626,25 +4027,31 @@ const TIRADAS = {
       ${datos.lugar ? `<p style="margin-top:12px">Naciste en ${this.escapar(datos.lugar)}.</p>` : ""}
     </div>`;
 
-    /* mediciones: los 10 planetas */
-    if (cal.planetas) {
-      const filas = cal.planetas.map(p => {
-        const signo = p.signo;
-        const casa = p.casa ? ` · casa ${p.casa}` : "";
-        return `<div class="medir-planeta">
-          <div class="mp-glifo" style="--cp:${p.retro ? "#ff9e6d" : "#e9ce8f"}">${p.glifo}</div>
-          <div class="mp-cuerpo">
-            <b>${p.nombre} <span class="mp-signo">${signo.emoji} ${signo.signo} ${this.gradoTexto(p.lon)}${p.retro ? ' <i class="mp-retro">retrógrado</i>' : ""}</span>${casa}</b>
-            <p class="mp-frase">${this.lecturaPorPlaneta[p.clave](signo)}</p>
-          </div>
-        </div>`;
-      }).join("");
-      html += `<section class="astral-seccion vidrio">
-        <span class="etiqueta-seccion">Tus mediciones celestes</span>
-        <h2 class="astral-titulo">Los 10 planetas de tu nacimiento</h2>
-        <div class="medir-lista">${filas}</div>
+    /* distribución de planetas */
+    html += this.distribucionHTML(cal);
+
+    /* el ascendente */
+    if (cal.casas && cal.ascSigno) {
+      const ascT = this.textosAscendente[cal.ascSigno.signo] || "";
+      html += `<section class="astral-seccion vidrio astral-ascendente dist-revelar">
+        <span class="etiqueta-seccion">El Ascendente</span>
+        <h2 class="astral-titulo">${s.signo} ascendiendo en ${cal.ascSigno.signo} ${cal.ascSigno.emoji}</h2>
+        <p class="astral-instruccion">Tu ascendente es el sello con el que entras al mundo: no lo eliges tú, pero sí decides cómo usarlo.</p>
+        <p class="dist-texto">${ascT}</p>
+        <div class="prologo-firma" style="justify-content:center">
+          <span>☀️ ${s.signo} en ti</span><span class="prologo-sep">→</span><span>🌅 ${cal.ascSigno.signo} hacia el mundo</span>
+        </div>
       </section>`;
     }
+
+    /* tabla de casas (Placidus) */
+    html += this.tablaCasasHTML(cal);
+
+    /* planetas, planeta a planeta (incl. Lilith) */
+    html += this.planetasHTML(cal);
+
+    /* aspectos */
+    html += this.aspectosHTML(cal);
 
     /* cuatro ángulos sagrados: Asc y Desc son los protagonistas */
     if (tieneCasas) {
@@ -3691,6 +4098,13 @@ const TIRADAS = {
       <span class="etiqueta-seccion">Tus gustos y afinidades</span>
       <p class="astral-instruccion">Lo que tu ${s.signo} ama casi sin darse cuenta:</p>
       <div class="chips-casas">${gustos}</div>
+    </section>`;
+
+    /* epílogo */
+    html += `<section class="astral-seccion vidrio astral-epilogo dist-revelar">
+      <span class="etiqueta-seccion">Epílogo</span>
+      <h2 class="astral-titulo">Para terminar, siente esto</h2>
+      <p class="dist-texto">${this.epilogoAstral}</p>
     </section>`;
 
     /* cierre */

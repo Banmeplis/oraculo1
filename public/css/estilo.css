@@ -1262,6 +1262,12 @@ h3 { font-size: 1.25rem; }
     linear-gradient(160deg, rgba(var(--color-arc), 0.95), rgba(140,110,220,0.8));
   box-shadow: 0 10px 30px rgba(var(--color-arc), 0.6), inset 0 0 20px rgba(255,255,255,0.25);
 }
+.arcangel-regente .ar-seal img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.35);
+}
 .arcangel-regente .ar-info { flex: 1; min-width: 0; }
 .arcangel-regente .ar-info small { color: var(--lavanda-suave); letter-spacing: 2px; text-transform: uppercase; font-size: 0.72rem; }
 .arcangel-regente .ar-info h3 { font-family: var(--fuente-deco); color: rgba(var(--color-arc), 1); font-size: 1.5rem; margin: 2px 0 4px; text-shadow: 0 0 22px rgba(var(--color-arc), 0.55); }
@@ -3294,4 +3300,292 @@ nav.menu a.btn-whatsapp:hover {
   .mp-glifo { flex-basis: 40px; width: 40px; height: 40px; }
   .astral-resultado .mp-frase { font-size: 1.3rem; }
   .astral-resultado .carta-grande .carta-texto .interp { font-size: 1.55rem; }
+}
+
+/* ============ reporte profesional de la carta astral ============ */
+.dist-revelar {
+  animation: distRevelar .85s cubic-bezier(.2, .7, .2, 1) both;
+}
+@keyframes distRevelar {
+  from { opacity: 0; transform: translateY(22px) scale(.985); filter: blur(2px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+.astral-prologo, .astral-epilogo { text-align: center; }
+.prologo-firma {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(233, 206, 143, 0.3);
+  background: rgba(233, 206, 143, 0.07);
+  color: var(--dorado);
+  font-family: var(--fuente-deco);
+  font-size: 1.3rem;
+  letter-spacing: .05em;
+  box-shadow: 0 0 22px rgba(233, 206, 143, 0.12) inset;
+}
+.prologo-sep { color: rgba(233, 206, 143, 0.5); font-size: 1rem; }
+.astral-resultado .dist-texto {
+  font-family: var(--fuente-serif);
+  font-size: 1.42rem;
+  line-height: 1.85;
+  color: var(--blanco-humo);
+  margin: 12px 0 0;
+}
+/* --- distribución --- */
+.dist-cuadricula {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+.dist-bloque {
+  position: relative;
+  overflow: hidden;
+  padding: 18px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(233, 206, 143, 0.22);
+  background: linear-gradient(160deg, rgba(22, 19, 50, 0.65), rgba(8, 7, 20, 0.5));
+}
+.dist-bloque::after {
+  content: "";
+  position: absolute;
+  left: -50%;
+  right: -50%;
+  top: -80%;
+  height: 120%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.14), transparent 60%);
+  opacity: 0;
+  animation: anguloBrillo 6s ease-in-out infinite;
+  pointer-events: none;
+}
+.dist-titulo {
+  font-family: var(--fuente-deco);
+  font-size: 1.35rem;
+  color: #f4dda0;
+  letter-spacing: .06em;
+  text-transform: capitalize;
+  text-shadow: 0 0 16px rgba(233, 206, 143, 0.35);
+  margin-bottom: 14px;
+}
+.dist-barras { display: grid; gap: 12px; }
+.dist-fila { display: grid; gap: 5px; }
+.dist-rotulo {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 1.12rem;
+  color: var(--blanco);
+}
+.dist-cuenta { font-size: 0.92rem; color: var(--lavanda-suave); white-space: nowrap; }
+.dist-barra {
+  height: 13px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(233, 206, 143, 0.14);
+}
+.dist-llenado {
+  width: 0;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--c) 60%, transparent), var(--c), #fff8e8);
+  box-shadow: 0 0 14px var(--c);
+  animation: barraCrecer 1.5s cubic-bezier(.2, .7, .2, 1) .35s both;
+}
+@keyframes barraCrecer { from { width: 0; } to { width: var(--w, 0); } }
+.astral-resultado .dist-texto { font-size: 1.32rem; line-height: 1.8; margin-top: 14px; }
+/* --- tabla de casas --- */
+.tabla-casas { overflow-x: auto; margin-top: 16px; }
+.tabla-casas table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--fuente-serif);
+  font-size: 1.25rem;
+}
+.tabla-casas thead th {
+  padding: 12px 14px;
+  text-align: left;
+  color: var(--dorado);
+  font-family: var(--fuente-deco);
+  font-size: 1.1rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  border-bottom: 2px solid rgba(233, 206, 143, 0.45);
+  background: rgba(233, 206, 143, 0.06);
+}
+.tabla-casas tbody td {
+  padding: 11px 14px;
+  border-bottom: 1px solid rgba(233, 206, 143, 0.12);
+  color: var(--blanco-humo);
+}
+.tabla-casas tbody tr:nth-child(even) { background: rgba(255, 255, 255, 0.03); }
+.tabla-casas tbody tr { transition: background .2s; }
+.tabla-casas tbody tr:hover { background: rgba(233, 206, 143, 0.08); }
+.tabla-casas tbody td:first-child { color: #f4dda0; font-weight: 600; white-space: nowrap; }
+.tabla-casas tbody td:nth-child(2) { color: var(--lavanda-suave); white-space: nowrap; }
+/* --- planetas --- */
+.astral-resultado .planeta-detalle {
+  position: relative;
+  overflow: hidden;
+  margin-top: 14px;
+  padding: 18px 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(233, 206, 143, 0.24);
+  border-left: 3px solid var(--pl-c, var(--dorado));
+  background: linear-gradient(160deg, rgba(22, 19, 50, 0.66), rgba(8, 7, 20, 0.52));
+  box-shadow: inset 0 0 24px rgba(var(--arc-color, 233, 206, 143), 0.05);
+}
+.planeta-cab { display: flex; gap: 15px; align-items: center; }
+.planeta-glifo {
+  flex: 0 0 54px;
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 1.7rem;
+  color: var(--pl-c, var(--dorado));
+  background: rgba(15, 13, 34, 0.75);
+  border: 1px solid color-mix(in srgb, var(--pl-c, #e9ce8f) 55%, transparent);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--pl-c, #e9ce8f) 55%, transparent);
+  animation: anguloFlota 4s ease-in-out infinite;
+}
+.planeta-titulo {
+  font-family: var(--fuente-deco);
+  font-size: 1.55rem;
+  color: #f4dda0;
+  letter-spacing: .04em;
+  text-shadow: 0 0 18px rgba(233, 206, 143, 0.3);
+}
+.planeta-sub { font-size: 1.15rem; color: var(--lavanda-suave); margin-top: 3px; }
+.planeta-intro {
+  font-family: var(--fuente-serif);
+  font-size: 1.32rem;
+  line-height: 1.8;
+  color: var(--blanco-humo);
+  margin: 14px 0 0;
+}
+.planeta-en {
+  display: flex;
+  gap: 13px;
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(233, 206, 143, 0.16);
+}
+.planeta-en-ico { font-size: 1.4rem; line-height: 1.3; }
+.planeta-en-titulo {
+  font-family: var(--fuente-deco);
+  font-size: 1.22rem;
+  color: var(--dorado);
+  letter-spacing: .03em;
+  margin-bottom: 4px;
+}
+.planeta-en p {
+  font-family: var(--fuente-serif);
+  font-size: 1.32rem;
+  line-height: 1.8;
+  color: var(--blanco-humo);
+  margin: 0;
+}
+.retro-carta {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border-left: 3px solid #ff9e6d;
+  background: rgba(255, 158, 109, 0.08);
+}
+.retro-ico {
+  flex: 0 0 auto;
+  font-size: 1.3rem;
+  font-family: var(--fuente-deco);
+  color: #ff9e6d;
+}
+.retro-carta p {
+  font-family: var(--fuente-serif);
+  font-size: 1.32rem;
+  line-height: 1.8;
+  color: var(--blanco-humo);
+  margin: 0;
+}
+.lilith-detalle { border-left-color: #e79bc9; }
+.lilith-mantra {
+  border-left-color: #e79bc9;
+  background: rgba(231, 155, 201, 0.08);
+}
+.lilith-mantra .retro-ico { color: #e79bc9; }
+.lilith-mantra p b { color: #e79bc9; }
+/* --- aspectos --- */
+.astral-resultado .aspecto-tarjeta {
+  position: relative;
+  overflow: hidden;
+  margin-top: 14px;
+  padding: 18px 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(233, 206, 143, 0.22);
+  background: linear-gradient(160deg, rgba(22, 19, 50, 0.66), rgba(8, 7, 20, 0.52));
+}
+.aspecto-orb {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ao-cuerpo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.ao-cuerpo i {
+  font-style: normal;
+  font-size: 1.6rem;
+  color: var(--dorado);
+  text-shadow: 0 0 14px rgba(233, 206, 143, 0.5);
+}
+.ao-cuerpo b {
+  font-family: var(--fuente-serif);
+  font-size: 1.22rem;
+  color: var(--blanco);
+}
+.ao-linea {
+  flex: 1;
+  min-width: 18px;
+  height: 0;
+  border-top: 2px dashed;
+  opacity: .8;
+}
+.ao-tipo {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.15;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(233, 206, 143, 0.25);
+}
+.ao-tipo b { color: #f4dda0; font-family: var(--fuente-deco); font-size: 1.05rem; letter-spacing: .05em; }
+.ao-tipo small { color: var(--lavanda-suave); font-size: 0.9rem; }
+.aspecto-texto {
+  font-family: var(--fuente-serif);
+  font-size: 1.32rem;
+  line-height: 1.8;
+  color: var(--blanco-humo);
+  margin: 14px 0 0;
+}
+.astral-ascendente { text-align: center; }
+.astral-ascendente .dist-texto { text-align: left; }
+@media (prefers-reduced-motion: reduce) {
+  .dist-revelar, .dist-llenado, .dist-bloque::after, .planeta-glifo { animation: none; opacity: 1; width: var(--w, auto); }
 }
