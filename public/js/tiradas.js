@@ -104,13 +104,13 @@ const TIRADAS = {
 
   /* ------------------------- 7 arcángeles regentes ----------------------- */
   arcangeles: {
-    miguel:  { nombre: "Arcángel Miguel",  emoji: "⚔️", img: "/arcangeles/miguel.jpeg",  regencia: "Protección y fuerza",      color: "104, 140, 220",     mensaje: "El guerrero de la luz vigila tu camino y disuelve toda oscuridad que se interponga. Bajo su espada, tu protección está garantizada mientras avanzas con valor.", consejo: "Te doy valor: no camines con miedo, camina con firmeza y nos defenderé la retaguardia." },
-    gabriel: { nombre: "Arcángel Gabriel", emoji: "📯", img: "/arcangeles/gabriel.jpeg", regencia: "Mensajes y propósito",      color: "212, 175, 55",      mensaje: "El mensajero divino despeja tu mente y te trae claridad sobre el propósito de tu alma. Presta atención a las señales: a través de él el universo te habla.", consejo: "Te traigo el mensaje que esperabas: escucha con el corazón abierto y la respuesta llegará." },
-    rafael:  { nombre: "Arcángel Rafael",  emoji: "🕯️", img: "/arcangeles/rafael.jpeg",  regencia: "Curación y guía",          color: "90, 200, 160",      mensaje: "El sanador ilumina las heridas que piden ser cuidadas, tanto del cuerpo como del alma. Su energía restauradora fluye hacia ti y te devuelve el equilibrio.", consejo: "Te curo y te sostengo: respira, suelta el dolor y deja que la sanación invada tu ser." },
-    uriel:   { nombre: "Arcángel Uriel",   emoji: "🔥", img: "/arcangeles/uriel.jpeg",   regencia: "Sabiduría y discernimiento", color: "230, 150, 60",      mensaje: "El portador de la luz te otorga la sabiduría para ver con claridad lo que está oculto. Confía en la certeza interior que enciende en tu corazón.", consejo: "Te doy discernimiento: no actúes por impulso, mira con luz interior y decide en paz." },
-    zadkiel: { nombre: "Arcángel Zadkiel", emoji: "💜", img: "/arcangeles/zadkiel.jpeg", regencia: "Misericordia y liberación", color: "160, 110, 240",     mensaje: "El ángel de la misericordia te ayuda a soltar culpas, viejos resentimientos y ataduras del pasado. Su presencia abre paso a un perdón que te libera.", consejo: "Te libero de culpas: perdónate y perdona, y sentirás cuán ligera es tu alma." },
-    jofiel:  { nombre: "Arcángel Jofiel",  emoji: "🌞", img: "/arcangeles/jofiel.jpeg",  regencia: "Belleza e inspiración",     color: "255, 170, 120",     mensaje: "El ángel de la belleza inunda tu vida de inspiración y te muestra la luz que hay incluso en los días grises. Rodeate de lo que te eleva y verás florecer tu mundo.", consejo: "Te inspiro y te ilumino: busca la belleza que te rodea y ella te guiará." },
-    chamuel: { nombre: "Arcángel Chamuel", emoji: "💗", img: "/arcangeles/chamuel.jpeg", regencia: "Paz y amor",               color: "240, 120, 150",     mensaje: "El ángel del amor puro trae paz a tus relaciones y reaviva los lazos más sinceros. A su calor, las puertas del corazón se abren a un afecto verdadero.", consejo: "Te doy amor y paz: abre el corazón y deja que el amor fluya sin miedo." }
+    miguel:  { nombre: "Arcángel Miguel",  emoji: "⚔️", img: "/arcangeles/miguel.jpeg",  regencia: "Protección y fuerza",      color: "104, 140, 220",     mensaje: "El guerrero de la luz vigila tu camino y disuelve toda oscuridad que se interponga. Bajo su espada, tu protección está garantizada mientras avanzas con valor.", consejo: "Te doy valor: no camines con miedo, camina con firmeza y nos defenderé la retaguardia.", regano: "No vengas a mí pidiendo escudo mientras corres a esconderlo frente a la batalla. Si quieres mi protección, camina derecho: el miedo no es tu sombra, es tu excusa. Enfréntalo hoy y yo respondo por tu retaguardia." },
+    gabriel: { nombre: "Arcángel Gabriel", emoji: "📯", img: "/arcangeles/gabriel.jpeg", regencia: "Mensajes y propósito",      color: "212, 175, 55",      mensaje: "El mensajero divino despeja tu mente y te trae claridad sobre el propósito de tu alma. Presta atención a las señales: a través de él el universo te habla.", consejo: "Te traigo el mensaje que esperabas: escucha con el corazón abierto y la respuesta llegará.", regano: "Te he llamado una y otra vez y tú me has hecho oídos sordos. Deja de pedirme señales nuevas cuando aún no has obedecido la que ya está sobre tu mesa: el propósito no espera tu permiso." },
+    rafael:  { nombre: "Arcángel Rafael",  emoji: "🕯️", img: "/arcangeles/rafael.jpeg",  regencia: "Curación y guía",          color: "90, 200, 160",      mensaje: "El sanador ilumina las heridas que piden ser cuidadas, tanto del cuerpo como del alma. Su energía restauradora fluye hacia ti y te devuelve el equilibrio.", consejo: "Te curo y te sostengo: respira, suelta el dolor y deja que la sanación invada tu ser.", regano: "Llevas la herida abierta y, en vez de curarla, pasas el paño una y otra vez para que no se seque. Sanar también es dejar de alimentar el dolor: suéltalo hoy, que yo me ocupo del resto." },
+    uriel:   { nombre: "Arcángel Uriel",   emoji: "🔥", img: "/arcangeles/uriel.jpeg",   regencia: "Sabiduría y discernimiento", color: "230, 150, 60",      mensaje: "El portador de la luz te otorga la sabiduría para ver con claridad lo que está oculto. Confía en la certeza interior que enciende en tu corazón.", consejo: "Te doy discernimiento: no actúes por impulso, mira con luz interior y decide en paz.", regano: "Actúas con la prisa encendida y el farol de la prudencia apagado, y luego me preguntas por qué tropiezas. Quédate quieto y mira antes de dar el paso: la sabiduría no se improvisa." },
+    zadkiel: { nombre: "Arcángel Zadkiel", emoji: "💜", img: "/arcangeles/zadkiel.jpeg", regencia: "Misericordia y liberación", color: "160, 110, 240",     mensaje: "El ángel de la misericordia te ayuda a soltar culpas, viejos resentimientos y ataduras del pasado. Su presencia abre paso a un perdón que te libera.", consejo: "Te libero de culpas: perdónate y perdona, y sentirás cuán ligera es tu alma.", regano: "Sigues cargando la culpa como si fuera un trofeo. Te ofrezco el perdón y tú lo llamas rendición. Perdonarte no te hace débil: te hace libre, y hoy es el día de soltar." },
+    jofiel:  { nombre: "Arcángel Jofiel",  emoji: "🌞", img: "/arcangeles/jofiel.jpeg",  regencia: "Belleza e inspiración",     color: "255, 170, 120",     mensaje: "El ángel de la belleza inunda tu vida de inspiración y te muestra la luz que hay incluso en los días grises. Rodeate de lo que te eleva y verás florecer tu mundo.", consejo: "Te inspiro y te ilumino: busca la belleza que te rodea y ella te guiará.", regano: "Vives mirando el gris y te quejas de que el color ha muerto. El sol sigue ahí: eres tú quien tiene las cortinas cerradas. Ábrelas y la belleza llenará lo que hoy ves vacío." },
+    chamuel: { nombre: "Arcángel Chamuel", emoji: "💗", img: "/arcangeles/chamuel.jpeg", regencia: "Paz y amor",               color: "240, 120, 150",     mensaje: "El ángel del amor puro trae paz a tus relaciones y reaviva los lazos más sinceros. A su calor, las puertas del corazón se abren a un afecto verdadero.", consejo: "Te doy amor y paz: abre el corazón y deja que el amor fluya sin miedo.", regano: "Pides paz y guardas el rencor en la misma habitación. El amor no entra por una puerta que tú misma atrancas con el orgullo. Perdona primero: la paz es consecuencia." }
   },
 
 /* selecciona arcángeles según el tipo de lectura:
@@ -2122,58 +2122,82 @@ const TIRADAS = {
     "Resultado final": "jofiel"
   },
 
-  /* interpretación de la gran tirada: cada arcángel habla de sus dos temas,
-     con opinión o regaño según las cartas que hayan salido en sus áreas */
+  /* interpretación de la gran tirada desde cero: las 14 cartas, cada arcángel
+     habla de sus dos áreas y, por separado, los regaños del cielo cuando alguna
+     carta sale invertida (sin combinaciones de cartas) + el mensaje final */
   interpretacionGranTirada(resultado) {
     const bloques = [];
     const cita = this.citas[Math.floor(Math.random() * this.citas.length)];
+    const posiciones = (resultado.tirada.posiciones || []).map(p => p[0]);
+    const fuerte = resultado.fuerte === true;
 
-    Object.keys(this.granTiradaArea).forEach((tema, i) => {
-      const posiciones = resultado.tirada.posiciones.map(p => p[0]);
-      const idxTema = posiciones.indexOf(tema);
-      if (idxTema === -1) return;
-      const carta = resultado.cartas[idxTema];
+    /* agrupa las 14 áreas por el arcángel que las custodia */
+    const porArcangel = {};
+    Object.keys(this.granTiradaArea).forEach(tema => {
+      const indice = posiciones.indexOf(tema);
+      if (indice === -1) return;
       const clave = this.granTiradaArea[tema];
-      let bloque = bloques.find(b => b.clave === clave);
-      if (!bloque) {
-        bloque = { clave, arcangel: this.arcangeles[clave], temas: [] };
-        bloques.push(bloque);
-      }
-      bloque.temas.push({ tema, carta });
+      (porArcangel[clave] = porArcangel[clave] || []).push({
+        tema, carta: resultado.cartas[indice], indice
+      });
     });
 
-    return bloques.map(b => {
-      const inv = b.temas.filter(t => t.carta.invertido).length;
-      const tenor = inv === 0 ? "luz" : (inv === b.temas.length ? "sombra" : "mixto");
-      const arc = b.arcangel;
-      const texto = b.temas.map(t =>
-        this.relatoDe(t.carta, t.tema, (resultado.fuerte || t.carta.invertido) ? "sombra" : "luz")
-      ).join(" " + this.elegirDe(this.puentes) + " ");
-      return {
+    const siete = Object.keys(this.arcangeles).map(clave => ({ clave, ...this.arcangeles[clave] }));
+
+    /* 1) la palabra de cada arcángel sobre sus áreas, carta por carta, sin combinar */
+    siete.forEach(arc => {
+      const temas = porArcangel[arc.clave] || [];
+      const frases = temas.map(t => {
+        const tono = (fuerte || t.carta.invertido) ? "sombra" : "luz";
+        const relato = this.relatoDe(t.carta, t.tema, tono);
+        return temas.length > 1 ? `${this.cap(t.tema)}: ${relato}` : relato;
+      }).join(" ");
+      bloques.push({
         icono: arc.emoji,
-        area: b.clave,
+        area: arc.clave,
         titulo: `${this.nombreCorto(arc.nombre)} · ${arc.regencia}`,
-        temas: b.temas.map(t => t.tema),
+        temas: temas.map(t => t.tema),
         arcangel: arc,
-        regano: resultado.fuerte || tenor === "sombra",
-        texto: this.primeraFrase(texto),
-        cartasHtml: ""
-      };
-    }).concat(this.haySemantica(resultado.cartas)
-      ? [{
-          cierre: true,
-          texto: this.mensajeFinalSemantico(resultado),
-          cita
-        }]
-      : [{
-          cierre: true,
-          texto: this.elegirDe([
-            "Los siete arcángeles han hablado, cada uno desde su don, y yo he escuchado cada palabra. Te voy a decir la verdad sin vueltas: no estás sola, nunca lo has estado, pero eso no quita que tengas que actuar. Lo que las cartas te mostraron hoy no es para asustarte: es para recordarte quién eres. La fuerza que buscas no está afuera, ya vive en ti. Deja el miedo, toma el consejo que más te dolió escuchar y ponlo en práctica: ese es el camino que todas las voces te señalan.",
-            "Siete voces han hablado y todas dicen lo mismo de maneras distintas: tu momento es ahora y la respuesta está en tus manos. No vinieron a adivinar tu futuro, vinieron a devolverte el mando de tu presente. Agradece lo que floreció, suelta lo que terminó y camina con la certeza de que llevas la guía dentro.",
-            "Cada arcángel colocó una piedra sobre tu camino, y juntas forman el puente que estabas esperando. La protección de Miguel, el amor de Chamuel, la sanación de Rafael, la voz de Gabriel, la claridad de Uriel, la liberación de Zadkiel y la luz de Jofiel ahora son tuyas. No desprecies el puente por miedo a cruzar: ya está firme. Da el paso."
-          ]),
-          cita
-        }]);
+        regano: false,
+        texto: `${arc.mensaje}${frases ? " " + frases : " " + arc.consejo}`
+      });
+    });
+
+    /* 2) los regaños del cielo, por separado: solo llaman los arcángeles que
+       tienen una carta invertida (o en modo fuerte), cada uno con su regaño */
+    const conRegano = siete.filter(arc =>
+      (porArcangel[arc.clave] || []).some(t => t.carta.invertido) || fuerte
+    );
+    if (conRegano.length) {
+      bloques.push({ encabezado: "Regaños del cielo" });
+      conRegano.forEach(arc => {
+        const areas = (porArcangel[arc.clave] || []).filter(t => t.carta.invertido || fuerte);
+        bloques.push({
+          icono: "⚡",
+          area: arc.clave,
+          titulo: `Regaño de ${this.nombreCorto(arc.nombre)}`,
+          temas: areas.map(t => t.tema),
+          arcangel: arc,
+          regano: true,
+          texto: arc.regano + (areas.length
+            ? " " + this.cap("Te lo digo por") + ": " + areas.map(t => t.tema).join(" y ") + "."
+            : "")
+        });
+      });
+    }
+
+    /* 3) el mensaje final: los siete arcángeles cierran, sin sintetizar cartas */
+    bloques.push({
+      cierre: true,
+      texto: this.elegirDe([
+        "Los siete arcángeles han hablado, cada uno desde su don, y yo he escuchado cada palabra. Te voy a decir la verdad sin vueltas: no estás sola, nunca lo has estado, pero eso no quita que tengas que actuar. Lo que las cartas te mostraron hoy no es para asustarte: es para recordarte quién eres. La fuerza que buscas no está afuera, ya vive en ti. Deja el miedo, toma el consejo que más te dolió escuchar y ponlo en práctica: ese es el camino que todas las voces te señalan.",
+        "Siete voces han hablado y todas dicen lo mismo de maneras distintas: tu momento es ahora y la respuesta está en tus manos. No vinieron a adivinar tu futuro, vinieron a devolverte el mando de tu presente. Agradece lo que floreció, suelta lo que terminó y camina con la certeza de que llevas la guía dentro.",
+        "Cada arcángel colocó una piedra sobre tu camino, y juntas forman el puente que estabas esperando. La protección de Miguel, el amor de Chamuel, la sanación de Rafael, la voz de Gabriel, la claridad de Uriel, la liberación de Zadkiel y la luz de Jofiel ahora son tuyas. No desprecies el puente por miedo a cruzar: ya está firme. Da el paso."
+      ]),
+      cita
+    });
+
+    return bloques;
   },
 
   /* ------------------- interpretación de la pregunta ---------------------
@@ -2980,6 +3004,10 @@ const TIRADAS = {
     let htmlFinal = `<div class="interpretacion-final">${resultadoHTML.fuerte ? '<h3 class="titulo-interp-final titulo-fuerte">🔥 ¡¡ LECTURA FUERTE !! 🔥<small style="display:block;font-size:.75rem;color:#ff9e6d;margin-top:6px">Los ángeles hablaron con firmeza porque te aman demasiado para mentirte</small></h3><hr class="raya-fuerte">' : `<h3 class="titulo-interp-final">${tituloFinal}</h3>`}`;
     finales.forEach((b, i) => {
       const arcDeArea = b.arcangel || this.arcangelDeArea(arcangeles, i);
+      if (b.encabezado && !b.cierre && !b.titulo) {
+        htmlFinal += `<div class="seccion-interp"><h3>${b.encabezado}</h3></div>`;
+        return;
+      }
       if (b.cierre) {
         const aUnido = this.arcangelUnido(arcangeles);
         htmlFinal += `<div class="mensaje-poderoso vidrio" style="--arc-color:${aUnido.color};animation-delay:${(1.2 + i * 0.25).toFixed(2)}s">
@@ -2998,7 +3026,7 @@ const TIRADAS = {
           </h4>
           ${b.presencia ? `<p class="presencia-arc">${b.presencia}</p>` : ""}
           ${b.respuestaIA ? `<p class="respuesta-ia" id="respuesta-ia">${b.texto}</p>` : (b.texto ? `<p>${b.texto}</p>` : "")}
-          ${b.cartasHtml ? `<div class="regano-cartas">${b.cartasHtml}</div>` : ""}
+          ${b.regano ? "" : (b.cartasHtml ? `<div class="regano-cartas">${b.cartasHtml}</div>` : "")}
           ${b.combinacion ? `<div class="combo-visual">
             ${b.combinacion.cartas && b.combinacion.cartas.length ? `
               ${b.combinacion.cartas.map(c => this.comboCartaHtml(c)).join('<span class="combo-mas">+</span>')}
