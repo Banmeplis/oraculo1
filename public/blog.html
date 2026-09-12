@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blog Â· EL CENDERO DE LOS ARðŸŒ™ANGELES</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>ðŸ”®</text></svg>">
+  <title>Blog · EL CENDERO DE LOS AR🌟ANGELES</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔮</text></svg>">
   <!-- >>> ZONA GOOGLE TAG / ADSENSE <<< -->
-  <!-- Cuando tengas los cÃ³digos, pega aquÃ­ el script de gtag.js (Google Tag): -->
+  <!-- Cuando tengas los códigos, pega aquí el script de gtag.js (Google Tag): -->
   <!--   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script> -->
   <!-- Y el script de Google AdSense: -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6331831674832770" crossorigin="anonymous"></script>
@@ -20,7 +20,7 @@
 
   <header class="nav">
     <div class="nav-inner">
-      <a class="logo" href="/"><span>â˜¾</span> EL CENDERO DE LOS ARðŸŒ™ANGELES</a>
+      <a class="logo" href="/"><span>☾</span> EL CENDERO DE LOS AR🌟ANGELES</a>
       <nav class="menu">
         <a href="/tarot.html">Tarot</a>
         <a href="/blog.html">Blog</a>
@@ -31,17 +31,17 @@
 
   <main class="contenedor">
     <section class="titulo-seccion" style="margin-top:50px">
-      <div class="deco">âœ§ âœ¦ âœ§</div>
-      <h2>El RincÃ³n del Blog</h2>
-      <p>Reflexiones, bendiciones y sabidurÃ­a compartida por la comunidad del EL CENDERO DE LOS ARðŸŒ™ANGELES.</p>
+      <div class="deco">✧ ✦ ✧</div>
+      <h2>El Rincón del Blog</h2>
+      <p>Reflexiones, bendiciones y sabiduría compartida por la comunidad del EL CENDERO DE LOS AR🌟ANGELES.</p>
     </section>
 
     <div class="rejilla rejilla-3" id="lista-posts"></div>
   </main>
 
   <footer class="pie">
-    <div class="logo"><span>â˜¾</span> EL CENDERO DE LOS ARðŸŒ™ANGELES</div>
-    <p>Â¿Quieres escribir? <a class="enlace" href="/panel.html">Entra a tu panel</a></p>
+    <div class="logo"><span>☾</span> EL CENDERO DE LOS AR🌟ANGELES</div>
+    <p>¿Quieres escribir? <a class="enlace" href="/panel.html">Entra a tu panel</a></p>
   </footer>
 
   <script src="/js/app.js?v=17"></script>
@@ -51,15 +51,15 @@
       .then(r => r.json())
       .then(posts => {
         const c = document.getElementById("lista-posts");
-        if (!posts.length) { c.innerHTML = '<p class="centrado" style="grid-column:1/-1;color:var(--lavanda-suave)">AÃºn no hay publicaciones. SÃ© la primera en iluminar el rincÃ³n. âœ¨</p>'; return; }
+        if (!posts.length) { c.innerHTML = '<p class="centrado" style="grid-column:1/-1;color:var(--lavanda-suave)">Aún no hay publicaciones. Sé la primera en iluminar el rincón. ✨</p>'; return; }
         c.innerHTML = posts.map(p => `
           <article class="tarjeta post">
             ${portadaImg(p)}
             <div class="cuerpo-post">
               <h3><a href="/articulo.html?id=${p.id}">${p.titulo}</a></h3>
-              <div class="meta">âœ§ ${p.autor} Â· ${fechaLegible(p.creado_en)}</div>
+              <div class="meta">✧ ${p.autor} · ${fechaLegible(p.creado_en)}</div>
               <p class="resumen">${p.resumen || ""}</p>
-              <a class="leer-mas" href="/articulo.html?id=${p.id}">Leer mÃ¡s â†’</a>
+              <a class="leer-mas" href="/articulo.html?id=${p.id}">Leer más →</a>
             </div>
           </article>`).join("");
       })

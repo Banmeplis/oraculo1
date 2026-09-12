@@ -160,7 +160,11 @@ app.use((err, req, res, next) => {
 });
 
 /* --------------------------------- start ------------------------------- */
-app.listen(cfg.PUERTO, () => {
+const server = app.listen(cfg.PUERTO, () => {
   console.log(`✦ Oráculo corriendo en  http://localhost:${cfg.PUERTO}`);
   console.log(`✦ Seguridad: Helmet ✓ | Rate-Limit ✓ | CORS ✓ | Compression ✓ | Morgan ✓`);
+});
+
+server.on('error', (err) => {
+  console.error('Server error:', err);
 });
