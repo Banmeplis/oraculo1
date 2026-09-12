@@ -1,6 +1,8 @@
 # Secretos y configuración sensible
 .env
 config.json
+oraculo-508402-c8b7f53c289a.json
+ClaveOraculo.json
 
 # Dependencias
 node_modules/
