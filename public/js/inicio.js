@@ -92,24 +92,45 @@ window.INICIO = (function () {
 
   /* ------------------------- ciclo lunar ------------------------- */
   var FASES = [
-    { nombre: "Luna Nueva",    ico: "🌑" },
-    { nombre: "Cuarto Creciente", ico: "🌒" },
-    { nombre: "Creciente Gibosa", ico: "🌓" },
-    { nombre: "Luna Llena",    ico: "🌕" },
-    { nombre: "Gibosa Menguante", ico: "🌖" },
-    { nombre: "Cuarto Menguante", ico: "🌗" },
-    { nombre: "Menguante",     ico: "🌘" },
-    { nombre: "Luna Nueva",    ico: "🌑" }
+    { nombre: "Luna Nueva",    ico: "🌑",  min: 0,   max: 45 },
+    { nombre: "Cuarto Creciente", ico: "🌒",  min: 45,  max: 90 },
+    { nombre: "Creciente Gibosa", ico: "🌓",  min: 90,  max: 135 },
+    { nombre: "Luna Llena",    ico: "🌕",  min: 135, max: 225 },
+    { nombre: "Gibosa Menguante", ico: "🌖",  min: 225, max: 270 },
+    { nombre: "Cuarto Menguante", ico: "🌗",  min: 270, max: 315 },
+    { nombre: "Menguante",     ico: "🌘",  min: 315, max: 360 },
+    { nombre: "Luna Nueva",    ico: "🌑",  min: 0,   max: 45 }
   ];
 
   function faseLunar(fecha) {
-    /* sincronización: luna nueva de referencia (6 ene 2000 18:14 UTC) */
+    /* Usa astronomy-engine si está disponible para precisión real */
+    if (typeof Astronomy !== "undefined" && typeof Astronomy.MoonPhase === "function") {
+      try {
+        var t = Astronomy.MakeTime(fecha || new Date());
+        return Astronomy.MoonPhase(t); /* 0..360 grados eclípticos */
+      } catch (e) { /* fallback abajo */ }
+    }
+    /* fallback: aproximación desde 2000 (menos precisa a largo plazo) */
     var ref = Date.UTC(2000, 0, 6, 18, 14, 0);
     var d = (fecha ? fecha.getTime() : Date.now()) - ref;
     var dias = d / 86400000;
     var ciclos = dias / 29.53058867;
-    var fraccion = ciclos - Math.floor(ciclos); /* 0..1 */
-    return fraccion;
+    var fraccion = ciclos - Math.floor(ciclos);
+    return fraccion * 360; /* convertir a grados para compatibilidad */
+  }
+
+  function faseLunarFraccion(fecha) {
+    var deg = faseLunar(fecha);
+    return deg / 360; /* 0..1 para compatibilidad con código existente */
+  }
+
+  function obtenerFase(fecha) {
+    var deg = faseLunar(fecha);
+    for (var i = 0; i < FASES.length; i++) {
+      var f = FASES[i];
+      if (deg >= f.min && deg < f.max) return f;
+    }
+    return FASES[0];
   }
 
   /* ------------------- solsticios y equinoccios del año ------------------ */
@@ -191,7 +212,6 @@ window.INICIO = (function () {
     var f = fecha || new Date();
     var dia = f.getDate();
     var mes = f.getMonth() + 1;
-    var fraccion = faseLunar(f);
     var puntos = 0;
 
     /* números maestros del día (11, 22) */
@@ -200,9 +220,11 @@ window.INICIO = (function () {
     /* día espejo (día == mes): 1/1, 2/2 ... 12/12, resonancia numérica */
     if (dia === mes) puntos += 1;
 
-    /* luna nueva o luna llena: ventanas de gran energía */
-    var distNueva = Math.min(fraccion, 1 - fraccion);
-    if (distNueva < 0.02 || Math.abs(fraccion - 0.5) < 0.02) puntos += 1;
+    /* luna nueva o luna llena: ventanas de gran energía (usa astronomía real) */
+    var moonPhase = faseLunar(f); /* 0..360 grados */
+    var distNueva = Math.min(moonPhase, 360 - moonPhase); /* distancia a 0° */
+    var distLlena = Math.abs(moonPhase - 180); /* distancia a 180° */
+    if (distNueva < 2 || distLlena < 2) puntos += 1; /* umbral ~2° ≈ 16 horas */
 
     if (puntos >= 3) return "importante";
     if (puntos === 2) return "normal";
@@ -214,10 +236,9 @@ window.INICIO = (function () {
     var el = document.getElementById("barra-lunar");
     if (!el) return;
     var hoy = new Date();
-    var f = faseLunar(hoy);
-    var diaLunar = Math.floor(f * 29.53058867) + 1; /* 1..30 */
-    var idx8 = Math.floor(f * 8) % 8;
-    var fase = FASES[idx8];
+    var fase = obtenerFase(hoy);
+    var fraccion = faseLunarFraccion(hoy);
+    var diaLunar = Math.floor(fraccion * 29.53058867) + 1; /* 1..30 */
     var fTexto = hoy.toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "short" });
     var det = "· " + fTexto + " · día " + diaLunar + " del ciclo lunar";
 
@@ -228,9 +249,9 @@ window.INICIO = (function () {
     /* puntos de las 8 fases, resaltando la actual */
     var pts = document.getElementById("lunar-puntos");
     pts.innerHTML = "";
-    FASES.forEach(function (p, i) {
+    FASES.slice(0, 8).forEach(function (p, i) {
       var s = document.createElement("span");
-      s.className = "lunar-pt" + (i === idx8 ? " activo" : "");
+      s.className = "lunar-pt" + (p === fase ? " activo" : "");
       s.textContent = p.ico;
       s.title = p.nombre;
       pts.appendChild(s);
@@ -323,6 +344,8 @@ window.INICIO = (function () {
     arcangelDelDia: arcangelDelDia,
     mensajeDelDia: mensajeDelDia,
     faseLunar: faseLunar,
+    faseLunarFraccion: faseLunarFraccion,
+    obtenerFase: obtenerFase,
     portalDelDia: portalDelDia
   };
 })();
