@@ -2907,7 +2907,7 @@ const TIRADAS = {
     const esPregunta = !!resultadoHTML.pregunta;
     let html = '<div class="resultado">';
     html += '<div class="resultado-cabecera"><div class="deco">' + this.elegantIcono[t.id] + "</div>";
-    html += "<p>Resultado de la tirada de tarot completa gratis</p></div>";
+    html += "<p>Resultado de la lectura de tarot completa gratis</p></div>";
 
     let arcangeles;
     if (esPregunta) {
@@ -3007,7 +3007,7 @@ const TIRADAS = {
           : "✨ La respuesta del arcángel a tu pregunta ✨")
         : esGranTirada
           ? "✨ La palabra de los siete arcángeles ✨"
-          : "✨ Interpretación final de tu tirada ✨";
+          : "✨ Interpretación final de tu lectura ✨";
     let htmlFinal = `<div class="interpretacion-final">${resultadoHTML.fuerte ? '<h3 class="titulo-interp-final titulo-fuerte">🔥 ¡¡ LECTURA FUERTE !! 🔥<small style="display:block;font-size:.75rem;color:#ff9e6d;margin-top:6px">Los ángeles hablaron con firmeza porque te aman demasiado para mentirte</small></h3><hr class="raya-fuerte">' : `<h3 class="titulo-interp-final">${tituloFinal}</h3>`}`;
     finales.forEach((b, i) => {
       const arcDeArea = b.arcangel || this.arcangelDeArea(arcangeles, i);
@@ -3056,8 +3056,9 @@ const TIRADAS = {
   },
 
   /* Horóscopo Negro anclado a la lectura: si el signo del usuario está en
-     su perfil, se muestra aquí la sección al terminar la tirada */
-  horoscopoLectura() {
+     su perfil, se muestra aquí la sección al terminar la tirada.
+     Además, genera un mensaje personalizado que conecta las cartas con el signo. */
+  horoscopoLectura(resultado) {
     const zona = document.getElementById("horoscopo-lectura");
     if (!zona) return;
     const signo = (typeof SESION !== "undefined" && SESION.signo) || null;
@@ -3073,9 +3074,47 @@ const TIRADAS = {
       </div>`;
       return;
     }
+
+    /* Mensaje personalizado: conecta cartas + signo zodiacal */
+    let cartasMsg = "";
+    if (resultado && resultado.cartas && resultado.cartas.length) {
+      const nombres = resultado.cartas.map(c => c.nombre).slice(0, 3);
+      constElementos = { "Fuego": "pasion", "Tierra": "abundancia", "Aire": "comunicación", "Agua": "emociones" };
+      const elem = signo.elemento || "Agua";
+      const tema = constElementos[elem] || "energía";
+      cartasMsg = `<div class="horoscopo-carta-conexion vidrio" style="margin:12px 0;padding:14px 16px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)">
+        <p style="font-size:.92rem;line-height:1.6;color:var(--blanco-humo);margin:0">
+          <span style="color:var(--dorado)">✧ Tu signo ${signo.emoji} ${signo.signo}</span> se conecta con ${tema} a través de
+          <b>${nombres.join(", ")}</b>. ${this.mensajeCartaSigno(signo.signo, nombres)}
+        </p>
+      </div>`;
+    }
+
+    zona.innerHTML = cartasMsg;
     fetchHoroscopo(signo.signo)
-      .then(d => { if (zona) zona.innerHTML = horoscopoHTML(d) || ""; })
-      .catch(() => {}); /* silencioso: la lectura ya está completa */
+      .then(d => {
+        if (zona) zona.innerHTML += horoscopoHTML(d) || "";
+      })
+      .catch(() => {});
+  },
+
+  /* Genera un mensaje que conecta las cartas tiradas con el signo zodiacal */
+  mensajeCartaSigno(signo, cartas) {
+    const mensajes = {
+      Aries: "Tu fuego se intensifica hoy: las cartas confirman que es momento de actuar con valentía.",
+      Tauro: "La tierra te sostiene: lo que las cartas revelan se materializará con paciencia.",
+      Géminis: "El aire lleva tu palabra: las cartas refuerzan tu poder de comunicación hoy.",
+      Cáncer: "El agua fluye en ti: las cartas hablan de emociones que necesitan ser abrazadas.",
+      Leo: "El sol brilla en tu camino: las cartas confirman tu luz natural.",
+      Virgo: "La tierra ordena tu vida: las cartas revelan claridad en los detalles.",
+      Libra: "El aire equilibra tu alma: las cartas buscan armonía en tus decisiones.",
+      Escorpio: "El agua transforma todo: las cartas hablan de renacer con fuerza.",
+      Sagitario: "El fuego expande tu horizonte: las cartas abren puertas nuevas.",
+      Capricornio: "La tierra consolida tu esfuerzo: las cartas confirman que vas por buen camino.",
+      Acuario: "El aire renueva tu visión: las cartas traen ideas frescas y revolucionarias.",
+      Piscis: "El agua nutre tu intuición: las cartas honran tu sensibilidad como don."
+    };
+    return mensajes[signo] || "Las cartas hablan directamente a tu signo con un mensaje único.";
   },
 
   /* ============================ carta astral ============================== */
@@ -4436,7 +4475,7 @@ async function mostrarResultado(r) {
   escena.appendChild(d);
   document.getElementById("btn-nueva-tirada").addEventListener("click", () => location.reload());
   document.getElementById("btn-guardar").addEventListener("click", () => TIRADAS.guardar(r));
-  TIRADAS.horoscopoLectura();
+  TIRADAS.horoscopoLectura(r);
 
   if (r.tirada && r.tirada.pregunta && r.pregunta) {
     const nodo = document.getElementById("respuesta-ia");
