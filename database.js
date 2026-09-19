@@ -124,6 +124,22 @@ try { db.exec("ALTER TABLE users ADD COLUMN baneado INTEGER NOT NULL DEFAULT 0")
    (para el estado conectado/offline del chat) */
 try { db.exec("ALTER TABLE users ADD COLUMN fecha_nacimiento TEXT"); } catch {}
 try { db.exec("ALTER TABLE users ADD COLUMN ultima_actividad TEXT"); } catch {}
+try { db.exec("ALTER TABLE users ADD COLUMN silenciado INTEGER NOT NULL DEFAULT 0"); } catch {}
+try {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS reportes (
+      id              INTEGER PRIMARY KEY AUTOINCREMENT,
+      autor_id        INTEGER NOT NULL REFERENCES users(id),
+      tipo            TEXT NOT NULL DEFAULT 'bug',
+      titulo          TEXT NOT NULL,
+      descripcion     TEXT NOT NULL,
+      estado          TEXT NOT NULL DEFAULT 'pendiente',
+      resuelto_por_id INTEGER REFERENCES users(id),
+      creado_en       TEXT NOT NULL DEFAULT (datetime('now')),
+      resuelto_en     TEXT
+    )
+  `);
+} catch {}
 /* normaliza el estado de amistad: el sistema usa 'aceptada' (pueden existir filas
    históricas o sembradas como 'aceptado') */
 try { db.exec("UPDATE amistades SET estado = 'aceptada' WHERE estado IN ('aceptado', 'aceptadas', 'aceptados')"); } catch {}

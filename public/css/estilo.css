@@ -2927,7 +2927,7 @@ nav.menu a.btn-whatsapp:hover {
 .horoscopo-emoji {
   width: 54px; height: 54px;
   display: grid; place-items: center;
-  font-size: 1.7rem;
+  font-size: 2rem;
   border-radius: 50%;
   background: radial-gradient(circle at 34% 28%, #fff4d8, transparent 55%), linear-gradient(135deg, var(--hc), #d49fff);
   box-shadow: 0 0 22px color-mix(in srgb, var(--hc) 70%, transparent);
@@ -2935,7 +2935,7 @@ nav.menu a.btn-whatsapp:hover {
 }
 .horoscopo-titulo {
   font-family: var(--fuente-deco);
-  font-size: 1.22rem;
+  font-size: 1.4rem;
   color: var(--blanco);
   letter-spacing: .5px;
 }
@@ -2946,7 +2946,7 @@ nav.menu a.btn-whatsapp:hover {
   font-weight: 800;
   padding: 4px 12px;
   border-radius: 999px;
-  font-size: .68rem;
+  font-size: .78rem;
   letter-spacing: 1.5px;
   box-shadow: 0 0 16px rgba(212, 175, 55, .45);
 }
@@ -2961,16 +2961,16 @@ nav.menu a.btn-whatsapp:hover {
 .horoscopo-dia b, .horoscopo-semana b {
   display: block;
   color: var(--dorado);
-  font-size: .8rem;
+  font-size: .92rem;
   letter-spacing: 1px;
   text-transform: uppercase;
   margin-bottom: 7px;
 }
-.horoscopo-dia p, .horoscopo-semana p { margin: 0; line-height: 1.6; }
+.horoscopo-dia p, .horoscopo-semana p { margin: 0; line-height: 1.7; font-size: 1.02rem; }
 .horoscopo-num {
   display: block;
   margin-top: 9px;
-  font-size: .78rem;
+  font-size: .88rem;
   color: var(--lavanda-suave);
   font-style: italic;
 }
@@ -2980,7 +2980,7 @@ nav.menu a.btn-whatsapp:hover {
   text-align: center;
   color: var(--lavanda-suave);
   padding: 18px;
-  font-size: .9rem;
+  font-size: 1.05rem;
 }
 .horoscopo-inicio { margin-top: 0; }
 #horoscopo-lectura { margin-top: 22px; }

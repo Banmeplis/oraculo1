@@ -1,6 +1,7 @@
 const express = require("express");
 const db = require("../database.js");
 const { requiereAuth, estaEnLinea, amigosEntre, perfilCorto } = require("../middleware/auth.js");
+const { tienePermiso } = require("../middleware/auth.js");
 
 const router = express.Router();
 
@@ -235,6 +236,27 @@ router.get("/notificaciones", requiereAuth, (req, res) => {
 router.post("/notificaciones/leer", requiereAuth, (req, res) => {
   db.prepare("UPDATE notificaciones SET leido = 1 WHERE user_id = ?").run(req.usuario.id);
   res.json({ ok: true });
+});
+
+/* --- Crear reporte de bug o problema (moderador+) --- */
+router.post("/reportes", requiereAuth, (req, res) => {
+  if (!tienePermiso(req.usuario.rol, 3))
+    return res.status(403).json({ error: "Solo los moderadores y superiores pueden crear reportes" });
+  const { tipo, titulo, descripcion } = req.body || {};
+  const tit = String(titulo || "").trim().slice(0, 200);
+  const desc = String(descripcion || "").trim().slice(0, 2000);
+  if (!tit || !desc) return res.status(400).json({ error: "Título y descripción son obligatorios" });
+  const tiposValidos = ["bug", "problema", "sugerencia", "cuenta_sospechosa"];
+  const tipoFinal = tiposValidos.includes(tipo) ? tipo : "bug";
+  const info = db.prepare(
+    "INSERT INTO reportes (autor_id, tipo, titulo, descripcion) VALUES (?,?,?,?)"
+  ).run(req.usuario.id, tipoFinal, tit, desc);
+  res.json({ ok: true, id: info.lastInsertRowid });
+});
+
+/* --- Silenciado: verificar si el usuario actual puede comentar --- */
+router.get("/silenciado", requiereAuth, (req, res) => {
+  res.json({ silenciado: !!req.usuario.silenciado });
 });
 
 module.exports = router;

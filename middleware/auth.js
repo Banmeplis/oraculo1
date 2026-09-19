@@ -2,9 +2,27 @@ const db = require("../database.js");
 const cfg = require("../config/index.js");
 const { signoDeFecha, signoPublico } = require("../config/zodiaco.js");
 
+const ROLES_VALIDOS = ["autor", "ayudante", "moderador", "admin"];
+
+const JERARQUIA = {
+  admin: 4,
+  moderador: 3,
+  ayudante: 2,
+  autor: 1
+};
+
 function rolEfectivo(email, rol) {
   if (email && String(email).toLowerCase() === cfg.MASTER_EMAIL) return "admin";
-  return rol || "autor";
+  if (!ROLES_VALIDOS.includes(rol)) return "autor";
+  return rol;
+}
+
+function nivelRol(rol) {
+  return JERARQUIA[rol] || 0;
+}
+
+function tienePermiso(rol, minimo) {
+  return nivelRol(rol) >= minimo;
 }
 
 const VENTANA_ONLINE = 3 * 60 * 1000;
@@ -18,7 +36,7 @@ function estaEnLinea(ultimaActividad) {
 
 function usuarioActual(req) {
   if (!req.session.user) return null;
-  const u = db.prepare("SELECT id, nombre, email, rol, avatar, baneado, fecha_nacimiento, ultima_actividad FROM users WHERE id = ?").get(req.session.user.id);
+  const u = db.prepare("SELECT id, nombre, email, rol, avatar, baneado, silenciado, fecha_nacimiento, ultima_actividad FROM users WHERE id = ?").get(req.session.user.id);
   if (!u || u.baneado) {
     req.session.user = null;
     return null;
@@ -32,6 +50,7 @@ function usuarioActual(req) {
     master: String(u.email).toLowerCase() === cfg.MASTER_EMAIL,
     picture: req.session.user.picture || undefined,
     baneado: u.baneado,
+    silenciado: u.silenciado,
     fecha_nacimiento: u.fecha_nacimiento || undefined,
     signo: signoPublico(signoDeFecha(u.fecha_nacimiento)),
     online: estaEnLinea(u.ultima_actividad),
@@ -49,7 +68,23 @@ function requiereAuth(req, res, next) {
 function requiereAdmin(req, res, next) {
   const u = usuarioActual(req);
   if (!u) return res.status(401).json({ error: "No has iniciado sesión" });
-  if (u.rol !== "admin") return res.status(403).json({ error: "Necesitas permisos de administrador" });
+  if (!tienePermiso(u.rol, 4)) return res.status(403).json({ error: "Necesitas permisos de administrador" });
+  req.usuario = u;
+  next();
+}
+
+function requiereModerador(req, res, next) {
+  const u = usuarioActual(req);
+  if (!u) return res.status(401).json({ error: "No has iniciado sesión" });
+  if (!tienePermiso(u.rol, 3)) return res.status(403).json({ error: "Necesitas permisos de moderador" });
+  req.usuario = u;
+  next();
+}
+
+function requiereAyudante(req, res, next) {
+  const u = usuarioActual(req);
+  if (!u) return res.status(401).json({ error: "No has iniciado sesión" });
+  if (!tienePermiso(u.rol, 2)) return res.status(403).json({ error: "Necesitas permisos de ayudante" });
   req.usuario = u;
   next();
 }
@@ -99,8 +134,14 @@ module.exports = {
   usuarioActual,
   requiereAuth,
   requiereAdmin,
+  requiereModerador,
+  requiereAyudante,
   requerido,
   validarFechaNacimiento,
   amigosEntre,
-  perfilCorto
+  perfilCorto,
+  ROLES_VALIDOS,
+  JERARQUIA,
+  nivelRol,
+  tienePermiso
 };

@@ -6,6 +6,7 @@ const bcrypt = require("bcryptjs");
 const db = require("../database.js");
 const cfg = require("../config/index.js");
 const { requiereAdmin } = require("../middleware/auth.js");
+const { ROLES_VALIDOS, tienePermiso, requiereModerador, estaEnLinea } = require("../middleware/auth.js");
 
 const router = express.Router();
 
@@ -74,7 +75,7 @@ router.get("/sync/posts", (req, res) => {
 router.get("/usuarios", requiereAdmin, (req, res) => {
   const esMaster = String(req.usuario.email).toLowerCase() === cfg.MASTER_EMAIL;
   const rows = db.prepare(`
-    SELECT u.id, u.nombre, u.email, u.rol, u.avatar, u.bio, u.baneado, u.proveedor, u.password_hash, u.creado_en,
+    SELECT u.id, u.nombre, u.email, u.rol, u.avatar, u.bio, u.baneado, u.silenciado, u.proveedor, u.password_hash, u.creado_en,
            (SELECT COUNT(*) FROM posts p WHERE p.autor_id = u.id) AS posts
     FROM users u ORDER BY u.baneado DESC, u.id ASC
   `).all();
@@ -120,9 +121,97 @@ router.put("/usuarios/:id/rol", requiereAdmin, (req, res) => {
   if (String(objetivo.email).toLowerCase() === cfg.MASTER_EMAIL)
     return res.status(400).json({ error: "El rol del usuario master es intocable" });
   const { rol } = req.body || {};
-  if (!["autor", "admin"].includes(rol)) return res.status(400).json({ error: "Rol no válido" });
+  if (!ROLES_VALIDOS.includes(rol)) return res.status(400).json({ error: "Rol no válido. Usa: " + ROLES_VALIDOS.join(", ") });
   db.prepare("UPDATE users SET rol = ? WHERE id = ?").run(rol, objetivo.id);
   res.json({ ok: true, rol, nombre: objetivo.nombre });
+});
+
+/* --- Usuarios conectados (admin) --- */
+router.get("/usuarios/conectados", requiereAdmin, (req, res) => {
+  const ventanaMs = 3 * 60 * 1000;
+  const desde = new Date(Date.now() - ventanaMs).toISOString().slice(0, 19).replace("T", " ");
+  const rows = db.prepare(`
+    SELECT id, nombre, email, avatar, rol, fecha_nacimiento, ultima_actividad
+    FROM users WHERE baneado = 0 AND ultima_actividad >= ? ORDER BY ultima_actividad DESC
+  `).all(desde);
+  res.json(rows.map(u => ({
+    ...u,
+    online: estaEnLinea(u.ultima_actividad)
+  })));
+});
+
+/* --- Silenciar usuario (moderador+) --- */
+router.put("/usuarios/:id/silenciar", requiereModerador, (req, res) => {
+  const objetivo = db.prepare("SELECT * FROM users WHERE id = ?").get(Number(req.params.id));
+  if (!objetivo) return res.status(404).json({ error: "Usuario no encontrado" });
+  if (String(objetivo.email).toLowerCase() === cfg.MASTER_EMAIL)
+    return res.status(400).json({ error: "El usuario master no puede ser silenciado" });
+  if (tienePermiso(objetivo.rol, 4))
+    return res.status(400).json({ error: "No puedes silenciar a un administrador" });
+  const { silenciado } = req.body || {};
+  db.prepare("UPDATE users SET silenciado = ? WHERE id = ?").run(silenciado ? 1 : 0, objetivo.id);
+  res.json({ ok: true, silenciado: silenciado ? 1 : 0, nombre: objetivo.nombre });
+});
+
+/* --- Amistad directa (admin agrega sin solicitud) --- */
+router.post("/amistad-directa", requiereAdmin, (req, res) => {
+  const { usuario_id } = req.body || {};
+  const otro = Number(usuario_id);
+  if (!otro) return res.status(400).json({ error: "Destino inválido" });
+  const objetivo = db.prepare("SELECT id, baneado FROM users WHERE id = ?").get(otro);
+  if (!objetivo || objetivo.baneado) return res.status(404).json({ error: "Usuario no encontrado" });
+  const existente = db.prepare(
+    "SELECT * FROM amistades WHERE (solicitante_id=? AND receptor_id=?) OR (solicitante_id=? AND receptor_id=?) LIMIT 1"
+  ).get(req.usuario.id, otro, otro, req.usuario.id);
+  if (existente && existente.estado === "aceptada")
+    return res.json({ ok: true, estado: "ya_eran_amigos", amistadId: existente.id });
+  if (existente) {
+    db.prepare("UPDATE amistades SET estado='aceptada', actualizado_en=datetime('now') WHERE id=?").run(existente.id);
+    return res.json({ ok: true, estado: "aceptada", amistadId: existente.id });
+  }
+  const id1 = db.prepare("INSERT INTO amistades (solicitante_id, receptor_id, estado) VALUES (?,?,'aceptada')").run(req.usuario.id, otro).lastInsertRowid;
+  db.prepare("INSERT OR IGNORE INTO amistades (solicitante_id, receptor_id, estado) VALUES (?,?,'aceptada')").run(otro, req.usuario.id);
+  res.json({ ok: true, estado: "aceptada", amistadId: id1 });
+});
+
+/* --- Reportes: listar todos (admin) --- */
+router.get("/reportes", requiereAdmin, (req, res) => {
+  const rows = db.prepare(`
+    SELECT r.*, u.nombre AS autor_nombre, u.email AS autor_email,
+           u2.nombre AS resuelto_por_nombre
+    FROM reportes r
+    JOIN users u ON u.id = r.autor_id
+    LEFT JOIN users u2 ON u2.id = r.resuelto_por_id
+    ORDER BY r.estado = 'pendiente' DESC, r.creado_en DESC
+  `).all();
+  res.json(rows);
+});
+
+/* --- Reportes: marcar resuelto --- */
+router.put("/reportes/:id/resolver", requiereAdmin, (req, res) => {
+  const r = db.prepare("SELECT * FROM reportes WHERE id = ?").get(Number(req.params.id));
+  if (!r) return res.status(404).json({ error: "Reporte no encontrado" });
+  db.prepare("UPDATE reportes SET estado = 'resuelto', resuelto_por_id = ?, resuelto_en = datetime('now') WHERE id = ?")
+    .run(req.usuario.id, r.id);
+  res.json({ ok: true });
+});
+
+/* --- Reportes: reabrir --- */
+router.put("/reportes/:id/reabrir", requiereAdmin, (req, res) => {
+  const r = db.prepare("SELECT * FROM reportes WHERE id = ?").get(Number(req.params.id));
+  if (!r) return res.status(404).json({ error: "Reporte no encontrado" });
+  db.prepare("UPDATE reportes SET estado = 'pendiente', resuelto_por_id = NULL, resuelto_en = NULL WHERE id = ?").run(r.id);
+  res.json({ ok: true });
+});
+
+/* --- Sanciones: lista de baneados y silenciados (admin) --- */
+router.get("/sanciones", requiereAdmin, (req, res) => {
+  const rows = db.prepare(`
+    SELECT id, nombre, email, rol, baneado, silenciado, proveedor, creado_en
+    FROM users WHERE baneado = 1 OR silenciado = 1
+    ORDER BY baneado DESC, silenciado DESC, id ASC
+  `).all();
+  res.json(rows);
 });
 
 module.exports = router;

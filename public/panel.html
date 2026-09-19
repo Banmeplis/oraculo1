@@ -40,6 +40,10 @@
         <a href="#" data-vista="posts">📚 Mis publicaciones</a>
         <a href="#" data-vista="lecturas">🔮 Mis lecturas</a>
         <a href="#" data-vista="usuarios" id="link-usuarios" class="oculto">👥 Usuarios</a>
+        <a href="#" data-vista="conectados" id="link-conectados" class="oculto">🟢 Conectados</a>
+        <a href="#" data-vista="reportar" id="link-reportar" class="oculto">🐛 Reportar</a>
+        <a href="#" data-vista="reportes" id="link-reportes" class="oculto">📋 Reportes</a>
+        <a href="#" data-vista="sanciones" id="link-sanciones" class="oculto">⚠️ Sanciones</a>
         <a href="#" data-vista="ads" id="link-ads" class="oculto">📃 Ads.txt</a>
       </aside>
 
@@ -96,9 +100,63 @@
         <section id="vista-usuarios" class="oculto">
           <h3>Gestión de usuarios</h3>
           <p style="color:var(--lavanda-suave);font-size:.92rem;margin-bottom:16px">
-            Administra el círculo: suspende (banea), restaura o cambia el rol de los miembros.
+            Administra el círculo: asigna roles (Administrador, Moderador, Ayudante, Autora), suspende o restaura miembros.
           </p>
           <div id="lista-usuarios"></div>
+        </section>
+
+        <!-- CONECTADOS (admin) -->
+        <section id="vista-conectados" class="oculto">
+          <h3>Usuarios conectados</h3>
+          <p style="color:var(--lavanda-suave);font-size:.92rem;margin-bottom:16px">
+            Miembros activos en los últimos 3 minutos. Puedes agregar amistades directamente desde aquí.
+          </p>
+          <div id="lista-conectados"></div>
+        </section>
+
+        <!-- REPORTAR BUG/PROBLEMA (moderador+) -->
+        <section id="vista-reportar" class="oculto">
+          <h3>Reportar bug o problema</h3>
+          <p style="color:var(--lavanda-suave);font-size:.92rem;margin-bottom:16px">
+            Notifica un error, comportamiento sospechoso o problema técnico. El equipo lo revisará.
+          </p>
+          <div id="aviso-reporte"></div>
+          <div class="campo">
+            <label for="r-tipo">Tipo</label>
+            <select id="r-tipo">
+              <option value="bug">🐛 Bug / Error técnico</option>
+              <option value="problema">⚠️ Problema con un usuario</option>
+              <option value="cuenta_sospechosa">🔍 Cuenta sospechosa</option>
+              <option value="sugerencia">💡 Sugerencia de mejora</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="r-titulo">Título del reporte *</label>
+            <input type="text" id="r-titulo" placeholder="Ej: El botón de favorito no funciona">
+          </div>
+          <div class="campo">
+            <label for="r-descripcion">Descripción detallada *</label>
+            <textarea id="r-descripcion" style="min-height:120px" placeholder="Describe el problema con detalle: qué pasabas haciendo, qué esperabas y qué ocurrió..."></textarea>
+          </div>
+          <button class="btn btn-dorado" id="btn-reportar">Enviar reporte</button>
+        </section>
+
+        <!-- REPORTES (admin/master) -->
+        <section id="vista-reportes" class="oculto">
+          <h3>Reportes recibidos</h3>
+          <p style="color:var(--lavanda-suave);font-size:.92rem;margin-bottom:16px">
+            Bugs reportados, problemas y sugerencias del equipo de moderación.
+          </p>
+          <div id="lista-reportes"></div>
+        </section>
+
+        <!-- SANCIONES (admin/master) -->
+        <section id="vista-sanciones" class="oculto">
+          <h3>Usuarios sancionados</h3>
+          <p style="color:var(--lavanda-suave);font-size:.92rem;margin-bottom:16px">
+            Cuentas baneadas o silenciadas. Puedes restaurar desde la pestaña de Usuarios.
+          </p>
+          <div id="lista-sanciones"></div>
         </section>
 
         <!-- ADS.TXT (solo admin) -->
@@ -147,9 +205,18 @@
         if (!d.user) { location.href = "/login.html?redir=panel"; return; }
         SESION._usuario = d.user;
         SESION.renderizar();
-        if (d.user.rol === "admin") {
+        const rol = d.user.rol;
+        if (rol === "admin" || rol === "moderador") {
           document.getElementById("link-usuarios").classList.remove("oculto");
+        }
+        if (rol === "admin") {
+          document.getElementById("link-conectados").classList.remove("oculto");
           document.getElementById("link-ads").classList.remove("oculto");
+          document.getElementById("link-reportes").classList.remove("oculto");
+          document.getElementById("link-sanciones").classList.remove("oculto");
+        }
+        if (rol === "moderador" || rol === "admin") {
+          document.getElementById("link-reportar").classList.remove("oculto");
         }
         renderHoroscopoPanel();
       } catch { location.href = "/login.html?redir=panel"; }
@@ -190,6 +257,9 @@
         if (a.dataset.vista === "posts") cargarPostsPanel();
         if (a.dataset.vista === "lecturas") cargarLecturas();
         if (a.dataset.vista === "usuarios") cargarUsuarios();
+        if (a.dataset.vista === "conectados") cargarConectados();
+        if (a.dataset.vista === "reportes") cargarReportes();
+        if (a.dataset.vista === "sanciones") cargarSanciones();
         if (a.dataset.vista === "ads") cargarAds();
       });
     });
@@ -342,7 +412,18 @@
       }));
     }
 
-    /* usuarios (solo admin) */
+    const ROLES_CONFIG = {
+      admin:      { label: "Administrador", color: "#d4af37", icon: "👑" },
+      moderador:  { label: "Moderador",     color: "#9b5de5", icon: "🛡️" },
+      ayudante:   { label: "Ayudante",      color: "#5ea8e0", icon: "🤝" },
+      autor:      { label: "Autora",        color: "#a3c26a", icon: "✍️" }
+    };
+
+    function rolBadge(rol) {
+      const r = ROLES_CONFIG[rol] || ROLES_CONFIG.autor;
+      return `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:999px;font-size:.78rem;font-weight:700;background:${r.color}22;color:${r.color};border:1px solid ${r.color}55">${r.icon} ${r.label}</span>`;
+    }
+
     async function cargarUsuarios() {
       const c = document.getElementById("lista-usuarios");
       try {
@@ -351,13 +432,16 @@
           <div class="tarjeta miniatura-post">
             <div class="datos">
               <strong>${escapHtml(u.nombre)} ${u.master ? '<span style="color:var(--dorado)">✧ Master</span>' : ""}</strong>
-              <span style="font-size:.85rem;color:var(--lavanda-suave)">${escapHtml(u.email)} · ${u.proveedor} · ${u.posts} publicaciones ${u.baneado ? '· <span style="color:#ff8095">SUSPENDIDO</span>' : ""}</span>
-              <span style="font-size:.85rem;color:var(--lavanda-suave)">Rol: ${u.rol} · desde ${fechaLegible(u.creado_en)}</span>
+              <span style="font-size:.85rem;color:var(--lavanda-suave)">${escapHtml(u.email)} · ${u.proveedor} · ${u.posts} publicaciones ${u.baneado ? '· <span style="color:#ff8095">SUSPENDIDO</span>' : ""} ${u.silenciado ? '· <span style="color:#f0a93b">SILENCIADO</span>' : ""}</span>
+              <span style="font-size:.85rem;color:var(--lavanda-suave)">${rolBadge(u.rol)} · desde ${fechaLegible(u.creado_en)}</span>
             </div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
               ${u.master ? "" : `
-                <button class="btn btn-suave" style="padding:8px 14px" data-rol="${u.id}" data-rol-actual="${u.rol}">${u.rol === "admin" ? "Quitar admin" : "Hacer admin"}</button>
+                <select class="btn btn-suave" style="padding:6px 10px;font-size:.82rem" data-rol-select="${u.id}">
+                  ${Object.entries(ROLES_CONFIG).map(([k, v]) => `<option value="${k}" ${u.rol === k ? "selected" : ""}>${v.icon} ${v.label}</option>`).join("")}
+                </select>
                 <button class="btn ${u.baneado ? "btn-dorado" : "btn-suave"}" style="padding:8px 14px;${u.baneado ? "" : "color:#ff8095"}" data-ban="${u.id}" data-est="${u.baneado ? 1 : 0}">${u.baneado ? "Restaurar" : "Suspender"}</button>
+                <button class="btn btn-suave" style="padding:6px 12px;font-size:.82rem;${u.silenciado ? "color:#f0a93b" : ""}" data-silenciar="${u.id}" data-sil-est="${u.silenciado ? 1 : 0}">${u.silenciado ? "🔊 Hablar" : "🔇 Silenciar"}</button>
               `}
             </div>
           </div>`).join("") || '<p class="centrado" style="color:var(--lavanda-suave)">Sin usuarios.</p>';
@@ -373,13 +457,25 @@
             cargarUsuarios();
           } catch (e) { mostrar(e.message, "error"); }
         }));
-        c.querySelectorAll("[data-rol]").forEach(b => b.addEventListener("click", async () => {
-          const rol = b.dataset.rolActual === "admin" ? "autor" : "admin";
-          const texto = rol === "admin" ? "¿Ascender a administrador?" : "¿Quitar el rol de administrador?";
+        c.querySelectorAll("[data-rol-select]").forEach(sel => sel.addEventListener("change", async () => {
+          const id = sel.dataset.rolSelect;
+          const rol = sel.value;
+          const nombreRol = ROLES_CONFIG[rol]?.label || rol;
+          if (!confirm("¿Cambiar el rol de este usuario a " + nombreRol + "?")) { cargarUsuarios(); return; }
+          try {
+            await fetchJSON("/api/admin/usuarios/" + id + "/rol", {
+              method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ rol })
+            });
+            cargarUsuarios();
+          } catch (e) { mostrar(e.message, "error"); }
+        }));
+        c.querySelectorAll("[data-silenciar]").forEach(b => b.addEventListener("click", async () => {
+          const silenciado = b.dataset.silEst === "0";
+          const texto = silenciado ? "¿Silenciar a este usuario? No podrá comentar." : "¿Quitar el silencio a este usuario?";
           if (!confirm(texto)) return;
           try {
-            await fetchJSON("/api/admin/usuarios/" + b.dataset.rol + "/rol", {
-              method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ rol })
+            await fetchJSON("/api/admin/usuarios/" + b.dataset.silenciar + "/silenciar", {
+              method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ silenciado })
             });
             cargarUsuarios();
           } catch (e) { mostrar(e.message, "error"); }
@@ -415,6 +511,151 @@
     });
 
     document.getElementById("btn-recargar-ads").addEventListener("click", cargarAds);
+
+    /* --- Usuarios conectados (admin) --- */
+    async function cargarConectados() {
+      const c = document.getElementById("lista-conectados");
+      try {
+        const usuarios = await fetchJSON("/api/admin/usuarios/conectados");
+        c.innerHTML = usuarios.map(u => `
+          <div class="tarjeta miniatura-post">
+            <div class="datos">
+              <strong>${escapHtml(u.nombre)}</strong>
+              <span style="font-size:.85rem;color:var(--lavanda-suave)">${escapHtml(u.email)} · ${rolBadge(u.rol)}</span>
+              <span style="font-size:.85rem;color:var(--lavanda-suave)">Última actividad: ${u.ultima_actividad ? fechaLegible(u.ultima_actividad) : "nunca"}</span>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+              <button class="btn btn-suave" style="padding:6px 12px;font-size:.82rem" data-agregar-amigo="${u.id}">🤝 Agregar amigo</button>
+            </div>
+          </div>`).join("") || '<p class="centrado" style="color:var(--lavanda-suave)">No hay usuarios conectados ahora mismo.</p>';
+        c.querySelectorAll("[data-agregar-amigo]").forEach(b => b.addEventListener("click", async () => {
+          try {
+            await fetchJSON("/api/admin/amistad-directa", {
+              method: "POST", headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ usuario_id: Number(b.dataset.agregarAmigo) })
+            });
+            b.textContent = "✓ Amigo agregado";
+            b.disabled = true;
+          } catch (e) { mostrar(e.message, "error"); }
+        }));
+      } catch (e) { c.innerHTML = '<div class="aviso error">' + e.message + '</div>'; }
+    }
+
+    /* --- Reportar bug/problema (moderador+) --- */
+    document.getElementById("btn-reportar").addEventListener("click", async () => {
+      const avisoRepo = document.getElementById("aviso-reporte");
+      const tipo = document.getElementById("r-tipo").value;
+      const titulo = document.getElementById("r-titulo").value.trim();
+      const descripcion = document.getElementById("r-descripcion").value.trim();
+      if (!titulo || !descripcion) {
+        avisoRepo.innerHTML = '<div class="aviso error">Título y descripción son obligatorios</div>';
+        return;
+      }
+      try {
+        await fetchJSON("/api/reportes", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tipo, titulo, descripcion })
+        });
+        avisoRepo.innerHTML = '<div class="aviso ok">Reporte enviado ✓ Gracias por tu ayuda.</div>';
+        document.getElementById("r-titulo").value = "";
+        document.getElementById("r-descripcion").value = "";
+      } catch (e) {
+        avisoRepo.innerHTML = '<div class="aviso error">' + e.message + '</div>';
+      }
+    });
+
+    /* --- Reportes (admin/master) --- */
+    const ESTADO_REPORTE = {
+      pendiente: { label: "Pendiente", color: "#f0a93b" },
+      resuelto:  { label: "Resuelto",  color: "#a3c26a" }
+    };
+    const TIPO_REPORTE = {
+      bug:               { label: "Bug",              icon: "🐛" },
+      problema:          { label: "Problema",         icon: "⚠️" },
+      cuenta_sospechosa: { label: "Cuenta sospechosa", icon: "🔍" },
+      sugerencia:        { label: "Sugerencia",       icon: "💡" }
+    };
+
+    async function cargarReportes() {
+      const c = document.getElementById("lista-reportes");
+      try {
+        const reportes = await fetchJSON("/api/admin/reportes");
+        c.innerHTML = reportes.map(r => {
+          const estado = ESTADO_REPORTE[r.estado] || ESTADO_REPORTE.pendiente;
+          const tipo = TIPO_REPORTE[r.tipo] || TIPO_REPORTE.bug;
+          return `<div class="tarjeta miniatura-post">
+            <div class="datos">
+              <strong>${tipo.icon} ${escapHtml(r.titulo)}</strong>
+              <span style="font-size:.85rem;color:var(--lavanda-suave)">
+                Por ${escapHtml(r.autor_nombre)} · ${fechaLegible(r.creado_en)}
+                · <span style="color:${estado.color}">${estado.label}</span>
+              </span>
+              <p style="font-size:.9rem;color:var(--blanco-humo);margin:6px 0 0;white-space:pre-wrap">${escapHtml(r.descripcion)}</p>
+              ${r.resuelto_por_nombre ? `<span style="font-size:.8rem;color:var(--lavanda-suave)">Resuelto por ${escapHtml(r.resuelto_por_nombre)} · ${fechaLegible(r.resuelto_en)}</span>` : ""}
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+              ${r.estado === "pendiente"
+                ? `<button class="btn btn-dorado" style="padding:6px 12px;font-size:.82rem" data-resolver="${r.id}">✓ Resolver</button>`
+                : `<button class="btn btn-suave" style="padding:6px 12px;font-size:.82rem" data-reabrir="${r.id}">Reabrir</button>`
+              }
+            </div>
+          </div>`;
+        }).join("") || '<p class="centrado" style="color:var(--lavanda-suave)">No hay reportes pendientes.</p>';
+        c.querySelectorAll("[data-resolver]").forEach(b => b.addEventListener("click", async () => {
+          try {
+            await fetchJSON("/api/admin/reportes/" + b.dataset.resolver + "/resolver", { method: "PUT" });
+            cargarReportes();
+          } catch (e) { mostrar(e.message, "error"); }
+        }));
+        c.querySelectorAll("[data-reabrir]").forEach(b => b.addEventListener("click", async () => {
+          try {
+            await fetchJSON("/api/admin/reportes/" + b.dataset.reabrir + "/reabrir", { method: "PUT" });
+            cargarReportes();
+          } catch (e) { mostrar(e.message, "error"); }
+        }));
+      } catch (e) { c.innerHTML = '<div class="aviso error">' + e.message + '</div>'; }
+    }
+
+    /* --- Sanciones (admin/master) --- */
+    async function cargarSanciones() {
+      const c = document.getElementById("lista-sanciones");
+      try {
+        const usuarios = await fetchJSON("/api/admin/sanciones");
+        c.innerHTML = usuarios.map(u => {
+          const badges = [];
+          if (u.baneado) badges.push('<span style="color:#ff8095">🚫 BANEADO</span>');
+          if (u.silenciado) badges.push('<span style="color:#f0a93b">🔇 SILENCIADO</span>');
+          return `<div class="tarjeta miniatura-post">
+            <div class="datos">
+              <strong>${escapHtml(u.nombre)}</strong>
+              <span style="font-size:.85rem;color:var(--lavanda-suave)">${escapHtml(u.email)} · ${u.proveedor} · ${badges.join(" · ")}</span>
+              <span style="font-size:.85rem;color:var(--lavanda-suave)">Rol: ${u.rol} · desde ${fechaLegible(u.creado_en)}</span>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+              ${u.baneado ? `<button class="btn btn-dorado" style="padding:6px 12px;font-size:.82rem" data-restaurar="${u.id}">Restaurar</button>` : ""}
+              ${u.silenciado ? `<button class="btn btn-suave" style="padding:6px 12px;font-size:.82rem;color:var(--dorado)" data-desilenciar="${u.id}">🔊 Quitar silencio</button>` : ""}
+            </div>
+          </div>`;
+        }).join("") || '<p class="centrado" style="color:var(--lavanda-suave)">No hay usuarios sancionados.</p>';
+        c.querySelectorAll("[data-restaurar]").forEach(b => b.addEventListener("click", async () => {
+          if (!confirm("¿Restaurar a este usuario?")) return;
+          try {
+            await fetchJSON("/api/admin/usuarios/" + b.dataset.restaurar + "/ban", {
+              method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ baneado: false })
+            });
+            cargarSanciones();
+          } catch (e) { mostrar(e.message, "error"); }
+        }));
+        c.querySelectorAll("[data-desilenciar]").forEach(b => b.addEventListener("click", async () => {
+          try {
+            await fetchJSON("/api/admin/usuarios/" + b.dataset.desilenciar + "/silenciar", {
+              method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ silenciado: false })
+            });
+            cargarSanciones();
+          } catch (e) { mostrar(e.message, "error"); }
+        }));
+      } catch (e) { c.innerHTML = '<div class="aviso error">' + e.message + '</div>'; }
+    }
   </script>
 </body>
 </html>

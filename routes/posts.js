@@ -1,6 +1,7 @@
 const express = require("express");
 const db = require("../database.js");
 const { requiereAuth, requerido, usuarioActual } = require("../middleware/auth.js");
+const { tienePermiso } = require("../middleware/auth.js");
 
 const router = express.Router();
 
@@ -82,6 +83,8 @@ router.post("/posts/:id/comentarios", (req, res) => {
   const post = db.prepare("SELECT id, titulo, autor_id FROM posts WHERE id = ?").get(Number(req.params.id));
   if (!post) return res.status(404).json({ error: "Artículo no encontrado" });
   const u = usuarioActual(req);
+  if (u && u.silenciado)
+    return res.status(403).json({ error: "Tu cuenta ha sido silenciada. No puedes comentar." });
   const autor = u ? u.nombre : "Anónimo";
   const user_id = u ? u.id : null;
   const info = db.prepare(
@@ -98,7 +101,9 @@ router.post("/posts/:id/comentarios", (req, res) => {
 router.delete("/comentarios/:id", requiereAuth, (req, res) => {
   const c = db.prepare("SELECT * FROM comentarios WHERE id = ?").get(Number(req.params.id));
   if (!c) return res.status(404).json({ error: "No encontrado" });
-  if (c.user_id !== req.usuario.id && req.usuario.rol !== "admin")
+  const esAutor = c.user_id === req.usuario.id;
+  const esStaff = tienePermiso(req.usuario.rol, 3);
+  if (!esAutor && !esStaff)
     return res.status(403).json({ error: "No tienes permiso" });
   db.prepare("DELETE FROM comentarios WHERE id = ?").run(c.id);
   res.json({ ok: true });
