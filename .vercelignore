@@ -1,0 +1,17 @@
+node_modules/
+data/
+uploads/
+.git/
+*.db
+*.db-wal
+*.db-shm
+.env
+config.json
+render.yaml
+scripts/
+seed/
+githooks/
+*.bat
+*.log
+.vscode/
+.opencode/
