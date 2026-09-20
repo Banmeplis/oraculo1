@@ -67,9 +67,15 @@
     });
   }
 
-  window.renderizarInterpretacion = function ({ lectura, cartas, escena }) {
+  window.renderizarInterpretacion = function ({ lectura, cartas, escena, pregunta, analisis }) {
     const raiz = document.createElement("div");
     raiz.className = "interpretacion-completa-nueva resultado";
+
+    const esPregunta = !!pregunta;
+    const q = String(pregunta || "").trim();
+    const enmarcar = (texto) => q
+      ? `${texto.replace(/\.$/, "")} Sobre tu pregunta «${q}», el oráculo responde con claridad.`
+      : texto;
 
     raiz.appendChild(crearSeccion("interpretacion-cabecera-nueva", `
       <div class="deco titulo-brillante">✦ ☾ ✦</div>
@@ -109,6 +115,9 @@
     presentes.forEach((arcangel, indice) => {
       const cartaArcangel = cartas[indice % cartas.length];
       const area = cartaArcangel?.posicion?.[0] || "Guia espiritual";
+      const angelMensaje = esPregunta && analisis
+        ? `${arcangel.mensaje} En esta consulta sobre «${q}», ${arcangel.nombre} te guía específicamente: presta atención a los signos que aparecen en tu camino.`
+        : arcangel.mensaje;
       const bloqueArcangel = crearSeccion("carta-grande vidrio arcangel-bloque-nueva", `
         <div class="particulas-arcangel" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
         <div class="sello arcangel-sello-nuevo" style="--arc-color:${arcangel.color}"><span>${arcangel.icono}</span><small>Guia angelical</small></div>
@@ -117,17 +126,21 @@
           <h4>${escapar(area)} <span style="font-weight:400;color:var(--lavanda-suave)">· Presencia espiritual</span></h4>
           <h3 class="titulo-arcangel-nombre">Arcangel ${escapar(arcangel.nombre)}</h3>
           <div class="palabras"><span>${escapar(arcangel.regencia)}</span></div>
-          <p class="interp">${escapar(arcangel.mensaje)}</p>
+          <p class="interp">${escapar(angelMensaje)}</p>
         </div>
       `);
       bloqueArcangel.style.setProperty("--arc-color", arcangel.color);
       raiz.appendChild(bloqueArcangel);
     });
 
+    const mensajeFinal = esPregunta
+      ? enmarcar(`${presentes.map(arcangel => arcangel.nombre).join(", ")} sellan esta lectura con su presencia. ${q ? `Sobre tu pregunta «${q}»` : "En esta consulta"}, los arcángeles te muestran el camino: confía en la señal que recibiste y da el paso que el oráculo te indica.`)
+      : `${presentes.map(arcangel => arcangel.nombre).join(", ")} sellan esta lectura con su presencia. No estas sola: sus simbolos te ayudan a reconocer tus recursos, actuar con calma y sostener tu propia luz.`;
+
     raiz.appendChild(crearSeccion("carta-grande vidrio mensaje-final-seccion-nueva", `
       <div class="deco">✦ ☾ ✦</div>
       <h2>El mensaje final</h2>
-      <p>${presentes.map(arcangel => arcangel.nombre).join(", ")} sellan esta lectura con su presencia. No estas sola: sus simbolos te ayudan a reconocer tus recursos, actuar con calma y sostener tu propia luz.</p>
+      <p>${escapar(mensajeFinal)}</p>
       <p>${escapar(consejoFinal(cartas))}</p>
       <em>"Nada llega antes ni despues de su tiempo; cada paso tuyo tiene su momento."</em>
     `));

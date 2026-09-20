@@ -596,6 +596,65 @@ const TIRADAS = {
     }
   },
 
+  /* genera una interpretación de carta ENFOCADA en la pregunta del consultante.
+     Usa el análisis NLP (tema, tono, tipo, persona, keywords) para contextualizar
+     el significado genérico de cada carta en la consulta específica. */
+  interpretarCartaPregunta(carta, resultado) {
+    const an = resultado.__analisis;
+    if (!an) return carta.texto;
+    const esencia = this.esencia[carta.nombre];
+    const base = carta.invertido
+      ? (esencia ? esencia.sombra : "una lección que te pide mirar hacia dentro")
+      : (esencia ? esencia.luz : "un mensaje de luz y confianza");
+    const tono = resultado.__tono || "neutro";
+    const tipo = resultado.__tipoPregunta || "situacion";
+    const ref = resultado.__persona || null;
+    const q = String(resultado.pregunta || "").trim();
+    const posicion = carta.posicion ? carta.posicion[0].toLowerCase() : "";
+
+    const enmarcar = (texto) => q
+      ? this.capitalizarPrimera(`Sobre tu pregunta «${q}», ${texto.replace(/^\s*sobre\s+/, "")}`)
+      : this.capitalizarPrimera(texto);
+
+    if (tipo === "si-no") {
+      const veredicto = carta.invertido
+        ? "hay un obstáculo o una condición que aún no se resuelve"
+        : "la energía fluye a tu favor y hay luz en este aspecto";
+      return enmarcar(`${carta.nombre} ${carta.invertido ? "invertida" : ""} te dice que ${veredicto}. ${base.charAt(0).toUpperCase() + base.slice(1)}.`);
+    }
+
+    if (tipo === "persona" && ref) {
+      const relTono = tono === "positivo" ? "con intención sincera" : (tono === "negativo" ? "con reservas que no son contra ti" : "en un momento de definición");
+      return enmarcar(`${carta.nombre} ${carta.invertido ? "invertida" : ""} habla de ${ref} ${relTono}. ${base.charAt(0).toUpperCase() + base.slice(1)}.`);
+    }
+
+    if (tipo === "consejo") {
+      const accion = carta.invertido
+        ? "antes de actuar, revisa lo que evitas mirar"
+        : "este es el paso que debes dar con confianza";
+      return enmarcar(`En tu consulta, ${carta.nombre} ${carta.invertido ? "invertida" : ""} te sugiere que ${accion}. ${base.charAt(0).toUpperCase() + base.slice(1)}.`);
+    }
+
+    if (tipo === "salud") {
+      const enfoque = carta.invertido
+        ? "atiende lo que has postergado en tu cuerpo"
+        : "tu vitalidad está de tu lado, cuídala";
+      return enmarcar(`${carta.nombre} ${carta.invertido ? "invertida" : ""} en salud indica que ${enfoque}. ${base.charAt(0).toUpperCase() + base.slice(1)}.`);
+    }
+
+    if (tipo === "fallecido") {
+      return enmarcar(`${carta.nombre} ${carta.invertido ? "invertida" : ""} trae un mensaje de ${carta.invertido ? "algo pendiente por sanar" : "paz y cierre"}. ${base.charAt(0).toUpperCase() + base.slice(1)}.`);
+    }
+
+    if (tipo === "espiritus" || tipo === "energias") {
+      return enmarcar(`${carta.nombre} ${carta.invertido ? "invertida" : ""} en este contexto espiritual revela que ${carta.invertido ? "hay una sombra que disolver" : "la energía fluye limpia y protegida"}. ${base.charAt(0).toUpperCase() + base.slice(1)}.`);
+    }
+
+    const tema = an.titulo ? `en el tema de ${an.titulo.toLowerCase()}` : "";
+    const signo = carta.invertido ? "una resistencia o un aprendizaje pendiente" : "un impulso favorable";
+    return enmarcar(`${carta.nombre} ${carta.invertido ? "invertida" : ""} ${tema} muestra ${signo}. ${base.charAt(0).toUpperCase() + base.slice(1)}.`);
+  },
+
   /* combinaciones de pares curadas: se detectan cuando dos cartas de la lectura
      coinciden, y aportan una lectura específica a la interpretación conjunta */
   parCombinaciones: [
@@ -2977,6 +3036,9 @@ const TIRADAS = {
 
     resultadoHTML.cartas.forEach((c, i) => {
       const pos = t.posiciones[i];
+      const textoCarta = esPregunta && resultadoHTML.__analisis
+        ? this.interpretarCartaPregunta(c, resultadoHTML)
+        : c.texto;
       html += `<div class="carta-grande vidrio" style="animation-delay:${(0.25 + i * 0.3).toFixed(2)}s">
         <div class="sello ${c.invertido ? "invertida" : ""}"><div>
           ${this.figuraDe(c)}
@@ -2986,7 +3048,7 @@ const TIRADAS = {
           <h4>${pos[0]} <span style="font-weight:400;color:var(--lavanda-suave)">· ${pos[1]}</span></h4>
           <h3>${c.nombre} ${c.invertido ? '<small style="font-size:.8rem;color:#ffd7e0">(invertida)</small>' : ""}</h3>
           <div class="palabras">${c.palabras.map(p => "<span>" + p + "</span>").join("")}</div>
-          <p class="interp">${c.texto}</p>
+          <p class="interp">${textoCarta}</p>
         </div>
       </div>`;
     });

@@ -93,6 +93,7 @@ router.post("/reflexion", async (req, res) => {
 
     const prompt = `Soy un/a ${usuario ? usuario.nombre : "consultante"} y he sacado una tirada de ${tirada || "tarot"}. Las cartas son: ${cartasDesc}. 
     Estoy buscando orientación sobre ${areaContext}. 
+    IMPORTANTE: Responde SOLO a esta consulta específica sobre ${areaContext}. NO hables de temas generales. Cada frase debe estar anclada al tema de ${areaContext}.
     Por favor dame una reflexión profunda de máximo 3 líneas que una el significado de estas cartas con mi pregunta sobre ${areaContext}. Sé conciso, espiritual pero práctico. No uses estructura de lista, escribe un párrafo continuo.`;
 
     const limpia = await completarIA(prompt, { maxTokens: 150, temp: 0.7 });
@@ -145,6 +146,8 @@ router.post("/pregunta", async (req, res) => {
     const instruccionTipo = INSTRUCCIONES_TIPO[an.tipo] || "";
 
     const prompt = `Eres el Oráculo de Zigurath y Anaia, un consejero espiritual que interpreta el tarot angelical para una persona que busca orientación. Hablas en español cálido, directo y práctico.
+
+IMPORTANTE: Tu ÚNICO trabajo es responder DIRECTAMENTE a la pregunta del consultante. NO hables de temas generales ni de la vida en general. Cada frase de tu respuesta DEBE estar anclada a la pregunta específica.
 
 El consultante pregunta EXACTAMENTE esto: "${pregunta}"
 
