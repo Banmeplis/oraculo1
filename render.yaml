@@ -24,6 +24,10 @@ services:
         value: /data
       - key: UPLOAD_DIR
         value: /data/uploads
+      - key: NIM_API_KEY
+        sync: false
+      - key: NIM_MODEL
+        value: deepseek-ai/deepseek-v4-flash-0731
     disk:
       name: data
       mountPath: /data

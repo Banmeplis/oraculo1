@@ -1,6 +1,6 @@
 const express = require("express");
 const { signoPublico, usuarioActual } = require("../middleware/auth.js");
-const { completarIA, isOpenAIConfigured, isHFConfigured } = require("./ia.js");
+const { completarIA, isOpenAIConfigured, isNIMConfigured, isHFConfigured } = require("./ia.js");
 const { ZODIACO } = require("../config/zodiaco.js");
 
 const router = express.Router();
@@ -175,7 +175,7 @@ router.get("/", async (req, res) => {
 
     let delDia = null, semanaText = null, fuente = "fallback";
 
-    if (isOpenAIConfigured() || isHFConfigured()) {
+    if (isOpenAIConfigured() || isNIMConfigured() || isHFConfigured()) {
       const fechaHoy = new Date().toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" });
       const prompt = `Eres el Horóscopo Negro de EL CENDERO DE LOS AR🌙ANGELES, un oráculo angelical oscuro pero cariñoso. La persona es de signo ${signo.signo} (${signo.emoji}, elemento ${signo.elemento.toLowerCase()}), regido por el arcángel ${signo.arcangel}.
 

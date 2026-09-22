@@ -23,7 +23,7 @@ app.use(helmet({
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "https:", "blob:"],
-      connectSrc: ["'self'", "https://oraculo1-hhwc.onrender.com"],
+      connectSrc: ["'self'", "https://oraculo1-hhwc.onrender.com", "https://oraculo1.vercel.app"],
       frameSrc: ["'self'", "https://pagead2.googlesyndication.com"],
       mediaSrc: ["'self'", "blob:"],
       objectSrc: ["'none'"]
@@ -148,6 +148,13 @@ app.use("/auth", auth.oauth);
 
 /* ----------------------------- errores --------------------------------- */
 app.use((req, res, next) => {
+  if (req.accepts("html")) {
+    const indexPath = path.join(__dirname, "public", "index.html");
+    try {
+      const content = fs.readFileSync(indexPath, "utf8");
+      return res.status(404).type("html").send(content);
+    } catch {}
+  }
   res.status(404).json({ error: "Ruta no encontrada" });
 });
 

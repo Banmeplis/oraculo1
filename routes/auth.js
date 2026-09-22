@@ -26,47 +26,11 @@ function origen(req) {
 }
 
 api.post("/registro", (req, res) => {
-  const { nombre, email, password, fecha_nacimiento } = req.body || {};
-  if (!requerido(nombre) || !requerido(email) || !requerido(password))
-    return res.status(400).json({ error: "Completa nombre, correo y contraseña" });
-  if (!requerido(fecha_nacimiento))
-    return res.status(400).json({ error: "Pon tu fecha de nacimiento para despertar tu signo en el Horóscopo Negro" });
-  const errFecha = validarFechaNacimiento(fecha_nacimiento);
-  if (errFecha) return res.status(400).json({ error: errFecha });
-  if (String(password).length < 6)
-    return res.status(400).json({ error: "La contraseña debe tener al menos 6 caracteres" });
-  const correo = String(email).trim().toLowerCase();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo))
-    return res.status(400).json({ error: "Correo no válido" });
-
-  const existe = db.prepare("SELECT id, baneado FROM users WHERE email = ?").get(correo);
-  if (existe) return res.status(409).json({ error: "Ese correo ya está registrado" });
-
-  const hash = bcrypt.hashSync(String(password), 10);
-  const rol = db.prepare("SELECT COUNT(*) AS n FROM users").get().n === 0
-    ? "admin"
-    : rolEfectivo(correo, "autor");
-  const info = db.prepare(
-    "INSERT INTO users (nombre, email, password_hash, proveedor, rol, fecha_nacimiento) VALUES (?, ?, ?, 'local', ?, ?)"
-  ).run(String(nombre).trim(), correo, hash, rol, String(fecha_nacimiento).trim());
-
-  req.session.user = { id: Number(info.lastInsertRowid), nombre: String(nombre).trim(), email: correo, rol };
-  res.json({ ok: true, user: req.session.user });
+  return res.status(503).json({ error: "El registro está temporalmente desactivado. Vuelve pronto." });
 });
 
 api.post("/login", (req, res) => {
-  const { email, password } = req.body || {};
-  if (!requerido(email) || !requerido(password))
-    return res.status(400).json({ error: "Ingresa correo y contraseña" });
-  const correo = String(email).trim().toLowerCase();
-  const u = db.prepare("SELECT * FROM users WHERE email = ?").get(correo);
-  if (!u || !u.password_hash || !bcrypt.compareSync(String(password), u.password_hash))
-    return res.status(401).json({ error: "Correo o contraseña incorrectos" });
-  if (u.baneado)
-    return res.status(403).json({ error: "Tu cuenta ha sido suspendida. Escribe a @juanshinku si crees que es un error." });
-
-  req.session.user = { id: u.id, nombre: u.nombre, email: u.email, rol: rolEfectivo(u.email, u.rol) };
-  res.json({ ok: true, user: req.session.user });
+  return res.status(503).json({ error: "El inicio de sesión está temporalmente desactivado. Vuelve pronto." });
 });
 
 api.post("/logout", (req, res) => {
@@ -95,17 +59,7 @@ api.get("/auth/check", (req, res) => {
 });
 
 oauth.get("/google", (req, res) => {
-  if (!cfg.GOOGLE.client_id)
-    return res.redirect("/login.html?err=google-no-config");
-  const url = "https://accounts.google.com/o/oauth2/v2/auth?" + new URLSearchParams({
-    client_id: cfg.GOOGLE.client_id,
-    redirect_uri: origen(req) + "/auth/google/callback",
-    response_type: "code",
-    scope: "openid email profile",
-    prompt: "select_account",
-    state: crypto.randomBytes(16).toString("hex")
-  });
-  res.redirect(url);
+  return res.redirect("/login.html?err=temporalmente-desactivado");
 });
 
 oauth.get("/google/callback", async (req, res) => {

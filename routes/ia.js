@@ -9,6 +9,11 @@ function isOpenAIConfigured() {
   return k.length >= 10 && !k.toLowerCase().includes("placeholder");
 }
 
+function isNIMConfigured() {
+  const k = cfg.NIM_API_KEY;
+  return k.length >= 10 && !k.toLowerCase().includes("placeholder");
+}
+
 function isHFConfigured() {
   const t = cfg.HF_TOKEN;
   return t.length >= 10 && !/tu_token/i.test(t);
@@ -25,6 +30,32 @@ async function completarIA(prompt, { system, maxTokens = 300, temp = 0.7 } = {})
         },
         body: JSON.stringify({
           model: cfg.OPENAI_MODEL,
+          messages: [
+            ...(system ? [{ role: "system", content: system }] : []),
+            { role: "user", content: prompt }
+          ],
+          temperature: temp,
+          max_tokens: maxTokens
+        })
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        const text = (data.choices?.[0]?.message?.content || "").trim();
+        if (text.length > 0) return text;
+      }
+    } catch {}
+  }
+
+  if (isNIMConfigured()) {
+    try {
+      const resp = await fetch(`${cfg.NIM_BASE_URL}/chat/completions`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${cfg.NIM_API_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: cfg.NIM_MODEL,
           messages: [
             ...(system ? [{ role: "system", content: system }] : []),
             { role: "user", content: prompt }
@@ -108,7 +139,7 @@ router.post("/pregunta", async (req, res) => {
     const { pregunta, tema, temaClave, cartas } = req.body || {};
     if (!pregunta) return res.status(400).json({ error: "Sin pregunta" });
 
-    if (!isOpenAIConfigured() && !isHFConfigured()) {
+    if (!isOpenAIConfigured() && !isNIMConfigured() && !isHFConfigured()) {
       return res.status(200).json({ ok: false, error: "sin token" });
     }
 
@@ -205,4 +236,5 @@ router.post("/analizar-pregunta", (req, res) => {
 module.exports = router;
 module.exports.completarIA = completarIA;
 module.exports.isOpenAIConfigured = isOpenAIConfigured;
+module.exports.isNIMConfigured = isNIMConfigured;
 module.exports.isHFConfigured = isHFConfigured;

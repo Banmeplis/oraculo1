@@ -1,6 +1,6 @@
 /* Artículos SEO del blog · EL CENDERO DE LOS AR🌙ANGELES
    Formato del cuerpo: minúsculas sueltas tipo markdown que entiende marcarComoHTML
-   (## h2, ### h3, - ítems de lista, **negrita**, enlaces [texto](https://...)). */
+   (## h2, ### h3, - ítems de lista, enlaces [texto](https://...)). */
 const POSTS_SEO = [
 
   { titulo: "Carta astral: qué es y cómo leerla paso a paso",
@@ -8,9 +8,9 @@ const POSTS_SEO = [
     cuerpo: `Tu carta astral es un mapa de cómo se veían los planetas en el momento exacto de tu nacimiento. No es un destino escrito, sino una brújula: te muestra tus talentos, tus desafíos y la energía con la que viniste a este mundo.
 
 ## Los tres datos que más se consultan
-- **Signo solar**: tu esencia, tu identidad y tu voluntad consciente.
-- **Signo lunar**: tu mundo emocional, tus instintos y lo que necesitas para sentirte en paz.
-- **Ascendente**: la puerta que presentas al exterior y la primera impresión que causas.
+- Signo solar: tu esencia, tu identidad y tu voluntad consciente.
+- Signo lunar: tu mundo emocional, tus instintos y lo que necesitas para sentirte en paz.
+- Ascendente: la puerta que presentas al exterior y la primera impresión que causas.
 
 Además, los planetas (Mercurio, Venus, Marte...) y las doce casas astrológicas completan el mapa con tus áreas de vida.
 
@@ -25,10 +25,10 @@ Puedes obtener tu perfil astrológico directamente en nuestra [lectura de carta 
     cuerpo: `El zodiaco se divide en doce signos y los cuatro elementos reparten su energía: fuego, tierra, aire y agua. Conocer el elemento de tu signo te ayuda a entender tu forma de actuar y de relacionarte.
 
 ## Los signos y su elemento
-- **Fuego** (Aries, Leo, Sagitario): pasión, iniciativa y entusiasmo.
-- **Tierra** (Tauro, Virgo, Capricornio): practicidad, constancia y seguridad.
-- **Aire** (Géminis, Libra, Acuario): ideas, diálogo y conexión social.
-- **Agua** (Cáncer, Escorpio, Piscis): sensibilidad, intuición y profundidad emocional.
+- Fuego (Aries, Leo, Sagitario): pasión, iniciativa y entusiasmo.
+- Tierra (Tauro, Virgo, Capricornio): practicidad, constancia y seguridad.
+- Aire (Géminis, Libra, Acuario): ideas, diálogo y conexión social.
+- Agua (Cáncer, Escorpio, Piscis): sensibilidad, intuición y profundidad emocional.
 
 ## Para qué te sirve conocerlo
 Entender tu elemento explica por qué a veces te cuesta descansar (fuego), planificar (aire) o soltar (tierra). También te orienta sobre los elementos con los que más te armonizas y sobre cómo balancear tu energía.
@@ -80,10 +80,10 @@ Mercurio rige la comunicación, los acuerdos, la tecnología y los desplazamient
 - Conversaciones que conviene recalendarizar.
 
 ## Cómo afrontarlo sin miedo y con filosofía
-- **Revisa antes de enviar**: lee dos veces cada mensaje importante.
-- **Respalda tu información**: copias de seguridad, siempre.
-- **Retoma lo pendiente**: la retrogradación es ideal para revisar, corregir y completar proyectos viejos.
-- **Evita firmar a la carrera**: los documentos de peso pueden esperar al tránsito directo.
+- Revisa antes de enviar: lee dos veces cada mensaje importante.
+- Respalda tu información: copias de seguridad, siempre.
+- Retoma lo pendiente: la retrogradación es ideal para revisar, corregir y completar proyectos viejos.
+- Evita firmar a la carrera: los documentos de peso pueden esperar al tránsito directo.
 
 Lejos de ser un castigo, Mercurio retrógrado es una invitación a frenar, revisar y volver al detalle. Úsalo como temporada de revisión y saldrás más ordenado de la experiencia.` },
 
@@ -92,18 +92,18 @@ Lejos de ser un castigo, Mercurio retrógrado es una invitación a frenar, revis
     cuerpo: `Después de los signos y los planetas, las casas astrológicas forman el tercer gran código de la carta natal. Representan las doce áreas de experiencia donde los planetas se expresan.
 
 ## Las doce casas en resumen
-- **1ª**: tu imagen y tu forma de empezar las cosas.
-- **2ª**: dinero, talentos y autoestima material.
-- **3ª**: comunicación, estudios y entorno cercano.
-- **4ª**: hogar, familia y raíz emocional.
-- **5ª**: creatividad, amor, juego e hijos.
-- **6ª**: trabajo diario, hábitos y salud.
-- **7ª**: pareja, socios y vínculos uno a uno.
-- **8ª**: transformación, recursos compartidos y misterio.
-- **9ª**: viajes, creencias y filosofía.
-- **10ª**: misión pública, carrera y vocación.
-- **11ª**: amistades, proyectos colectivos y sueños.
-- **12ª**: espiritualidad, introspección y descanso.
+- 1ª: tu imagen y tu forma de empezar las cosas.
+- 2ª: dinero, talentos y autoestima material.
+- 3ª: comunicación, estudios y entorno cercano.
+- 4ª: hogar, familia y raíz emocional.
+- 5ª: creatividad, amor, juego e hijos.
+- 6ª: trabajo diario, hábitos y salud.
+- 7ª: pareja, socios y vínculos uno a uno.
+- 8ª: transformación, recursos compartidos y misterio.
+- 9ª: viajes, creencias y filosofía.
+- 10ª: misión pública, carrera y vocación.
+- 11ª: amistades, proyectos colectivos y sueños.
+- 12ª: espiritualidad, introspección y descanso.
 
 ## Cómo leerlas
 Mira en qué casa está el planeta de tu área favorita: por ejemplo, si tu Venus está en la casa 7, el amor cobra protagonismo en tu vida. No necesitas memorizarlo todo: empieza por las casas de tu sol, tu luna y tu ascendente.
@@ -115,10 +115,10 @@ Para empezar sin marearte, consulta tu [perfil astral gratuito](https://oraculo1
     cuerpo: `Desde la antigüedad las personas han observado la luna para sembrar y cosechar. En astrología, el ciclo lunar funciona como un calendario energético: cada fase favorece un tipo de acción.
 
 ## Las fases y su energía
-- **Luna nueva**: siembra, inicia proyectos y fija intenciones.
-- **Cuarto creciente**: actúa, sostén el impulso y resuelve obstáculos.
-- **Luna llena**: cosecha, agradece y libera lo que ya cumplió su tiempo.
-- **Cuarto menguante**: descansa, limpia y suelta lo que ya no necesitas.
+- Luna nueva: siembra, inicia proyectos y fija intenciones.
+- Cuarto creciente: actúa, sostén el impulso y resuelve obstáculos.
+- Luna llena: cosecha, agradece y libera lo que ya cumplió su tiempo.
+- Cuarto menguante: descansa, limpia y suelta lo que ya no necesitas.
 
 ## Cómo alinearte con el ciclo
 Sigue el ritmo natural: en la nueva semana escribe tus intenciones, en el creciente avanza con constancia, en la llena celebra los logros y en el menguante haz espacio para el descanso y la purificación.
@@ -132,18 +132,18 @@ Lee también nuestro artículo sobre [rituales con velas](https://oraculo1-hhwc.
     cuerpo: `En astrología, cada signo tiene un planeta regente: una influencia dominante que comparte su "temperamento" con el signo. Conocer a tu regente es entender el motor que hay detrás de tus decisiones.
 
 ## Tabla rápida de regentes
-- **Aries** → Marte (acción y coraje).
-- **Tauro** → Venus (placer y estabilidad).
-- **Géminis** → Mercurio (idea y palabra).
-- **Cáncer** → la Luna (emoción y cuidado).
-- **Leo** → el Sol (luz y expresión).
-- **Virgo** → Mercurio (análisis y servicio).
-- **Libra** → Venus (armonía y vínculos).
-- **Escorpio** → Plutón (transformación).
-- **Sagitario** → Júpiter (fe y expansión).
-- **Capricornio** → Saturno (estructura y tiempo).
-- **Acuario** → Urano (originalidad y libertad).
-- **Piscis** → Neptuno (nube, sueño e intuición).
+- Aries → Marte (acción y coraje).
+- Tauro → Venus (placer y estabilidad).
+- Géminis → Mercurio (idea y palabra).
+- Cáncer → la Luna (emoción y cuidado).
+- Leo → el Sol (luz y expresión).
+- Virgo → Mercurio (análisis y servicio).
+- Libra → Venus (armonía y vínculos).
+- Escorpio → Plutón (transformación).
+- Sagitario → Júpiter (fe y expansión).
+- Capricornio → Saturno (estructura y tiempo).
+- Acuario → Urano (originalidad y libertad).
+- Piscis → Neptuno (nube, sueño e intuición).
 
 ## Cómo potenciar a tu regente
 Haz lo que tu regente ama: si tu regente es Marte, mueve tu cuerpo; si es la Luna, cuida tus rituales nocturnos; si es Júpiter, amplía horizontes con estudio y fe. Alimentarlo te devuelve equilibrio.
@@ -160,10 +160,10 @@ Tu regente planetario se complementa con un regente espiritual. Descubre qué ar
 - Revisiones del dinero y de la autoestima material.
 
 ## Guía práctica para vivirlo bien
-- **No decides, reexaminas**: evita rupturas impulsivas; primero observa.
-- **Si vuelve alguien del pasado**, conéctalo con tu aprendizaje, no con la nostalgia.
-- **Revisa tu relación contigo**: Venus retrógrado también es amor propio.
-- **Cuidado con las compras**: retrasa los gastos grandes y reflexiona.
+- No decides, reexaminas: evita rupturas impulsivas; primero observa.
+- Si vuelve alguien del pasado, conéctalo con tu aprendizaje, no con la nostalgia.
+- Revisa tu relación contigo: Venus retrógrado también es amor propio.
+- Cuidado con las compras: retrasa los gastos grandes y reflexiona.
 
 Venus retrógrado no está diseñado para que lo temas, sino para que ames con más consciencia. Cuando termina, muchas relaciones salen fortalecidas y otras se despiden con claridad.
 
@@ -174,9 +174,9 @@ Si este tránsito te trae dudas de corazón, una [tirada de tarot del amor](http
     cuerpo: `A lo largo del año, la Luna nueva pasa una vez por cada signo. Cuando lo hace en el tuyo, se abre una ventana especial: la energía te acompaña desde lo esencial, y sembrar una intención tiene más fuerza que nunca.
 
 ## Preparación del ritual de intención
-- **Fecha**: elige la noche de la Luna nueva en tu signo.
-- **Espacio**: un lugar limpio, una vela blanca y un cuaderno.
-- **Estado**: llega tranquilo, con una respiración lenta.
+- Fecha: elige la noche de la Luna nueva en tu signo.
+- Espacio: un lugar limpio, una vela blanca y un cuaderno.
+- Estado: llega tranquilo, con una respiración lenta.
 
 ## Pasos sencillos
 1. Enciende la vela y respira tres veces mirando la llama.
@@ -194,10 +194,10 @@ Conoce qué regente espiritual acompaña a tu signo con nuestra [lectura de cart
     cuerpo: `El esoterismo reúne conocimientos ocultos o reservados que se transmiten de forma directa: simbología, energías, rituales y tradiciones que buscan comprender lo invisible. No es superstición ni magia de entretenimiento, sino un camino de estudio y práctica.
 
 ## Por dónde empezar sin perderse
-- **Lee con criterio**: comienza por autores serios y fuentes que citen a sus maestros.
-- **Practica poco y bien**: un ritual sencillo y constante vale más que cien técnicas a medias.
-- **Pregúntate por qué**: tu intención lo es todo; si te motiva el control o el miedo, espera.
-- **No sigas sin entender**: cualquier práctica debe explicarse con lógica y respeto.
+- Lee con criterio: comienza por autores serios y fuentes que citen a sus maestros.
+- Practica poco y bien: un ritual sencillo y constante vale más que cien técnicas a medias.
+- Pregúntate por qué: tu intención lo es todo; si te motiva el control o el miedo, espera.
+- No sigas sin entender: cualquier práctica debe explicarse con lógica y respeto.
 
 ## Qué NO debes hacer
 Evita a quienes prometen resultados instantáneos, cobran por "secretos absolutos" o provocan temor para retenerte. El esoterismo sano ilumina, no asfixia.
@@ -212,11 +212,11 @@ Todo el camino se abre más fácil con guía intencionada. Conoce los [siete arc
     cuerpo: `Los símbolos esotéricos de protección concentran siglos de intención humana. No actúan por sí solos: un símbolo trabaja cuando una persona lo carga con fe y lo usa con respeto.
 
 ## Símbolos de protección más conocidos
-- **El círculo**: la frontera sagrada, el límite que protege al que está dentro.
-- **El pentáculo**: los cinco elementos en equilibrio, armonía más que miedo.
-- **El ojo**: la conciencia que observa y disipa la confusión.
-- **La espada o el escudo**: límite firme y defensa del propio espacio.
-- **La llave**: puertas que se abren o se cierran deliberadamente.
+- El círculo: la frontera sagrada, el límite que protege al que está dentro.
+- El pentáculo: los cinco elementos en equilibrio, armonía más que miedo.
+- El ojo: la conciencia que observa y disipa la confusión.
+- La espada o el escudo: límite firme y defensa del propio espacio.
+- La llave: puertas que se abren o se cierran deliberadamente.
 
 ## Cómo usarlos bien
 - Elige el símbolo que te resuene, no el más "vistoso".
@@ -240,7 +240,7 @@ El 11 es un número maestro en numerología. Es intuición elevada, inspiración
 
 ## Cómo calcular tu número de camino de vida
 Suma los dígitos de tu fecha de nacimiento hasta obtener un solo número:
-- 15/09/1990 → 1+5+0+9+1+9+9+0 = 34 → 3+4 = **7**.
+- 15/09/1990 → 1+5+0+9+1+9+9+0 = 34 → 3+4 = 7.
 Si en el camino aparece un 11, 22 o 33, respétalo: son números maestros.
 
 ## Para qué sirve
@@ -253,22 +253,22 @@ Explora la simbología completa de otros códigos como los [símbolos de protecc
     cuerpo: `Según la tradición oriental, los chakras son centros de energía dispuestos a lo largo de la columna. Cada uno se asocia con un color, una función y un área de tu vida. La idea no es "abrir todo", sino mantener el flujo en equilibrio.
 
 ## Los siete chakras
-- **Raíz** (rojo): seguridad, estabilidad y pertenencia.
-- **Sacro** (naranja): placer, creatividad y emociones.
-- **Plexo solar** (amarillo): voluntad, autoestima y poder personal.
-- **Corazón** (verde): amor, vínculos y compasión.
-- **Garganta** (azul): comunicación y expresión.
-- **Tercer ojo** (índigo): intuición y claridad mental.
-- **Corona** (violeta): conexión espiritual y sentido.
+- Raíz (rojo): seguridad, estabilidad y pertenencia.
+- Sacro (naranja): placer, creatividad y emociones.
+- Plexo solar (amarillo): voluntad, autoestima y poder personal.
+- Corazón (verde): amor, vínculos y compasión.
+- Garganta (azul): comunicación y expresión.
+- Tercer ojo (índigo): intuición y claridad mental.
+- Corona (violeta): conexión espiritual y sentido.
 
 ## Señales de desequilibrio
 Cada centro excesivo o deficiente puede manifestarse en tensión, inseguridad o dificultades concretas: habla de límites si es la raíz, de expresar lo que sientes si es la garganta.
 
 ## Equilibrio básico sin técnicas complicadas
-- **Muévete y camina al aire libre** para la raíz.
-- **Respira profundo** y siente el cuerpo para el plexo.
-- **Practica gratitud** para el corazón.
-- **Descansa y guarda silencio** para el tercer ojo y la corona.
+- Muévete y camina al aire libre para la raíz.
+- Respira profundo y siente el cuerpo para el plexo.
+- Practica gratitud para el corazón.
+- Descansa y guarda silencio para el tercer ojo y la corona.
 
 No hace falta "dominar" los chakras: observarlos y darles atención es ya un gran paso. Descubre qué arcángel puede sostenerte en ese trabajo en nuestra [lectura de carta astral](https://oraculo1-hhwc.onrender.com/tarot.html).` },
 
@@ -277,10 +277,10 @@ No hace falta "dominar" los chakras: observarlos y darles atención es ya un gra
     cuerpo: `Igual que lavas tu ropa y tu casa, tu campo energético necesita cuidado. La higiene espiritual es esa rutina sencilla que te permite descansar, soltar y recuperarte del día.
 
 ## Hábitos de limpieza diaria
-- **Corta el día con una ducha**: visualiza que el agua arrastra lo que no es tuyo.
-- **Abre las ventanas** y renueva el aire de tu casa cada mañana.
-- **Cuida tu descanso**: dormir bien es la higiene número uno.
-- **Elige con quién pasas tu tiempo**: tu energía se mezcla con la de otros.
+- Corta el día con una ducha: visualiza que el agua arrastra lo que no es tuyo.
+- Abre las ventanas y renueva el aire de tu casa cada mañana.
+- Cuida tu descanso: dormir bien es la higiene número uno.
+- Elige con quién pasas tu tiempo: tu energía se mezcla con la de otros.
 
 ## Para momentos de agotamiento
 Cuando sientas el cuerpo pesado o el ánimo bajo sin motivo claro: quédate a solas, respira hondo, pon las manos sobre el pecho y repite algo como "suelto lo que no me pertenece". Después descansa y toma agua.
@@ -300,10 +300,10 @@ Un [ritual con vela blanca](https://oraculo1-hhwc.onrender.com/blog.html) es una
 - Mucha sensibilidad a la luz, al ruido o al ambiente de las personas.
 
 ## Cómo trabajarlo con prudencia
-- **Cuida tus ojos y tu pantalla**: el exceso de estímulos lo fatiga.
-- **Medita unos minutos al día** observando tu respiración.
-- **Descansa la vista en la naturaleza** y mira horizontes lejanos.
-- **Rodéate de calma**: el silencio es su nutriente principal.
+- Cuida tus ojos y tu pantalla: el exceso de estímulos lo fatiga.
+- Medita unos minutos al día observando tu respiración.
+- Descansa la vista en la naturaleza y mira horizontes lejanos.
+- Rodéate de calma: el silencio es su nutriente principal.
 
 ## Responsabilidad
 Evita las técnicas agresivas y los que prometen "abrir el tercer ojo" de golpe. Un despertar forzado desestabiliza. El camino sano es lento, suave y con base en el equilibrio de los chakras inferiores.
@@ -320,10 +320,10 @@ Si tu intuición habla fuerte, escúchala y luego contrástala con la razón. Ac
 - El hábito pequeño se repite: también el malo.
 
 ## Claves para vivir en coherencia
-- **Actúa como quien ya es lo que quiere ser**: no esperes a "merecerlo".
-- **Arregla lo que esté a tu alcance**: pide perdón, devuelve, agradece.
-- **No uses el karma como amenaza hacia otros**: el karma lo revisa cada quien.
-- **Compasión ante el dolor ajeno**: no sabes qué está pagando internamente.
+- Actúa como quien ya es lo que quiere ser: no esperes a "merecerlo".
+- Arregla lo que esté a tu alcance: pide perdón, devuelve, agradece.
+- No uses el karma como amenaza hacia otros: el karma lo revisa cada quien.
+- Compasión ante el dolor ajeno: no sabes qué está pagando internamente.
 
 ## La regla que lo resume
 Trata a los demás como te gustaría ser tratado, porque el karma convierte cada acto en semilla. Y recuerda: nunca es tarde para sembrar mejor.
@@ -340,10 +340,10 @@ Si quieres revisar un patrón que se repite, una [lectura de tarot](https://orac
 - Si lo compras, hazlo con consciencia: el objeto te acompaña, no te salva.
 
 ## Cómo limpiarlo y cargarlo
-1. **Limpia**: lávalo con agua o deja que respire en la luz de la luna una noche.
-2. **Activa** (carga tu intención): sostenlo y repite tu intención en presente.
-3. **Vincula**: dedícalo a un propósito concreto (protección, abundancia, serenidad).
-4. **Mantén**: agradécele con frecuencia y repite la carga cada mes o en luna nueva.
+1. Limpia: lávalo con agua o deja que respire en la luz de la luna una noche.
+2. Activa (carga tu intención): sostenlo y repite tu intención en presente.
+3. Vincula: dedícalo a un propósito concreto (protección, abundancia, serenidad).
+4. Mantén: agradécele con frecuencia y repite la carga cada mes o en luna nueva.
 
 ## Errores comunes
 - Cargarlo solo una vez y olvidarlo.
@@ -357,16 +357,16 @@ Un amuleto bien trabajado es un recordatorio constante de tu palabra. Protégete
     cuerpo: `Una sincronía es una coincidencia cargada de significado que parece suceder justo cuando te hace falta. La más conocida son los números repetidos: 111, 222, 11:11. No es que el universo escriba mensajes literales: sí es que la atención hace visible el momento.
 
 ## Señales frecuentes y su lectura suave
-- **Números repetidos**: acompáñalos de una pausa y una intención.
-- **Plumas, mariposas o pájaros cerca**: a menudo se leen como recuerdo de un ser querido.
-- **Nombres o canciones que se repiten**: observa qué estabas pensando.
-- **Reuniones coincidentes**: personas que aparecen justo cuando necesitas su ayuda.
+- Números repetidos: acompáñalos de una pausa y una intención.
+- Plumas, mariposas o pájaros cerca: a menudo se leen como recuerdo de un ser querido.
+- Nombres o canciones que se repiten: observa qué estabas pensando.
+- Reuniones coincidentes: personas que aparecen justo cuando necesitas su ayuda.
 
 ## Cómo distinguir señal de casualidad
-- **Frecuencia**: algo que se repite insistentemente pide atención.
-- **Emoción**: si te detiene el corazón, hay un eco.
-- **Utilidad**: la señal responde a una pregunta real que tenías.
-- **Calma**: una señal verdadera suele tranquilizar, no inquietar.
+- Frecuencia: algo que se repite insistentemente pide atención.
+- Emoción: si te detiene el corazón, hay un eco.
+- Utilidad: la señal responde a una pregunta real que tenías.
+- Calma: una señal verdadera suele tranquilizar, no inquietar.
 
 ## Cuándo no leer señales
 Si buscas señales en todo, la mente proyecta ruido. La guía sana combina señal, razón y responsabilidad. Pregunta, observa y luego decide con tus pies en la tierra.
@@ -378,13 +378,13 @@ Para ponerle palabras a esas corazonadas, una [tirada de tarot gratuita](https:/
     cuerpo: `Según la tradición, los siete arcángeles asisten a los humanos como mensajeros y protectores. Cada uno concentra una virtud y una misión distinta, y saber cuál invocar según tu momento hace el rezo más claro.
 
 ## Los siete arcángeles y sus dones
-- **Miguel** ⚔️: protección, fuerza y límites.
-- **Gabriel** 📯: comunicación, mensajes y propósito.
-- **Rafael** 🕯️: sanación del cuerpo y del alma.
-- **Uriel** 🔥: sabiduría y discernimiento.
-- **Chamuel** 💗: amor, paz y vínculos.
-- **Zadkiel** 💜: perdón, liberación y misericordia.
-- **Jofiel** 🌞: inspiración, belleza y claridad.
+- Miguel ⚔️: protección, fuerza y límites.
+- Gabriel 📯: comunicación, mensajes y propósito.
+- Rafael 🕯️: sanación del cuerpo y del alma.
+- Uriel 🔥: sabiduría y discernimiento.
+- Chamuel 💗: amor, paz y vínculos.
+- Zadkiel 💜: perdón, liberación y misericordia.
+- Jofiel 🌞: inspiración, belleza y claridad.
 
 ## Cómo elegir a tu arcángel
 Piensa en tu necesidad concreta y dirige tu corazón al arcángel de esa virtud: si necesitas protegerte o poner límites, Miguel; si estás sanando, Rafael; si quieres claridad para decidir, Uriel. No hay "mejor" arcángel: hay el adecuado para cada estación.
@@ -594,15 +594,15 @@ Este ritual va muy bien después de una [limpieza con vela blanca](https://oracu
     cuerpo: `La llama de una vela es la parte más expresiva del ritual: su bailarín traslada la energía del ambiente. Interpretarla es más un arte de observación que un código fijo, y conviene mirarla siempre con humildad.
 
 ## Cómo observar la llama
-- **Llama alta y firme**: energía clara y fluida.
-- **Llama baja y tímida**: pueden haber bloqueos, cansancio o necesidad de descanso.
-- **Chisporroteos y chasquidos**: tensión, conversaciones pendientes o ruido mental.
-- **Llama que baila mucho**: movimiento, emociones en ebullición.
-- **Humo negro espeso**: suele indicar atmósfera pesada o intención confusa.
+- Llama alta y firme: energía clara y fluida.
+- Llama baja y tímida: pueden haber bloqueos, cansancio o necesidad de descanso.
+- Chisporroteos y chasquidos: tensión, conversaciones pendientes o ruido mental.
+- Llama que baila mucho: movimiento, emociones en ebullición.
+- Humo negro espeso: suele indicar atmósfera pesada o intención confusa.
 
 ## Los restos de la cera
-- **Cera que gotea limpia y recta**: proceso ordenado.
-- **Montañas y grumos**: recuerda revisar qué está "derramando" tu vida de más.
+- Cera que gotea limpia y recta: proceso ordenado.
+- Montañas y grumos: recuerda revisar qué está "derramando" tu vida de más.
 
 ## La regla de oro
 Nunca interpretes una sola señal por aislada. Mira el conjunto: el color, la forma, tu sensación al verla y lo que pasaba en tu día. Y recuerda que las velas dependen mucho de la corriente de aire: un ventilador no es un mensaje del cielo.
@@ -646,7 +646,7 @@ Descubre también el [ritual de vela blanca](https://oraculo1-hhwc.onrender.com/
 - Asegura una ventilación mínima para que el humo no se acumule.
 
 ## Durante el ritual
-- **Nunca la dejes desatendida**: las velas se apagan o se vigilan siempre.
+- Nunca la dejes desatendida: las velas se apagan o se vigilan siempre.
 - No la muevas mientras la cera está líquida.
 - Retira etiquetas y adornos que puedan arder.
 
@@ -663,11 +663,11 @@ La seguridad no aleja la magia: la protege. Con el lugar preparado y la vela vig
     cuerpo: `Conectar con un arcángel es un acto de fe, respeto y claridad. Cuando se hace bien, aporta paz y orientación; cuando se hace mal, genera ansiedad y expectativas rotas. Estos son los errores más comunes y su corrección.
 
 ## Errores que debes evitar
-- **Tratar la invocación como un espectáculo**: no es para demostrar nada ni para entretenerse.
-- **Pedir desde la urgencia y la desesperación**: pide con calma, incluso en medio del dolor.
-- **Exigir resultados** ("tiene que volver", "debe darme dinero"): los ángeles acompañan, no cumplen órdenes.
-- **Usar nombres o fórmulas "secretas" sin entenderlas**: lo que importa es la intención, no las palabras de memoria.
-- **Invocar con miedo o para dañar a alguien**: eso distorsiona toda la conexión.
+- Tratar la invocación como un espectáculo: no es para demostrar nada ni para entretenerse.
+- Pedir desde la urgencia y la desesperación: pide con calma, incluso en medio del dolor.
+- Exigir resultados ("tiene que volver", "debe darme dinero"): los ángeles acompañan, no cumplen órdenes.
+- Usar nombres o fórmulas "secretas" sin entenderlas: lo que importa es la intención, no las palabras de memoria.
+- Invocar con miedo o para dañar a alguien: eso distorsiona toda la conexión.
 
 ## Cómo invocar correctamente
 Respira, pon tu intención en palabras propias, pide claridad y gratitud, y suelta el resultado. Una buena invocación es sencilla: "Arcángel (nombre), acompaña mi camino, dame claridad y protege mi espacio".
@@ -704,9 +704,9 @@ Conoce los [errores comunes al invocar](https://oraculo1-hhwc.onrender.com/blog.
     cuerpo: `No existe una única oración obligatoria a un arcángel, pero sí una estructura que facilita la conexión: gratitud, petición clara y confianza en el resultado. Lo demás son palabras tuyas.
 
 ## Los tres tiempos de una oración
-1. **Gratitud**: agradece primero lo que ya tienes ("Gracias por tu presencia y por la protección de hoy").
-2. **Petición clara**: nombra tu necesidad concreta y constructiva ("Dame claridad para decidir este trabajo").
-3. **Confianza y cierre**: entrega el resultado ("Que se manifieste lo mejor para mí, confío en tu guía").
+1. Gratitud: agradece primero lo que ya tienes ("Gracias por tu presencia y por la protección de hoy").
+2. Petición clara: nombra tu necesidad concreta y constructiva ("Dame claridad para decidir este trabajo").
+3. Confianza y cierre: entrega el resultado ("Que se manifieste lo mejor para mí, confío en tu guía").
 
 ## Ejemplo completo
 "Arcángel Rafael, gracias por acompañar mi sanación. Te pido claridad para escuchar a mi cuerpo y paciencia para este proceso. Confío en que el cuidado llegue como necesito."
@@ -726,10 +726,10 @@ Conoce también los [errores comunes al invocar](https://oraculo1-hhwc.onrender.
     cuerpo: `La diferencia entre una petición sana y una distorsionada no está en las palabras, sino en el origen: pedir desde el ego o el control tensa la conexión, porque conviertes la fe en una orden.
 
 ## Señales de que pides desde el ego
-- **Quieres resultados exactos** ("tiene que volver en una semana").
-- **Pides control sobre otras personas** (que regresen, cambien o te prefieran).
-- **La petición te exime de tu parte** (sin actuar, solo "esperando").
-- **Te sientes con derecho** a que el cielo cumpla tu guion.
+- Quieres resultados exactos ("tiene que volver en una semana").
+- Pides control sobre otras personas (que regresen, cambien o te prefieran).
+- La petición te exime de tu parte (sin actuar, solo "esperando").
+- Te sientes con derecho a que el cielo cumpla tu guion.
 
 ## Cómo renovar la petición
 Reescribe la intención en términos que te devuelvan tu responsabilidad:
@@ -749,13 +749,13 @@ Descubre qué arcángel elegir según tu necesidad en la guía de los [siete arc
     cuerpo: `Conectar con los arcángeles no requiere rituales complejos, sino actitud. Estas reglas de oro resumen lo esencial para un vínculo diario, sereno y real.
 
 ## Las siete reglas
-1. **Intención clara**: pide lo que de verdad necesitas, en positivo.
-2. **Humildad**: pide desde la escucha, no desde la exigencia.
-3. **Gratitud**: agradece antes y después de pedir.
-4. **Constancia**: mejor dos minutos cada día que un gran gesto al año.
-5. **Responsabilidad**: tú pones la acción; el cielo acompaña.
-6. **Silencio**: aprende a callar para escuchar la respuesta.
-7. **Calma**: conecta en paz, nunca desde la desesperación.
+1. Intención clara: pide lo que de verdad necesitas, en positivo.
+2. Humildad: pide desde la escucha, no desde la exigencia.
+3. Gratitud: agradece antes y después de pedir.
+4. Constancia: mejor dos minutos cada día que un gran gesto al año.
+5. Responsabilidad: tú pones la acción; el cielo acompaña.
+6. Silencio: aprende a callar para escuchar la respuesta.
+7. Calma: conecta en paz, nunca desde la desesperación.
 
 ## Cómo aplicar las reglas en el día a día
 Al despertar, elige un arcángel y pide una sola cosa: "Miguel, sostén mis límites hoy". Antes de dormir, agradece una guía concreta. Mantén el cuaderno donde anotes las señales que recibas.
@@ -773,17 +773,17 @@ Antes de empezar, evita los [errores comunes al invocar](https://oraculo1-hhwc.o
     cuerpo: `Una conexión sana con lo angelical trae paz; una distorsionada genera ansiedad. Aprender a reconocer las señales de desequilibrio te devuelve el rumbo rápido.
 
 ## Señales de que algo se desvirtuó
-- **Ansiedad si no "sientes" la presencia un día**: la fe se volvió dependencia.
-- **Pides y pides sin actuar**: esperas que el cielo haga tu vida.
-- **Vives pendiente de señales**: dormir, trabajar o decidir se paralizan.
-- **Te comparas o compites espiritualmente**: "a mí me contacta más gente que a ti".
-- **Descuido tu cuerpo y tu descanso** en nombre de la práctica.
+- Ansiedad si no "sientes" la presencia un día: la fe se volvió dependencia.
+- Pides y pides sin actuar: esperas que el cielo haga tu vida.
+- Vives pendiente de señales: dormir, trabajar o decidir se paralizan.
+- Te comparas o compites espiritualmente: "a mí me contacta más gente que a ti".
+- Descuido tu cuerpo y tu descanso en nombre de la práctica.
 
 ## Cómo corregirlo
-1. **Pausa**: detén durante unos días la práctica si sientes angustia.
-2. **Vuelve a lo concreto**: ropa, comida, sueño, trabajo, personas.
-3. **Reduce el estímulo**: menos "contenido esotérico" y más silencio.
-4. **Cambia la dirección de la petición**: de "que se manifieste" a "qué paso doy hoy".
+1. Pausa: detén durante unos días la práctica si sientes angustia.
+2. Vuelve a lo concreto: ropa, comida, sueño, trabajo, personas.
+3. Reduce el estímulo: menos "contenido esotérico" y más silencio.
+4. Cambia la dirección de la petición: de "que se manifieste" a "qué paso doy hoy".
 
 ## La conexión que sana
 Una conexión verdadera te devuelve los pies a la tierra, no te los quita. Si algo te eleva confundiéndote, no es celestial: es ruido.
@@ -803,10 +803,10 @@ Vuelve a empezar con las [reglas de oro de la conexión](https://oraculo1-hhwc.o
 - Cuando sientes que seguiste forzando una conexión por costumbre.
 
 ## Un cierre sencillo y respetuoso
-1. **Recuerda lo recibido**: escribe o nombra en voz alta qué te acompañó.
-2. **Agradece sin exigir**: "Gracias por tu guía en esta etapa".
-3. **Suelta con paz**: "Entrego este proceso con gratitud y confío en el camino".
-4. **Guarda los objetos** de la práctica (velas, papeles) con respeto o descártalos agradeciendo antes.
+1. Recuerda lo recibido: escribe o nombra en voz alta qué te acompañó.
+2. Agradece sin exigir: "Gracias por tu guía en esta etapa".
+3. Suelta con paz: "Entrego este proceso con gratitud y confío en el camino".
+4. Guarda los objetos de la práctica (velas, papeles) con respeto o descártalos agradeciendo antes.
 
 ## Qué NO es cerrar
 Cerrar no es borrar ni olvidar; es agradecer y seguir avanzando con lo aprendido. Tampoco exige rituales de limpieza dramáticos si la etapa fue sana.

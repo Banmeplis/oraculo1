@@ -29,6 +29,9 @@ module.exports = {
   OPENAI_API_KEY: process.env.OPENAI_API_KEY || "",
   OPENAI_MODEL: process.env.OPENAI_MODEL || "gpt-4o-mini",
   OPENAI_BASE_URL: (process.env.OPENAI_BASE_URL || "https://api.openai.com/v1").replace(/\/+$/, ""),
+  NIM_API_KEY: process.env.NIM_API_KEY || "",
+  NIM_MODEL: process.env.NIM_MODEL || "deepseek-ai/deepseek-v4-flash-0731",
+  NIM_BASE_URL: (process.env.NIM_BASE_URL || "https://integrate.api.nvidia.com/v1").replace(/\/+$/, ""),
   HF_TOKEN: process.env.HF_TOKEN || "",
   HF_MODELOS: (process.env.HF_MODELOS || "mistralai/Mistral-7B-Instruct-v0.2,google/flan-t5-large,bigscience/bloom-560m")
     .split(",").map(m => m.trim()).filter(Boolean)
