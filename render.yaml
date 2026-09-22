@@ -15,7 +15,7 @@ services:
     healthCheckPath: /
     envVars:
       - key: NODE_VERSION
-        value: 24.20.0
+        value: 22.12.0
       - key: SECRETO_SESION
         generateValue: true
       - key: ORIGEN_PUBLICO
