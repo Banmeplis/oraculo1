@@ -1,13 +1,46 @@
 {
-  "version": 2,
-  "builds": [
+  "installCommand": "echo static",
+  "buildCommand": "echo static",
+  "outputDirectory": "public",
+  "framework": null,
+  "rewrites": [
     {
-      "src": "server.js",
-      "use": "@vercel/node"
+      "source": "/api/:path*",
+      "destination": "https://oraculo1-hhwc.onrender.com/api/:path*"
+    },
+    {
+      "source": "/auth/:path*",
+      "destination": "https://oraculo1-hhwc.onrender.com/auth/:path*"
+    },
+    {
+      "source": "/uploads/:path*",
+      "destination": "https://oraculo1-hhwc.onrender.com/uploads/:path*"
+    },
+    {
+      "source": "/vendor/:path*",
+      "destination": "https://oraculo1-hhwc.onrender.com/vendor/:path*"
     }
   ],
-  "routes": [
-    { "src": "/ads.txt", "dest": "/public/ads.txt" },
-    { "src": "/(.*)", "dest": "/server.js" }
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    },
+    {
+      "source": "/js/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/css/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    }
   ]
 }
